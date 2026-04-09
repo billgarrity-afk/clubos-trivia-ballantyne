@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{--bg:#08080F;--bg2:#0E0E1C;--card:#141424;--pink:#FF2D78;--cyan:#00E5FF;--gold:#FFD600;--lime:#39FF6B;--purple:#9D4EDD;--white:#F0EEF8;--dim:rgba(240,238,248,0.55);--faint:rgba(240,238,248,0.07);--sep:rgba(255,255,255,0.1);}
+  :root{--bg:#020C18;--bg2:#041628;--card:#062030;--pink:#FF2D78;--cyan:#00E5FF;--gold:#FFD600;--lime:#39FF6B;--purple:#9D4EDD;--white:#F0EEF8;--dim:rgba(240,238,248,0.55);--faint:rgba(240,238,248,0.07);--sep:rgba(255,255,255,0.1);}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;overflow:hidden;}
-  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(255,45,120,0.12),transparent),radial-gradient(ellipse 60% 50% at 80% 110%,rgba(157,78,221,0.12),transparent);}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(0,100,200,0.2),transparent),radial-gradient(ellipse 60% 50% at 80% 110%,rgba(0,170,255,0.1),transparent);}
   .app{position:fixed;inset:0;display:flex;flex-direction:column;z-index:1;}
   .screen{display:none;flex-direction:column;height:100%;overflow-y:auto;}
   .screen.active{display:flex;}
@@ -58,15 +58,16 @@
   .ans-list-m{display:flex;flex-direction:column;gap:11px;}
   .ans-btn-m{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--sep);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
   .ans-btn-m:active{transform:scale(0.98);}
-  .ans-btn-m.selected{background:rgba(0,229,255,0.1);border-color:var(--cyan);}
+  .ans-btn-m.selected{background:rgba(0,229,255,0.15);border-color:var(--cyan);opacity:1!important;filter:none!important;}
   .ans-btn-m.selected .ans-letter-m{background:var(--cyan);border-color:var(--cyan);color:#08080F;}
-  .ans-btn-m.locked{cursor:default;pointer-events:none;}
+  .ans-btn-m.selected .ans-letter-m::after{content:'✓';position:absolute;font-size:14px;font-weight:700;}
+  .ans-btn-m.locked{cursor:default;pointer-events:none;opacity:0.3;filter:saturate(0);}
   .ans-btn-m.correct-reveal{background:rgba(57,255,107,0.13);border-color:var(--lime);}
   .ans-btn-m.correct-reveal .ans-letter-m{background:var(--lime);border-color:var(--lime);color:#08080F;}
   .ans-btn-m.wrong-reveal{opacity:0.35;}
   .ans-letter-m{width:36px;height:36px;border-radius:9px;background:var(--faint);border:1px solid var(--sep);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:20px;color:var(--cyan);flex-shrink:0;transition:all 0.15s;}
   .ans-text-m{font-size:16px;font-weight:500;color:var(--white);line-height:1.3;}
-  .submitted-msg{margin-top:14px;text-align:center;font-size:13px;color:var(--dim);padding:10px 14px;background:var(--card);border:1px solid var(--sep);border-radius:10px;display:none;}
+  .submitted-msg{margin-top:14px;text-align:center;font-size:14px;color:var(--cyan);padding:12px 14px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);border-radius:10px;display:none;font-weight:600;letter-spacing:0.03em;}
   .submitted-msg b{color:var(--cyan);}
 
   /* RESULT */
@@ -115,7 +116,7 @@
   .over-rank{font-size:18px;color:var(--cyan);margin-top:8px;font-weight:600;}
 
   /* NAV */
-  .nav-bar{padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(8,8,15,0.95);border-top:1px solid var(--sep);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .nav-bar{padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:rgba(2,10,20,0.98);border-top:1px solid var(--sep);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .nav-wordmark{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:rgba(240,238,248,0.3);letter-spacing:0.04em;}
   .nav-wordmark span{color:rgba(201,168,76,0.5);}
   .nav-club{font-size:11px;color:rgba(240,238,248,0.2);letter-spacing:0.1em;margin-left:8px;}
@@ -359,7 +360,15 @@ async function submitAnswer(ri,qi,answerIdx,correctIdx,pts){
   clearInterval(timerBarInt);
   const isCorrect=answerIdx===correctIdx,ptsEarned=isCorrect?pts:0;
   if(isCorrect)playerScore+=ptsEarned;
-  document.querySelectorAll('.ans-btn-m').forEach((b,i)=>{b.classList.add('locked');if(i===answerIdx)b.classList.add('selected');});
+  document.querySelectorAll('.ans-btn-m').forEach((b,i)=>{
+    b.classList.add('locked');
+    if(i===answerIdx){
+      b.classList.add('selected');
+      // Replace letter with checkmark
+      const letter = b.querySelector('.ans-letter-m');
+      if(letter) letter.textContent = '✓';
+    }
+  });
   document.getElementById('submittedMsg').style.display='block';
   document.getElementById('waitScore').textContent=playerScore.toLocaleString();
   try{
