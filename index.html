@@ -4,28 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClubOS Music Trivia — Ballantyne CC</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-  :root {
+  :root{
     --bg:#020C18; --bg2:#041628; --bg3:#062034;
     --pink:#FF2D78; --cyan:#00E5FF; --gold:#FFD600;
     --lime:#39FF6B; --purple:#9D4EDD;
     --white:#F0EEF8; --dim:rgba(240,238,248,0.5);
     --faint:rgba(240,238,248,0.07); --sep:rgba(255,255,255,0.08);
-    /* ClubOS brand */
-    --clubos-gold:#C9A84C;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'DM Sans',sans-serif;background:var(--bg);width:1920px;height:1080px;overflow:hidden;color:var(--white);}
   body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.025) 0px,rgba(0,0,0,0.025) 1px,transparent 1px,transparent 4px);}
 
   .bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;}
-  .glow-blob{position:absolute;border-radius:50%;filter:blur(130px);opacity:0.15;animation:blobDrift 14s ease-in-out infinite alternate;}
+  .glow-blob{position:absolute;border-radius:50%;filter:blur(130px);animation:blobDrift 14s ease-in-out infinite alternate;}
   .glow-blob.a{width:900px;height:700px;background:#0066CC;top:-250px;left:-150px;opacity:0.2;}
-  .glow-blob.b{width:700px;height:600px;background:var(--pink);top:500px;right:-200px;animation-delay:-5s;opacity:0.12;}
-  .glow-blob.c{width:600px;height:400px;background:#00AAFF;bottom:-100px;left:700px;animation-delay:-10s;opacity:0.18;}
+  .glow-blob.b{width:700px;height:600px;background:var(--pink);top:500px;right:-200px;opacity:0.12;animation-delay:-5s;}
+  .glow-blob.c{width:600px;height:400px;background:#00AAFF;bottom:-100px;left:700px;opacity:0.18;animation-delay:-10s;}
   @keyframes blobDrift{from{transform:translate(0,0) scale(1)}to{transform:translate(50px,40px) scale(1.1)}}
 
   .display-wrapper{position:relative;z-index:1;display:grid;grid-template-rows:88px 1fr 70px;height:1080px;width:1920px;}
@@ -34,25 +32,48 @@
   .header{display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(2,12,24,0.92);border-bottom:1px solid var(--sep);backdrop-filter:blur(24px);position:relative;}
   .header::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan),var(--gold),var(--pink));background-size:300% 100%;animation:rainbow 4s linear infinite;}
   @keyframes rainbow{0%{background-position:0%}100%{background-position:300%}}
-
   .brand{display:flex;align-items:center;gap:16px;}
   .brand-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--pink),var(--purple));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;}
   .brand-name{font-family:'Bebas Neue';font-size:32px;letter-spacing:2px;color:var(--white);line-height:1;}
   .brand-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);margin-top:3px;}
-
   .hdr-center{position:absolute;left:50%;transform:translateX(-50%);text-align:center;}
   .round-eye{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);font-weight:600;margin-bottom:4px;}
   .round-label{font-family:'Bebas Neue';font-size:30px;letter-spacing:3px;color:var(--white);}
-
-  .hdr-right{display:flex;align-items:center;gap:28px;}
+  .hdr-right{display:flex;align-items:center;gap:20px;}
   .live-time{font-family:'Space Grotesk';font-size:30px;color:var(--white);font-weight:700;letter-spacing:1px;}
   .time-lbl{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;text-align:right;margin-top:2px;}
+
+  /* PAUSE BUTTON in header */
+  .pause-btn{
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);
+    border-radius:8px;padding:8px 16px;cursor:pointer;
+    font-family:'Bebas Neue';font-size:16px;letter-spacing:2px;color:var(--gold);
+    transition:all 0.2s;
+  }
+  .pause-btn:hover{background:rgba(255,214,0,0.2);}
+  .pause-btn.paused{background:rgba(57,255,107,0.1);border-color:rgba(57,255,107,0.4);color:var(--lime);}
 
   /* MAIN */
   .main-grid{display:grid;grid-template-columns:1fr 400px;overflow:hidden;}
   .question-area{padding:0 56px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
   .screen{display:none;}
   .screen.active{display:flex;flex-direction:column;height:100%;justify-content:center;}
+
+  /* PAUSE OVERLAY */
+  .pause-overlay{
+    position:absolute;inset:0;
+    background:rgba(2,12,24,0.92);
+    backdrop-filter:blur(12px);
+    display:none;
+    flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;z-index:50;
+    animation:fadeUp 0.3s ease both;
+  }
+  .pause-overlay.active{display:flex;}
+  .pause-icon{font-size:80px;}
+  .pause-title{font-family:'Bebas Neue';font-size:72px;letter-spacing:6px;color:var(--gold);}
+  .pause-sub{font-size:18px;color:var(--dim);letter-spacing:2px;}
 
   /* LOBBY */
   .lobby{text-align:center;align-items:center;}
@@ -63,7 +84,7 @@
   .lobby-count{font-family:'Bebas Neue';font-size:52px;color:var(--cyan);letter-spacing:2px;margin-bottom:6px;}
   .lobby-hint{font-size:14px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;}
   .start-btn{margin-top:32px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:14px;padding:20px 52px;font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:white;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
-  .start-btn:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(255,45,120,0.4);}
+  .start-btn:hover,.start-btn:focus{transform:translateY(-3px);box-shadow:0 8px 32px rgba(255,45,120,0.4);outline:none;}
 
   /* ROUND INTRO */
   .round-intro{text-align:center;align-items:center;}
@@ -103,8 +124,8 @@
 
   /* REVEAL */
   .rev-fact-wrap{margin-top:24px;animation:fadeUp 0.5s ease 0.5s both;}
-  .rev-fact-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
-  .rev-fact-text{font-size:18px;color:var(--white);max-width:900px;line-height:1.6;}
+  .rev-fact-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
+  .rev-fact-text{font-size:20px;color:var(--white);max-width:900px;line-height:1.65;opacity:0.85;}
 
   /* LEADERBOARD */
   .lb-title{font-family:'Bebas Neue';font-size:56px;letter-spacing:4px;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeUp 0.4s ease both;}
@@ -136,15 +157,12 @@
 
   /* RIGHT PANEL */
   .right-panel{background:rgba(4,18,36,0.8);border-left:1px solid var(--sep);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(12px);}
-
-  /* QR */
   .qr-section{padding:20px 22px;border-bottom:1px solid var(--sep);display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;}
   .qr-eye{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);font-weight:600;}
   #qrCanvas{width:186px;height:186px;background:white;border-radius:10px;padding:7px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
   #qrCanvas img,#qrCanvas canvas{width:172px!important;height:172px!important;}
   #qrUrl{font-size:9px;color:rgba(240,238,248,0.25);text-align:center;word-break:break-all;max-width:186px;line-height:1.5;}
   .qr-hint{font-size:11px;color:var(--dim);text-align:center;}
-
   .panel-section{padding:16px 20px;border-bottom:1px solid var(--sep);flex-shrink:0;}
   .panel-eye{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);font-weight:600;margin-bottom:12px;}
   .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
@@ -152,12 +170,10 @@
   .stat-val{font-family:'Bebas Neue';font-size:30px;letter-spacing:1px;line-height:1;}
   .stat-val.pink{color:var(--pink)}.stat-val.cyan{color:var(--cyan)}.stat-val.gold{color:var(--gold)}.stat-val.lime{color:var(--lime)}
   .stat-lbl{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-
   .round-tracker{display:flex;gap:8px;}
   .round-pip{flex:1;height:6px;border-radius:3px;background:var(--faint);border:1px solid var(--sep);transition:all 0.5s;}
   .round-pip.active{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 8px rgba(0,229,255,0.4);}
   .round-pip.done{background:var(--lime);border-color:var(--lime);}
-
   .activity-section{flex:1;overflow:hidden;padding:16px 20px;display:flex;flex-direction:column;}
   .activity-feed{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:8px;}
   .activity-item{display:flex;align-items:center;gap:11px;background:rgba(4,22,44,0.8);border-radius:9px;padding:9px 12px;border:1px solid var(--sep);animation:slideIn 0.35s ease both;flex-shrink:0;}
@@ -169,28 +185,23 @@
 
   /* FOOTER */
   .footer{background:rgba(2,10,20,0.95);border-top:1px solid var(--sep);display:flex;align-items:center;justify-content:space-between;padding:0 52px;backdrop-filter:blur(20px);}
-  .spon-lbl{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(240,238,248,0.25);}
-  .spon-name{font-family:'Bebas Neue';font-size:22px;color:var(--gold);letter-spacing:2px;}
-  .spon-tag{font-size:10px;color:var(--dim);}
   .footer-center{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:10px;}
   .fdot{width:4px;height:4px;border-radius:50%;background:var(--pink);}
-
-  /* ClubOS wordmark - bottom right */
   .clubos-lockup{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
   .clubos-powered{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,238,248,0.25);}
   .clubos-wordmark{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:0.04em;color:rgba(240,238,248,0.4);}
   .clubos-wordmark span{color:rgba(201,168,76,0.6);}
+  /* Keyboard hint */
+  .key-hint{font-size:10px;color:rgba(240,238,248,0.2);letter-spacing:1px;}
+  .key-hint kbd{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:3px;padding:1px 5px;font-size:10px;font-family:'DM Sans';}
 
   /* CONFETTI */
   .cfwrap{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden;}
   .cp{position:absolute;width:9px;height:9px;top:-20px;opacity:0;animation:cfFall linear forwards;border-radius:2px;}
   @keyframes cfFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(1200px) rotate(720deg)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-
-  /* ERROR */
-  .err-banner{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#FF2D78;color:white;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:600;letter-spacing:0.05em;z-index:200;display:none;box-shadow:0 4px 20px rgba(255,45,120,0.4);}
+  .err-banner{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--pink);color:white;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:600;z-index:200;display:none;}
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -199,14 +210,13 @@ const CONFIG={
   supabaseUrl:'https://ykfvwqewnfnibpzytspn.supabase.co',
   supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms',
   clubSlug:'ballantyne-cc',
-  sponsor:{name:'Genesis of Cary',tagline:'The Ultimate Driving Experience'},
   footerMsg:'Scan to play · No app needed · Submit answers from your phone',
   questionSecs:20,revealSecs:7,introCDSecs:8,
   rounds:[
     {name:'Classic Rock',icon:'🎸',intro:'Name that riff. Finish that lyric. Pure classic rock — let\'s see who really knows their stuff.',questions:[
       {q:"Which band recorded 'Stairway to Heaven' on their 1971 untitled fourth album?",answers:["The Rolling Stones","Led Zeppelin","The Who","Deep Purple"],correct:1,fact:"Led Zeppelin IV has no official title — the band intentionally released it with zero text on the cover.",pts:200},
       {q:"Finish the lyric: 'I can't get no… _____'",answers:["Satisfaction","Love from you","Sleep at night","Peace of mind"],correct:0,fact:"Keith Richards came up with the iconic riff in his sleep and recorded it on a cassette player by his bed.",pts:100},
-      {q:"What year did Queen release 'Bohemian Rhapsody'?",answers:["1971","1973","1975","1977"],correct:2,fact:"At nearly 6 minutes, radio execs called it too long to play. It became one of the best-selling singles of all time.",pts:200},
+      {q:"What year did Queen release 'Bohemian Rhapsody'?",answers:["1971","1973","1975","1977"],correct:2,fact:"At nearly 6 minutes, radio execs called it too long. It became one of the best-selling singles of all time.",pts:200},
       {q:"Which band featured Mick Fleetwood and Lindsey Buckingham?",answers:["The Eagles","Fleetwood Mac","Crosby Stills & Nash","Heart"],correct:1,fact:"'Rumours' (1977) spent 31 weeks at #1 and has sold over 40 million copies worldwide.",pts:200},
       {q:"'Hotel California' was recorded by which band?",answers:["Lynyrd Skynyrd","Creedence Clearwater","The Eagles","Tom Petty & the Heartbreakers"],correct:2,fact:"The guitar outro took Don Felder and Joe Walsh 16 takes. The whole song is over 6 minutes.",pts:100}
     ]},
@@ -260,6 +270,9 @@ const CONFIG={
       <div class="round-label" id="roundLabel">—</div>
     </div>
     <div class="hdr-right">
+      <button class="pause-btn" id="pauseBtn" onclick="togglePause()" style="display:none">
+        ⏸ PAUSE
+      </button>
       <div>
         <div class="live-time" id="liveTime">—</div>
         <div class="time-lbl">Local Time</div>
@@ -268,7 +281,14 @@ const CONFIG={
   </header>
 
   <div class="main-grid">
-    <div class="question-area">
+    <div class="question-area" style="position:relative;">
+
+      <!-- PAUSE OVERLAY -->
+      <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-icon">⏸</div>
+        <div class="pause-title">Game Paused</div>
+        <div class="pause-sub">Press <kbd style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:2px 8px;">Space</kbd> or the Pause button to resume</div>
+      </div>
 
       <div class="screen lobby" id="screenLobby">
         <div class="lobby-icon">🎵</div>
@@ -276,7 +296,7 @@ const CONFIG={
         <div class="lobby-sub">Scan the QR · Join from your phone · No app needed</div>
         <div class="lobby-count" id="lobbyCount">0</div>
         <div class="lobby-hint">Players Ready · 5 Rounds · Classic Rock · 80s · 90s · Country · Pop</div>
-        <button class="start-btn" onclick="startGame()">Start the Game</button>
+        <button class="start-btn" id="startBtn" onclick="startGame()">Start the Game</button>
       </div>
 
       <div class="screen round-intro" id="screenIntro">
@@ -361,17 +381,19 @@ const CONFIG={
   </div>
 
   <footer class="footer">
+    <div class="key-hint"><kbd>Space</kbd> Pause &nbsp; <kbd>Enter</kbd> Start</div>
+    <div class="footer-center"><div class="fdot"></div><span id="footerMsg">—</span><div class="fdot"></div></div>
     <div class="clubos-lockup">
       <div class="clubos-powered">Powered by</div>
       <div class="clubos-wordmark">Club<span>OS</span></div>
     </div>
-    <div class="footer-center"><div class="fdot"></div><span id="footerMsg">—</span><div class="fdot"></div></div>
-    <div style="width:180px;"></div>
   </footer>
 </div>
 
 <script>
-const LETTERS=['A','B','C','D'],CIRCUM=2*Math.PI*37,AV_COLORS=['#FF2D78','#00E5FF','#9D4EDD','#FFD600','#39FF6B','#FF8C00','#FF2D78','#00E5FF'];
+const LETTERS=['A','B','C','D'],CIRCUM=2*Math.PI*37;
+const AV_COLORS=['#FF2D78','#00E5FF','#9D4EDD','#FFD600','#39FF6B','#FF8C00','#FF2D78','#00E5FF'];
+
 document.getElementById('footerMsg').textContent=CONFIG.footerMsg;
 const rt=document.getElementById('roundTracker');
 CONFIG.rounds.forEach((_,i)=>{const p=document.createElement('div');p.className='round-pip';p.id=`pip-${i}`;rt.appendChild(p);});
@@ -380,47 +402,243 @@ document.getElementById('liveTime').textContent=new Date().toLocaleTimeString('e
 
 function showErr(msg){const b=document.getElementById('errBanner');b.textContent=msg;b.style.display='block';setTimeout(()=>b.style.display='none',6000);}
 
+// ── SUPABASE ─────────────────────────────────────────────────
 const sb=supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey);
-let sessionId=null,playerCount=0,answerCount=0,answerTotal=0,correctCount=0,maxStreak=0,playerStreaks={};
+let sessionId=null,playerCount=0,answerCount=0,maxStreak=0,playerStreaks={};
+let isPaused=false,pausedTimerVal=null,currentRi=0,currentQi=0;
 
 async function initSession(){
   try{
     const{data,error}=await sb.from('trivia_sessions').insert({club_slug:CONFIG.clubSlug,phase:'lobby',round_index:0,question_index:0}).select().single();
-    if(error){showErr('DB error: '+error.message);console.error('Session error:',error);return;}
+    if(error){showErr('DB error: '+error.message);return;}
     sessionId=data.id;
     const playUrl=`${window.location.origin}/play.html?s=${sessionId}`;
     document.getElementById('qrUrl').textContent=playUrl.replace('https://','');
-    new QRCode(document.getElementById('qrCanvas'),{text:playUrl,width:172,height:172,colorDark:'#08080F',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    new QRCode(document.getElementById('qrCanvas'),{text:playUrl,width:172,height:172,colorDark:'#020C18',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+
+    // Also write host URL to session for discovery
+    await sb.from('trivia_sessions').update({updated_at:new Date().toISOString()}).eq('id',sessionId);
 
     sb.channel('players-'+sessionId).on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${sessionId}`},p=>onPlayerJoined(p.new)).subscribe();
-    sb.channel('answers-'+sessionId).on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_answers',filter:`session_id=eq.${sessionId}`},p=>onAnswerIn(p.new)).subscribe();
+
+    // Listen for host commands (pause from host.html)
+    sb.channel('session-cmds-'+sessionId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${sessionId}`},p=>onSessionUpdate(p.new)).subscribe();
+
     showScreen('screenLobby');
   }catch(e){showErr('Connection failed');console.error(e);}
 }
 
-function onPlayerJoined(player){playerCount++;document.getElementById('statPlayers').textContent=playerCount;document.getElementById('lobbyCount').textContent=playerCount;addActivity(player.name,AV_COLORS[playerCount%AV_COLORS.length],'Joined the game 🎮',null);}
-function onAnswerIn(answer){answerCount++;answerTotal++;document.getElementById('statAnswers').textContent=answerCount;if(answer.is_correct){correctCount++;playerStreaks[answer.player_id]=(playerStreaks[answer.player_id]||0)+1;const s=playerStreaks[answer.player_id];if(s>maxStreak){maxStreak=s;document.getElementById('statStreak').textContent=s+'x';}}else{playerStreaks[answer.player_id]=0;}document.getElementById('statAcc').textContent=answerTotal>0?Math.round(correctCount/answerTotal*100)+'%':'—';}
-async function updatePhase(phase,ri,qi){if(!sessionId)return;await sb.from('trivia_sessions').update({phase,round_index:ri,question_index:qi,updated_at:new Date().toISOString()}).eq('id',sessionId);}
-async function updatePlayerScores(ri,qi){if(!sessionId)return;const{data:answers}=await sb.from('trivia_answers').select('player_id,is_correct,pts_earned').eq('session_id',sessionId).eq('round_index',ri).eq('question_index',qi);if(!answers)return;for(const a of answers){const{data:p}=await sb.from('trivia_players').select('score,streak').eq('id',a.player_id).single();if(p){if(a.is_correct)await sb.from('trivia_players').update({score:(p.score||0)+a.pts_earned,streak:(p.streak||0)+1}).eq('id',a.player_id);else await sb.from('trivia_players').update({streak:0}).eq('id',a.player_id);}}}
-async function fetchLB(){const{data}=await sb.from('trivia_players').select('name,score,streak').eq('session_id',sessionId).order('score',{ascending:false}).limit(6);return data||[];}
+function onSessionUpdate(s){
+  if(s.phase==='paused'&&!isPaused) doPause();
+  else if(s.phase==='question'&&isPaused) doResume();
+}
 
+function onPlayerJoined(player){
+  playerCount++;
+  document.getElementById('statPlayers').textContent=playerCount;
+  document.getElementById('lobbyCount').textContent=playerCount;
+  addActivity(player.name,AV_COLORS[playerCount%AV_COLORS.length],'Joined the game 🎮',null);
+}
+
+// ── FIX: accuracy only updates at reveal, not during question ──
+function updateAccuracy(answerTotal, correctCount){
+  const acc=answerTotal>0?Math.round(correctCount/answerTotal*100):0;
+  document.getElementById('statAcc').textContent=acc+'%';
+}
+
+// ── FIX: TV only counts answers, doesn't compute scoring ──────
+// Scoring is done by play.html on the player's device
+function onAnswerIn(answer){
+  answerCount++;
+  document.getElementById('statAnswers').textContent=answerCount;
+  if(answer.is_correct){
+    playerStreaks[answer.player_id]=(playerStreaks[answer.player_id]||0)+1;
+    const s=playerStreaks[answer.player_id];
+    if(s>maxStreak){maxStreak=s;document.getElementById('statStreak').textContent=s+'x';}
+  } else {
+    playerStreaks[answer.player_id]=0;
+  }
+}
+
+async function updatePhase(phase,ri,qi){
+  if(!sessionId)return;
+  await sb.from('trivia_sessions').update({phase,round_index:ri,question_index:qi,updated_at:new Date().toISOString()}).eq('id',sessionId);
+}
+
+async function fetchLB(){
+  const{data}=await sb.from('trivia_players').select('name,score,streak').eq('session_id',sessionId).order('score',{ascending:false}).limit(6);
+  return data||[];
+}
+
+// ── ACCURACY: compute from DB at reveal time only ────────────
+async function computeAndShowAccuracy(ri,qi){
+  const{data}=await sb.from('trivia_answers').select('is_correct').eq('session_id',sessionId).eq('round_index',ri).eq('question_index',qi);
+  if(!data||!data.length)return;
+  const correct=data.filter(a=>a.is_correct).length;
+  updateAccuracy(data.length, correct);
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function updatePips(cur){CONFIG.rounds.forEach((_,i)=>{const p=document.getElementById(`pip-${i}`);p.className='round-pip';if(i<cur)p.classList.add('done');else if(i===cur)p.classList.add('active');});}
 function addActivity(name,color,action,pts){const f=document.getElementById('actFeed');const el=document.createElement('div');el.className='activity-item';el.innerHTML=`<div class="av" style="background:${color}">${name.substring(0,2).toUpperCase()}</div><div style="flex:1"><div class="av-name">${name}</div><div class="av-action">${action}</div></div>${pts?`<div class="av-pts">+${pts}</div>`:''}`;f.insertBefore(el,f.firstChild);while(f.children.length>9)f.removeChild(f.lastChild);}
 function confetti(n=50){const clrs=['#FF2D78','#00E5FF','#FFD600','#39FF6B','#9D4EDD'];const w=document.getElementById('cfWrap');for(let i=0;i<n;i++){const p=document.createElement('div');p.className='cp';p.style.cssText=`left:${Math.random()*100}%;background:${clrs[Math.floor(Math.random()*clrs.length)]};width:${Math.random()*7+5}px;height:${Math.random()*7+5}px;animation-duration:${Math.random()*2+2.5}s;animation-delay:${Math.random()*0.6}s;border-radius:${Math.random()>.5?'50%':'2px'};`;w.appendChild(p);setTimeout(()=>p.remove(),5000);}}
 
-let timerInt=null;
-function startTimer(secs,onEnd){clearInterval(timerInt);let t=secs;const fill=document.getElementById('timerFill'),num=document.getElementById('timerNum');fill.style.strokeDasharray=CIRCUM;function tick(){fill.style.strokeDashoffset=CIRCUM*(1-t/secs);fill.style.stroke=t<=5?'var(--gold)':'var(--pink)';fill.style.filter=t<=5?'drop-shadow(0 0 8px rgba(255,214,0,0.8))':'drop-shadow(0 0 6px rgba(255,45,120,0.6))';num.textContent=t;t--;if(t<0){clearInterval(timerInt);onEnd();}}tick();timerInt=setInterval(tick,1000);}
+// ── TIMER ─────────────────────────────────────────────────────
+let timerInt=null,timerVal=0;
+function startTimer(secs,onEnd){
+  clearInterval(timerInt);
+  timerVal=secs;
+  const fill=document.getElementById('timerFill'),num=document.getElementById('timerNum');
+  fill.style.strokeDasharray=CIRCUM;
+  function tick(){
+    if(isPaused)return;
+    fill.style.strokeDashoffset=CIRCUM*(1-timerVal/secs);
+    fill.style.stroke=timerVal<=5?'var(--gold)':'var(--pink)';
+    fill.style.filter=timerVal<=5?'drop-shadow(0 0 8px rgba(255,214,0,0.8))':'drop-shadow(0 0 6px rgba(255,45,120,0.6))';
+    num.textContent=timerVal;
+    timerVal--;
+    if(timerVal<0){clearInterval(timerInt);onEnd();}
+  }
+  tick();timerInt=setInterval(tick,1000);
+}
 function stopTimer(){clearInterval(timerInt);}
 
-async function renderLB(cid,limit=6){const players=await fetchLB();const max=players[0]?.score||1;const medals=['🥇','🥈','🥉'],cls=['gold','silver','bronze'];document.getElementById(cid).innerHTML=players.slice(0,limit).map((p,i)=>`<div class="lb-row ${cls[i]||''}" style="animation:fadeUp 0.4s ease ${i*0.07}s both"><div class="lb-rank">${i+1}</div>${i<3?`<span style="font-size:22px">${medals[i]}</span>`:''}<div class="lb-name">${p.name}</div>${p.streak>=2?`<div class="lb-streak">🔥 ${p.streak}-streak</div>`:''}<div class="lb-score">${(p.score||0).toLocaleString()}</div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${((p.score||0)/max*100).toFixed(1)}%"></div></div></div>`).join('');return players;}
+async function renderLB(cid,limit=6){
+  const players=await fetchLB();
+  const max=players[0]?.score||1;
+  const medals=['🥇','🥈','🥉'],cls=['gold','silver','bronze'];
+  document.getElementById(cid).innerHTML=players.slice(0,limit).map((p,i)=>`<div class="lb-row ${cls[i]||''}" style="animation:fadeUp 0.4s ease ${i*0.07}s both"><div class="lb-rank">${i+1}</div>${i<3?`<span style="font-size:22px">${medals[i]}</span>`:''}<div class="lb-name">${p.name}</div>${p.streak>=2?`<div class="lb-streak">🔥 ${p.streak}-streak</div>`:''}<div class="lb-score">${(p.score||0).toLocaleString()}</div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${((p.score||0)/max*100).toFixed(1)}%"></div></div></div>`).join('');
+  return players;
+}
 
+// ── PAUSE ─────────────────────────────────────────────────────
+function doPause(){
+  isPaused=true;
+  document.getElementById('pauseOverlay').classList.add('active');
+  const btn=document.getElementById('pauseBtn');
+  btn.textContent='▶ RESUME';btn.classList.add('paused');
+}
+function doResume(){
+  isPaused=false;
+  document.getElementById('pauseOverlay').classList.remove('active');
+  const btn=document.getElementById('pauseBtn');
+  btn.textContent='⏸ PAUSE';btn.classList.remove('paused');
+}
+async function togglePause(){
+  if(!sessionId)return;
+  if(isPaused){
+    doResume();
+    await updatePhase('question',currentRi,currentQi);
+  } else {
+    doPause();
+    await sb.from('trivia_sessions').update({phase:'paused',updated_at:new Date().toISOString()}).eq('id',sessionId);
+  }
+}
+
+// ── KEYBOARD: remote control ──────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'||e.key===' '){
+    e.preventDefault();
+    // Pause/resume during question
+    const qScreen=document.getElementById('screenQuestion');
+    if(qScreen.classList.contains('active')) togglePause();
+  }
+  if(e.code==='Enter'||e.key==='Enter'){
+    // Start game from lobby
+    const lobby=document.getElementById('screenLobby');
+    if(lobby.classList.contains('active')) startGame();
+  }
+});
+
+// ── GAME FLOW ─────────────────────────────────────────────────
 function startGame(){runIntro(0);}
-function runIntro(ri){const r=CONFIG.rounds[ri];updatePips(ri);document.getElementById('roundLabel').textContent=`Round ${ri+1} — ${r.name}`;document.getElementById('riIcon').textContent=r.icon;document.getElementById('riEye').textContent=`Round ${ri+1} of ${CONFIG.rounds.length}`;document.getElementById('riTitle').textContent=r.name;document.getElementById('riSub').textContent=r.intro;showScreen('screenIntro');updatePhase('intro',ri,0);let c=CONFIG.introCDSecs;const el=document.getElementById('riCountdown');el.textContent=`Starting in ${c}…`;const ct=setInterval(()=>{c--;el.textContent=`Starting in ${c}…`;if(c<=0){clearInterval(ct);runQuestion(ri,0);}},1000);}
-function runQuestion(ri,qi){const r=CONFIG.rounds[ri],q=r.questions[qi];if(!q){showMidLB(ri);return;}answerCount=0;document.getElementById('statAnswers').textContent='0';document.getElementById('qNum').textContent=`Q${qi+1}`;document.getElementById('qCat').textContent=r.name;document.getElementById('qPts').textContent=`${q.pts} PTS`;document.getElementById('qText').textContent=q.q;document.getElementById('ansGrid').innerHTML=q.answers.map((a,i)=>`<div class="abtn"><div class="aletter">${LETTERS[i]}</div><div class="atext">${a}</div></div>`).join('');showScreen('screenQuestion');updatePhase('question',ri,qi);startTimer(CONFIG.questionSecs,()=>runReveal(ri,qi));}
-async function runReveal(ri,qi){const r=CONFIG.rounds[ri],q=r.questions[qi];stopTimer();await updatePlayerScores(ri,qi);document.getElementById('revNum').textContent=`Q${qi+1}`;document.getElementById('revQ').textContent=q.q;document.getElementById('revFact').textContent=q.fact;document.getElementById('revAnswers').innerHTML=q.answers.map((a,i)=>{const ok=i===q.correct;return`<div class="abtn ${ok?'correct':'wrong'}">${ok?'<div class="correct-sweep"></div>':''}<div class="aletter">${LETTERS[i]}</div><div class="atext">${a}</div></div>`;}).join('');showScreen('screenReveal');updatePhase('reveal',ri,qi);if(Math.random()>0.55)confetti(35);setTimeout(()=>runQuestion(ri,qi+1),CONFIG.revealSecs*1000);}
-async function showMidLB(ri){const isLast=ri===CONFIG.rounds.length-1;const players=await renderLB('lbList',6);document.getElementById('lbTitle').textContent=isLast?'🏆 Final Scores':'🏆 Leaderboard';document.getElementById('lbSub').textContent=isLast?'Thanks for playing! See you next trivia night.':`After Round ${ri+1} · ${CONFIG.rounds.length-ri-1} round${CONFIG.rounds.length-ri-1!==1?'s':''} remaining`;showScreen('screenLB');updatePhase('leaderboard',ri,0);confetti(60);setTimeout(()=>{if(isLast)showGameOver(players);else runIntro(ri+1);},10000);}
-function showGameOver(players){document.getElementById('winnerName').textContent=players[0]?.name||'—';renderLB('goList',5);showScreen('screenOver');updatePhase('gameover',0,0);confetti(80);let sec=20;const el=document.getElementById('goRestart');const ct=setInterval(()=>{sec--;el.textContent=`New game starting in ${sec}…`;if(sec<=0){clearInterval(ct);location.reload();}},1000);}
+
+function runIntro(ri){
+  const r=CONFIG.rounds[ri];
+  currentRi=ri;
+  updatePips(ri);
+  document.getElementById('roundLabel').textContent=`Round ${ri+1} — ${r.name}`;
+  document.getElementById('riIcon').textContent=r.icon;
+  document.getElementById('riEye').textContent=`Round ${ri+1} of ${CONFIG.rounds.length}`;
+  document.getElementById('riTitle').textContent=r.name;
+  document.getElementById('riSub').textContent=r.intro;
+  document.getElementById('pauseBtn').style.display='none';
+  showScreen('screenIntro');
+  updatePhase('intro',ri,0);
+  let c=CONFIG.introCDSecs;
+  const el=document.getElementById('riCountdown');
+  el.textContent=`Starting in ${c}…`;
+  const ct=setInterval(()=>{c--;el.textContent=`Starting in ${c}…`;if(c<=0){clearInterval(ct);runQuestion(ri,0);}},1000);
+}
+
+function runQuestion(ri,qi){
+  const r=CONFIG.rounds[ri],q=r.questions[qi];
+  if(!q){showMidLB(ri);return;}
+  currentRi=ri;currentQi=qi;
+  answerCount=0;
+  document.getElementById('statAnswers').textContent='0';
+  document.getElementById('qNum').textContent=`Q${qi+1}`;
+  document.getElementById('qCat').textContent=r.name;
+  document.getElementById('qPts').textContent=`${q.pts} PTS`;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('ansGrid').innerHTML=q.answers.map((a,i)=>`<div class="abtn"><div class="aletter">${LETTERS[i]}</div><div class="atext">${a}</div></div>`).join('');
+  document.getElementById('pauseBtn').style.display='flex';
+
+  // Subscribe to answers for this question (count only, no scoring)
+  const ch=sb.channel('q-answers-'+sessionId+'-'+ri+'-'+qi);
+  ch.on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_answers',filter:`session_id=eq.${sessionId}`},p=>{
+    if(p.new.round_index===ri&&p.new.question_index===qi) onAnswerIn(p.new);
+  }).subscribe();
+
+  showScreen('screenQuestion');
+  updatePhase('question',ri,qi);
+  startTimer(CONFIG.questionSecs,()=>{ch.unsubscribe();runReveal(ri,qi);});
+}
+
+async function runReveal(ri,qi){
+  const r=CONFIG.rounds[ri],q=r.questions[qi];
+  stopTimer();
+  document.getElementById('pauseBtn').style.display='none';
+
+  // Compute accuracy from DB at reveal time (fix: not during question)
+  await computeAndShowAccuracy(ri,qi);
+
+  document.getElementById('revNum').textContent=`Q${qi+1}`;
+  document.getElementById('revQ').textContent=q.q;
+  document.getElementById('revFact').textContent=q.fact;
+  document.getElementById('revAnswers').innerHTML=q.answers.map((a,i)=>{
+    const ok=i===q.correct;
+    return`<div class="abtn ${ok?'correct':'wrong'}">${ok?'<div class="correct-sweep"></div>':''}<div class="aletter">${LETTERS[i]}</div><div class="atext">${a}</div></div>`;
+  }).join('');
+  showScreen('screenReveal');
+  updatePhase('reveal',ri,qi);
+  if(Math.random()>0.55)confetti(35);
+  setTimeout(()=>runQuestion(ri,qi+1),CONFIG.revealSecs*1000);
+}
+
+async function showMidLB(ri){
+  const isLast=ri===CONFIG.rounds.length-1;
+  const players=await renderLB('lbList',6);
+  document.getElementById('lbTitle').textContent=isLast?'🏆 Final Scores':'🏆 Leaderboard';
+  document.getElementById('lbSub').textContent=isLast?'Thanks for playing! See you next trivia night.':`After Round ${ri+1} · ${CONFIG.rounds.length-ri-1} round${CONFIG.rounds.length-ri-1!==1?'s':''} remaining`;
+  document.getElementById('pauseBtn').style.display='none';
+  showScreen('screenLB');
+  updatePhase('leaderboard',ri,0);
+  confetti(60);
+  setTimeout(()=>{if(isLast)showGameOver(players);else runIntro(ri+1);},10000);
+}
+
+function showGameOver(players){
+  document.getElementById('winnerName').textContent=players[0]?.name||'—';
+  renderLB('goList',5);
+  showScreen('screenOver');
+  updatePhase('gameover',0,0);
+  confetti(80);
+  let sec=20;
+  const el=document.getElementById('goRestart');
+  const ct=setInterval(()=>{sec--;el.textContent=`New game starting in ${sec}…`;if(sec<=0){clearInterval(ct);location.reload();}},1000);
+}
 
 initSession();
 </script>
