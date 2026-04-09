@@ -372,8 +372,6 @@ const CONFIG={
 
 <script>
 const LETTERS=['A','B','C','D'],CIRCUM=2*Math.PI*37,AV_COLORS=['#FF2D78','#00E5FF','#9D4EDD','#FFD600','#39FF6B','#FF8C00','#FF2D78','#00E5FF'];
-document.getElementById('sponName').textContent=CONFIG.sponsor.name;
-document.getElementById('sponTag').textContent=CONFIG.sponsor.tagline;
 document.getElementById('footerMsg').textContent=CONFIG.footerMsg;
 const rt=document.getElementById('roundTracker');
 CONFIG.rounds.forEach((_,i)=>{const p=document.createElement('div');p.className='round-pip';p.id=`pip-${i}`;rt.appendChild(p);});
