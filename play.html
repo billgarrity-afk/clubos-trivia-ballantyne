@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ClubOS Music Trivia</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#08080F; --bg2:#0E0E1C; --card:#141424;
+    --pink:#FF2D78; --cyan:#00E5FF; --gold:#FFD600;
+    --lime:#39FF6B; --purple:#9D4EDD;
+    --white:#F0EEF8; --dim:rgba(240,238,248,0.55);
+    --faint:rgba(240,238,248,0.07); --sep:rgba(255,255,255,0.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;overflow:hidden;}
+
+  /* ambient */
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(255,45,120,0.12),transparent),
+               radial-gradient(ellipse 60% 50% at 80% 110%,rgba(157,78,221,0.12),transparent);
+  }
+
+  .app{position:fixed;inset:0;display:flex;flex-direction:column;z-index:1;}
+
+  /* SCREENS */
+  .screen{display:none;flex-direction:column;height:100%;padding:24px 20px;overflow-y:auto;}
+  .screen.active{display:flex;}
+
+  /* ── JOIN SCREEN ── */
+  .join-header{text-align:center;padding:20px 0 28px;}
+  .join-icon{font-size:56px;margin-bottom:12px;}
+  .join-title{font-family:'Bebas Neue';font-size:42px;letter-spacing:3px;
+    background:linear-gradient(135deg,var(--gold),var(--pink));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .join-sub{font-size:14px;color:var(--dim);margin-top:6px;line-height:1.5;}
+
+  .join-form{display:flex;flex-direction:column;gap:16px;}
+  .join-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);font-weight:600;margin-bottom:8px;}
+  .join-input{
+    width:100%;background:var(--card);border:1.5px solid var(--sep);
+    border-radius:14px;padding:18px 20px;
+    font-size:20px;font-family:'DM Sans',sans-serif;font-weight:600;
+    color:var(--white);outline:none;
+    transition:border-color 0.2s;
+  }
+  .join-input:focus{border-color:var(--cyan);}
+  .join-input::placeholder{color:rgba(240,238,248,0.25);}
+
+  .join-btn{
+    width:100%;background:linear-gradient(135deg,var(--pink),var(--purple));
+    border:none;border-radius:14px;padding:20px;
+    font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;color:white;
+    cursor:pointer;transition:transform 0.15s,opacity 0.15s;
+    margin-top:8px;
+  }
+  .join-btn:active{transform:scale(0.97);opacity:0.9;}
+  .join-btn:disabled{opacity:0.5;cursor:default;}
+
+  .rounds-preview{margin-top:28px;background:var(--card);border:1px solid var(--sep);border-radius:14px;padding:18px;}
+  .rp-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:600;}
+  .rp-list{display:flex;flex-direction:column;gap:8px;}
+  .rp-item{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--dim);}
+  .rp-icon{font-size:18px;}
+
+  /* ── WAITING SCREEN ── */
+  .wait-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;}
+  .wait-icon{font-size:60px;animation:pulse 1.5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.9);opacity:0.6}}
+  .wait-title{font-family:'Bebas Neue';font-size:36px;letter-spacing:3px;color:var(--white);}
+  .wait-sub{font-size:15px;color:var(--dim);line-height:1.6;max-width:280px;}
+  .wait-score{font-family:'Bebas Neue';font-size:52px;color:var(--cyan);letter-spacing:2px;}
+  .wait-score-lbl{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:-8px;}
+
+  /* ── QUESTION SCREEN ── */
+  .q-header{padding:12px 0 16px;}
+  .q-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .q-badge{font-family:'Bebas Neue';font-size:16px;letter-spacing:2px;color:var(--pink);background:rgba(255,45,120,0.1);border:1px solid rgba(255,45,120,0.3);padding:3px 12px;border-radius:4px;}
+  .q-pts-badge{font-family:'Bebas Neue';font-size:20px;color:var(--gold);letter-spacing:2px;}
+  .q-round{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:12px;}
+
+  .timer-bar-wrap{width:100%;height:5px;background:var(--faint);border-radius:3px;overflow:hidden;margin-bottom:20px;}
+  .timer-bar{height:100%;background:linear-gradient(90deg,var(--pink),var(--gold));border-radius:3px;transition:width 1s linear;}
+
+  .q-question{
+    font-family:'Bebas Neue';font-size:32px;color:var(--white);
+    line-height:1.2;letter-spacing:0.5px;margin-bottom:24px;
+  }
+
+  .ans-list{display:flex;flex-direction:column;gap:12px;}
+  .ans-btn{
+    display:flex;align-items:center;gap:16px;
+    background:var(--card);border:1.5px solid var(--sep);
+    border-radius:14px;padding:18px 20px;
+    cursor:pointer;transition:all 0.18s;
+    -webkit-tap-highlight-color:transparent;
+    position:relative;overflow:hidden;
+  }
+  .ans-btn:active{transform:scale(0.98);}
+  .ans-btn.selected{background:rgba(0,229,255,0.1);border-color:var(--cyan);}
+  .ans-btn.selected .ans-letter{background:var(--cyan);border-color:var(--cyan);color:#08080F;}
+  .ans-btn.locked{cursor:default;pointer-events:none;}
+  .ans-btn.correct-reveal{background:rgba(57,255,107,0.13);border-color:var(--lime);}
+  .ans-btn.correct-reveal .ans-letter{background:var(--lime);border-color:var(--lime);color:#08080F;}
+  .ans-btn.wrong-reveal{opacity:0.4;}
+  .ans-letter{
+    width:38px;height:38px;border-radius:10px;
+    background:var(--faint);border:1px solid var(--sep);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue';font-size:20px;color:var(--cyan);
+    flex-shrink:0;transition:all 0.18s;
+  }
+  .ans-text{font-size:16px;font-weight:500;color:var(--white);line-height:1.3;}
+
+  .submitted-msg{
+    margin-top:20px;text-align:center;
+    font-size:14px;color:var(--dim);
+    animation:fadeUp 0.4s ease both;
+  }
+  .submitted-msg b{color:var(--cyan);}
+
+  /* ── RESULT SCREEN ── */
+  .result-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;}
+  .result-icon{font-size:72px;animation:popIn 0.5s cubic-bezier(0.16,1,0.3,1) both;}
+  @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .result-label{font-family:'Bebas Neue';font-size:48px;letter-spacing:3px;}
+  .result-label.correct{color:var(--lime);}
+  .result-label.wrong{color:var(--pink);}
+  .result-pts{font-family:'Bebas Neue';font-size:36px;color:var(--gold);letter-spacing:2px;}
+  .result-fact{font-size:14px;color:var(--dim);line-height:1.6;max-width:300px;margin-top:4px;}
+  .result-total{
+    margin-top:12px;background:var(--card);border:1px solid var(--sep);
+    border-radius:12px;padding:14px 28px;text-align:center;
+  }
+  .result-total-val{font-family:'Bebas Neue';font-size:42px;color:var(--cyan);letter-spacing:2px;}
+  .result-total-lbl{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:-4px;}
+  .result-next{font-size:13px;color:var(--dim);margin-top:8px;letter-spacing:1px;}
+
+  /* LEADERBOARD */
+  .lb-header{text-align:center;padding:16px 0 20px;}
+  .lb-title{font-family:'Bebas Neue';font-size:44px;letter-spacing:3px;
+    background:linear-gradient(135deg,var(--gold),var(--pink));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .lb-sub{font-size:12px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+  .lb-list-m{display:flex;flex-direction:column;gap:10px;}
+  .lb-row-m{
+    display:flex;align-items:center;gap:14px;
+    background:var(--card);border:1px solid var(--sep);
+    border-radius:12px;padding:13px 18px;
+    position:relative;overflow:hidden;
+  }
+  .lb-row-m.gold{background:rgba(255,214,0,0.09);border-color:rgba(255,214,0,0.3);}
+  .lb-row-m.silver{background:rgba(200,200,220,0.06);border-color:rgba(200,200,220,0.15);}
+  .lb-row-m.bronze{background:rgba(205,127,50,0.07);border-color:rgba(205,127,50,0.2);}
+  .lb-row-m.me{border-color:var(--cyan)!important;background:rgba(0,229,255,0.08)!important;}
+  .lb-rk{font-family:'Bebas Neue';font-size:28px;min-width:36px;color:var(--dim);}
+  .lb-row-m.gold .lb-rk{color:var(--gold);}
+  .lb-row-m.silver .lb-rk{color:#C0C0C0;}
+  .lb-row-m.bronze .lb-rk{color:#CD7F32;}
+  .lb-nm{flex:1;font-size:16px;font-weight:600;color:var(--white);}
+  .lb-sc{font-family:'Bebas Neue';font-size:26px;color:var(--cyan);letter-spacing:1px;}
+  .lb-bar-m{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--sep);}
+  .lb-bar-m-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width 1.5s cubic-bezier(0.16,1,0.3,1);}
+
+  /* GAME OVER */
+  .over-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;}
+  .over-trophy{font-size:80px;}
+  .over-title{font-family:'Bebas Neue';font-size:54px;letter-spacing:4px;background:linear-gradient(135deg,var(--gold),var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .over-sub{font-size:16px;color:var(--dim);line-height:1.6;}
+  .over-final{background:var(--card);border:1px solid var(--sep);border-radius:14px;padding:18px 36px;margin-top:8px;}
+  .over-score-val{font-family:'Bebas Neue';font-size:54px;color:var(--gold);letter-spacing:2px;}
+  .over-score-lbl{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;}
+  .over-rank{font-size:20px;color:var(--cyan);margin-top:8px;font-weight:600;}
+
+  /* NAV BAR */
+  .nav-bar{
+    padding:12px 20px;padding-bottom:max(12px,env(safe-area-inset-bottom));
+    background:rgba(8,8,15,0.95);border-top:1px solid var(--sep);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .nav-club{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;}
+  .nav-club b{color:var(--gold);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- JOIN -->
+  <div class="screen active" id="sJoin">
+    <div class="join-header">
+      <div class="join-icon">🎵</div>
+      <div class="join-title">Music Trivia</div>
+      <div class="join-sub">Ballantyne Country Club · Cabana Night</div>
+    </div>
+    <div class="join-form">
+      <div>
+        <div class="join-label">Your Name</div>
+        <input class="join-input" id="nameInput" type="text" placeholder="Enter your name…" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <button class="join-btn" id="joinBtn" onclick="joinGame()">Join the Game →</button>
+    </div>
+    <div class="rounds-preview">
+      <div class="rp-title">Tonight's Rounds</div>
+      <div class="rp-list">
+        <div class="rp-item"><span class="rp-icon">🎸</span> Classic Rock</div>
+        <div class="rp-item"><span class="rp-icon">🕺</span> 80s Hits</div>
+        <div class="rp-item"><span class="rp-icon">💿</span> 90s Bangers</div>
+        <div class="rp-item"><span class="rp-icon">🤠</span> Country Roads</div>
+        <div class="rp-item"><span class="rp-icon">🎤</span> Pop Anthems</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAITING -->
+  <div class="screen" id="sWait">
+    <div class="wait-wrap">
+      <div class="wait-icon">⏳</div>
+      <div class="wait-title" id="waitTitle">Game Starting Soon</div>
+      <div class="wait-sub" id="waitSub">The game will begin when the host starts the round. Watch the screen!</div>
+      <div style="margin-top:16px;">
+        <div class="wait-score" id="waitScore">0</div>
+        <div class="wait-score-lbl">Your Score</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="screen" id="sQuestion">
+    <div class="q-header">
+      <div class="q-top">
+        <div class="q-badge" id="pQNum">Q1</div>
+        <div class="q-pts-badge" id="pQPts">200 PTS</div>
+      </div>
+      <div class="q-round" id="pQRound">—</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+    </div>
+    <div class="q-question" id="pQText">—</div>
+    <div class="ans-list" id="pAnsList"></div>
+    <div class="submitted-msg" id="submittedMsg" style="display:none">
+      Answer submitted! 📨 <b>Watch the screen</b> for the reveal.
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="sResult">
+    <div class="result-wrap">
+      <div class="result-icon" id="resIcon">🎯</div>
+      <div class="result-label" id="resLabel">Correct!</div>
+      <div class="result-pts" id="resPts">+200 pts</div>
+      <div class="result-fact" id="resFact">—</div>
+      <div class="result-total">
+        <div class="result-total-val" id="resTotalScore">0</div>
+        <div class="result-total-lbl">Total Score</div>
+      </div>
+      <div class="result-next" id="resNext">Next question coming up…</div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="screen" id="sLB">
+    <div class="lb-header">
+      <div class="lb-title">Leaderboard</div>
+      <div class="lb-sub" id="lbSubM">—</div>
+    </div>
+    <div class="lb-list-m" id="lbListM"></div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="screen" id="sOver">
+    <div class="over-wrap">
+      <div class="over-trophy">🏆</div>
+      <div class="over-title">Game Over!</div>
+      <div class="over-sub" id="overSub">Thanks for playing — see you next trivia night!</div>
+      <div class="over-final">
+        <div class="over-score-val" id="overScore">0</div>
+        <div class="over-score-lbl">Final Score</div>
+      </div>
+      <div class="over-rank" id="overRank">—</div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-club">ClubOS · <b>Ballantyne CC</b></div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG (must match TV display) ────────────────────────────
+const SUPABASE_URL = 'https://ykfvwqewnfnibpzytspn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms'; // ← same key as index.html
+
+const ROUNDS_CONFIG = [
+  { name:'Classic Rock', icon:'🎸', questions:[
+    {q:"Which band recorded 'Stairway to Heaven' on their 1971 untitled fourth album?",answers:["The Rolling Stones","Led Zeppelin","The Who","Deep Purple"],correct:1,fact:"Led Zeppelin IV has no official title — the band intentionally released it with zero text on the cover.",pts:200},
+    {q:"Finish the lyric: 'I can't get no… _____'",answers:["Satisfaction","Love from you","Sleep at night","Peace of mind"],correct:0,fact:"Keith Richards came up with the iconic riff in his sleep and recorded it on a cassette player by his bed.",pts:100},
+    {q:"What year did Queen release 'Bohemian Rhapsody'?",answers:["1971","1973","1975","1977"],correct:2,fact:"At nearly 6 minutes, radio executives called it too long. It became one of the best-selling singles of all time.",pts:200},
+    {q:"Which band featured Mick Fleetwood and Lindsey Buckingham?",answers:["The Eagles","Fleetwood Mac","Crosby Stills & Nash","Heart"],correct:1,fact:"'Rumours' (1977) spent 31 weeks at #1 and has sold over 40 million copies worldwide.",pts:200},
+    {q:"'Hotel California' was recorded by which band?",answers:["Lynyrd Skynyrd","Creedence Clearwater","The Eagles","Tom Petty & the Heartbreakers"],correct:2,fact:"The guitar outro took Don Felder and Joe Walsh 16 takes to record.",pts:100}
+  ]},
+  { name:'80s Hits', icon:'🕺', questions:[
+    {q:"Which 80s pop star sang 'Like a Virgin' at the 1984 MTV VMAs?",answers:["Cyndi Lauper","Pat Benatar","Madonna","Whitney Houston"],correct:2,fact:"Madonna's performance on a giant wedding cake is considered one of the most iconic moments in VMA history.",pts:100},
+    {q:"'Don't You (Forget About Me)' was the theme to which 1985 film?",answers:["Ferris Bueller's Day Off","The Breakfast Club","Sixteen Candles","Pretty in Pink"],correct:1,fact:"Simple Minds almost turned the song down. It became their only #1 US hit.",pts:200},
+    {q:"What band performed 'Take On Me' in 1985?",answers:["Duran Duran","Flock of Seagulls","a-ha","Depeche Mode"],correct:2,fact:"The music video used rotoscoping — 3,000 individually drawn animation frames took 16 weeks to complete.",pts:200},
+    {q:"Michael Jackson's 'Thriller' album was released in which year?",answers:["1980","1982","1984","1986"],correct:1,fact:"Thriller is the best-selling album of all time, with estimated sales between 66 and 70 million copies worldwide.",pts:200},
+    {q:"Which song contains: 'Every breath you take, every move you make'?",answers:["Roxanne","Every Little Thing She Does Is Magic","Every Breath You Take","Message in a Bottle"],correct:2,fact:"Sting wrote the song in just 30 minutes at a piano in Jamaica.",pts:100}
+  ]},
+  { name:'90s Bangers', icon:'💿', questions:[
+    {q:"Nirvana's 'Smells Like Teen Spirit' appeared on which album?",answers:["Bleach","Nevermind","In Utero","Incesticide"],correct:1,fact:"The title came from graffiti Kathleen Hanna wrote on Kurt Cobain's wall as a joke.",pts:200},
+    {q:"Who sang 'Baby Got Back' in 1992?",answers:["LL Cool J","MC Hammer","Vanilla Ice","Sir Mix-a-Lot"],correct:3,fact:"MTV banned the video initially, then reversed course. It spent 5 weeks at #1.",pts:100},
+    {q:"The 1997 hit 'MMMBop' was performed by which group?",answers:["Backstreet Boys","Hanson","98 Degrees","New Kids on the Block"],correct:1,fact:"The Hanson brothers (ages 11, 14, and 16) wrote it. It debuted at #1 in 27 countries.",pts:200},
+    {q:"Which Alanis Morissette album featured 'Ironic' and 'You Oughta Know'?",answers:["Supposed Former Infatuation Junkie","Jagged Little Pill","Under Rug Swept","So-Called Chaos"],correct:1,fact:"Jagged Little Pill won the 1996 Grammy for Album of the Year. Alanis was 20 years old.",pts:200},
+    {q:"'I want it that way' — by which group?",answers:["NSYNC","Boyz II Men","Backstreet Boys","98 Degrees"],correct:2,fact:"Producer Max Martin designed the lyrics to sound good phonetically — the song makes little literal sense.",pts:100}
+  ]},
+  { name:'Country Roads', icon:'🤠', questions:[
+    {q:"Which country icon was known as 'The Man in Black'?",answers:["Waylon Jennings","Willie Nelson","Johnny Cash","Merle Haggard"],correct:2,fact:"Johnny Cash wore black as a symbol of solidarity with the poor and working class — and never stopped.",pts:100},
+    {q:"Who sang 'Before He Cheats' in 2005?",answers:["Miranda Lambert","Carrie Underwood","Taylor Swift","Faith Hill"],correct:1,fact:"Carrie Underwood performed this song at her first American Idol audition.",pts:200},
+    {q:"'On the road again, just can't wait to get on the road again' is by?",answers:["Garth Brooks","John Denver","Willie Nelson","Kenny Rogers"],correct:2,fact:"Willie Nelson wrote the song on a barf bag on an airplane in 1980.",pts:100},
+    {q:"Garth Brooks' 'Friends in Low Places' is set at what type of event?",answers:["A rodeo","A wedding","A bar fight","A county fair"],correct:1,fact:"The original full version includes a rarely heard third verse most radio versions cut.",pts:200},
+    {q:"Which singer released 'Jolene' in 1973?",answers:["Loretta Lynn","Tammy Wynette","Dolly Parton","Emmylou Harris"],correct:2,fact:"Dolly Parton wrote 'Jolene' and 'I Will Always Love You' on the same day.",pts:200}
+  ]},
+  { name:'Pop Anthems', icon:'🎤', questions:[
+    {q:"Taylor Swift's 'Shake It Off' was from which album?",answers:["Red","1989","Reputation","Fearless"],correct:1,fact:"1989 marked Taylor Swift's full transition to pop and sold over 1.2 million copies in its first week.",pts:200},
+    {q:"Which artist sang 'Rolling in the Deep'?",answers:["Rihanna","Adele","Lorde","Amy Winehouse"],correct:1,fact:"Adele wrote 'Rolling in the Deep' in 40 minutes after a bad breakup.",pts:100},
+    {q:"'We found love in a hopeless place' — by which artist?",answers:["Beyoncé","Katy Perry","Rihanna","Nicki Minaj"],correct:2,fact:"Calvin Harris reportedly wrote and produced the track in two hours.",pts:200},
+    {q:"Which pop queen sang 'Roar' and 'Firework'?",answers:["Lady Gaga","Rihanna","Katy Perry","Nicki Minaj"],correct:2,fact:"'Roar' and 'Firework' are two of Katy Perry's five #1 hits from 'Teenage Dream.'",pts:200},
+    {q:"How many Grammys has Beyoncé won — more than any artist in history?",answers:["28","32","40","47"],correct:2,fact:"Beyoncé holds the record with 40 Grammy wins as of 2024, surpassing Georg Solti's previous record of 31.",pts:300}
+  ]}
+];
+
+const LETTERS = ['A','B','C','D'];
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// State
+const params     = new URLSearchParams(window.location.search);
+const sessionId  = params.get('s');
+let playerId     = null;
+let playerName   = '';
+let playerScore  = 0;
+let hasAnswered  = false;
+let myLastAnswer = null;
+let currentPhase = null;
+let timerBarInt  = null;
+
+if (!sessionId) {
+  document.body.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,238,248,0.5);font-family:DM Sans,sans-serif;">Invalid link. Please scan the QR code on the TV.</div>';
+}
+
+// ── SCREENS ───────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── JOIN ──────────────────────────────────────────────────────
+async function joinGame() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) { document.getElementById('nameInput').focus(); return; }
+  document.getElementById('joinBtn').disabled = true;
+  document.getElementById('joinBtn').textContent = 'Joining…';
+
+  const { data, error } = await sb.from('trivia_players').insert({
+    session_id: sessionId,
+    name: name,
+    score: 0,
+    streak: 0
+  }).select().single();
+
+  if (error) {
+    console.error(error);
+    document.getElementById('joinBtn').disabled = false;
+    document.getElementById('joinBtn').textContent = 'Join the Game →';
+    return;
+  }
+
+  playerId    = data.id;
+  playerName  = name;
+  playerScore = 0;
+
+  // Subscribe to session state changes
+  sb.channel('session-state-'+sessionId)
+    .on('postgres_changes', {
+      event:'UPDATE', schema:'public', table:'trivia_sessions',
+      filter:`id=eq.${sessionId}`
+    }, payload => handleSessionUpdate(payload.new))
+    .subscribe();
+
+  // Fetch current session state
+  const { data: session } = await sb.from('trivia_sessions')
+    .select('*').eq('id', sessionId).single();
+
+  if (session) handleSessionUpdate(session);
+  else show('sWait');
+}
+
+// ── SESSION UPDATE HANDLER ────────────────────────────────────
+function handleSessionUpdate(session) {
+  const { phase, round_index, question_index } = session;
+
+  // Don't re-render same state
+  if (phase === currentPhase &&
+      session.round_index === window._lastRound &&
+      session.question_index === window._lastQ) return;
+
+  currentPhase    = phase;
+  window._lastRound = round_index;
+  window._lastQ     = question_index;
+  hasAnswered       = false;
+  myLastAnswer      = null;
+
+  switch(phase) {
+    case 'lobby':
+      show('sWait');
+      document.getElementById('waitTitle').textContent = 'Waiting to Start…';
+      document.getElementById('waitSub').textContent   = 'The host will start the game shortly. Watch the big screen!';
+      break;
+
+    case 'intro':
+      show('sWait');
+      const r = ROUNDS_CONFIG[round_index];
+      document.getElementById('waitTitle').textContent = `${r?.icon||'🎵'} Round ${round_index+1}`;
+      document.getElementById('waitSub').textContent   = `${r?.name||''} — Get ready!`;
+      document.getElementById('waitScore').textContent = playerScore.toLocaleString();
+      break;
+
+    case 'question':
+      renderQuestion(round_index, question_index);
+      break;
+
+    case 'reveal':
+      if (myLastAnswer !== null) {
+        renderResult(round_index, question_index, myLastAnswer);
+      } else {
+        // Didn't answer — show reveal with no pts
+        renderResult(round_index, question_index, -1);
+      }
+      break;
+
+    case 'leaderboard':
+      renderLeaderboard(round_index);
+      break;
+
+    case 'gameover':
+      renderGameOver();
+      break;
+  }
+}
+
+// ── RENDER QUESTION ───────────────────────────────────────────
+function renderQuestion(roundIdx, qIdx) {
+  const r = ROUNDS_CONFIG[roundIdx];
+  const q = r?.questions[qIdx];
+  if (!q) return;
+
+  document.getElementById('pQNum').textContent   = `Q${qIdx+1}`;
+  document.getElementById('pQRound').textContent = `${r.icon} ${r.name}`;
+  document.getElementById('pQPts').textContent   = `${q.pts} PTS`;
+  document.getElementById('pQText').textContent  = q.q;
+  document.getElementById('submittedMsg').style.display = 'none';
+
+  document.getElementById('pAnsList').innerHTML = q.answers.map((a,i)=>`
+    <div class="ans-btn" id="ab${i}" onclick="submitAnswer(${roundIdx},${qIdx},${i},${q.correct},${q.pts})">
+      <div class="ans-letter">${LETTERS[i]}</div>
+      <div class="ans-text">${a}</div>
+    </div>
+  `).join('');
+
+  // Timer bar
+  clearInterval(timerBarInt);
+  let pct = 100;
+  const bar = document.getElementById('timerBar');
+  bar.style.width = '100%';
+  bar.style.transition = 'none';
+  setTimeout(()=>{
+    bar.style.transition = 'width 1s linear';
+    timerBarInt = setInterval(()=>{
+      pct -= (100/20);
+      if (pct < 0) pct = 0;
+      bar.style.width = pct+'%';
+      bar.style.background = pct < 25
+        ? 'linear-gradient(90deg,#FF2D78,#FFD600)'
+        : 'linear-gradient(90deg,#FF2D78,#FFD600)';
+      if (pct <= 0) clearInterval(timerBarInt);
+    }, 1000);
+  }, 50);
+
+  show('sQuestion');
+}
+
+// ── SUBMIT ANSWER ─────────────────────────────────────────────
+async function submitAnswer(roundIdx, qIdx, answerIdx, correctIdx, pts) {
+  if (hasAnswered) return;
+  hasAnswered  = true;
+  myLastAnswer = answerIdx;
+  clearInterval(timerBarInt);
+
+  const isCorrect  = answerIdx === correctIdx;
+  const ptsEarned  = isCorrect ? pts : 0;
+  if (isCorrect) playerScore += ptsEarned;
+
+  // Lock all buttons, highlight selected
+  document.querySelectorAll('.ans-btn').forEach((btn,i)=>{
+    btn.classList.add('locked');
+    if(i===answerIdx) btn.classList.add('selected');
+  });
+
+  document.getElementById('submittedMsg').style.display = 'block';
+  document.getElementById('waitScore').textContent = playerScore.toLocaleString();
+
+  // Write to Supabase
+  await sb.from('trivia_answers').insert({
+    session_id:     sessionId,
+    player_id:      playerId,
+    round_index:    roundIdx,
+    question_index: qIdx,
+    answer_index:   answerIdx,
+    is_correct:     isCorrect,
+    pts_earned:     ptsEarned
+  });
+
+  // Update player score in DB
+  await sb.from('trivia_players').update({
+    score:  playerScore,
+    streak: isCorrect ? (await getStreak()+1) : 0
+  }).eq('id', playerId);
+}
+
+async function getStreak() {
+  const { data } = await sb.from('trivia_players').select('streak').eq('id', playerId).single();
+  return data?.streak || 0;
+}
+
+// ── RENDER RESULT ─────────────────────────────────────────────
+function renderResult(roundIdx, qIdx, chosenIdx) {
+  const q = ROUNDS_CONFIG[roundIdx]?.questions[qIdx];
+  if (!q) return;
+
+  const isCorrect = chosenIdx === q.correct;
+  const noAnswer  = chosenIdx === -1;
+
+  document.getElementById('resIcon').textContent  = noAnswer ? '⏰' : (isCorrect ? '🎯' : '😬');
+  document.getElementById('resLabel').textContent = noAnswer ? 'Time\'s Up!' : (isCorrect ? 'Correct!' : 'Not Quite!');
+  document.getElementById('resLabel').className   = `result-label ${isCorrect?'correct':'wrong'}`;
+  document.getElementById('resPts').textContent   = isCorrect ? `+${q.pts} pts` : (noAnswer ? 'No answer submitted' : '+0 pts');
+  document.getElementById('resFact').textContent  = q.fact;
+  document.getElementById('resTotalScore').textContent = playerScore.toLocaleString();
+  document.getElementById('resNext').textContent  = 'Next question coming up…';
+
+  show('sResult');
+}
+
+// ── LEADERBOARD ───────────────────────────────────────────────
+async function renderLeaderboard(roundIdx) {
+  const isLast = roundIdx === ROUNDS_CONFIG.length - 1;
+  document.getElementById('lbSubM').textContent = isLast
+    ? 'Final Standings'
+    : `After Round ${roundIdx+1} · ${ROUNDS_CONFIG.length-roundIdx-1} remaining`;
+
+  const { data: players } = await sb.from('trivia_players')
+    .select('id, name, score, streak')
+    .eq('session_id', sessionId)
+    .order('score', { ascending:false });
+
+  const max = players?.[0]?.score || 1;
+  const cls = ['gold','silver','bronze'];
+  const medals = ['🥇','🥈','🥉'];
+
+  document.getElementById('lbListM').innerHTML = (players||[]).map((p,i)=>`
+    <div class="lb-row-m ${cls[i]||''} ${p.id===playerId?'me':''}">
+      <div class="lb-rk">${i+1}</div>
+      ${i<3?`<span style="font-size:18px">${medals[i]}</span>`:''}
+      <div class="lb-nm">${p.name}${p.id===playerId?' ⭐':''}</div>
+      <div class="lb-sc">${(p.score||0).toLocaleString()}</div>
+      <div class="lb-bar-m"><div class="lb-bar-m-fill" style="width:${((p.score||0)/max*100).toFixed(1)}%"></div></div>
+    </div>
+  `).join('');
+
+  show('sLB');
+}
+
+// ── GAME OVER ─────────────────────────────────────────────────
+async function renderGameOver() {
+  const { data: players } = await sb.from('trivia_players')
+    .select('id, name, score')
+    .eq('session_id', sessionId)
+    .order('score', { ascending:false });
+
+  const rank = (players||[]).findIndex(p=>p.id===playerId)+1;
+  const total = players?.length||0;
+
+  document.getElementById('overScore').textContent = playerScore.toLocaleString();
+  document.getElementById('overRank').textContent  = rank > 0 ? `You finished #${rank} of ${total} players` : '';
+  document.getElementById('overSub').textContent   = rank===1
+    ? `🎉 YOU WON! Nicely done, ${playerName}!`
+    : `Great game, ${playerName}! See you next trivia night.`;
+
+  show('sOver');
+}
+
+// ── ENTER TO JOIN ─────────────────────────────────────────────
+document.getElementById('nameInput').addEventListener('keydown', e => {
+  if (e.key==='Enter') joinGame();
+});
+</script>
+</body>
+</html>
