@@ -14,7 +14,6 @@
 
   .app{min-height:100%;display:flex;flex-direction:column;padding-bottom:max(20px,env(safe-area-inset-bottom));}
 
-  /* HEADER */
   .host-header{padding:20px 22px 16px;border-bottom:1px solid var(--sep);background:rgba(2,12,24,0.9);position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);}
   .host-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
   .host-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:rgba(240,238,248,0.4);}
@@ -23,7 +22,6 @@
   .host-title{font-family:'Bebas Neue';font-size:28px;letter-spacing:2px;color:var(--white);}
   .host-sub{font-size:12px;color:var(--dim);margin-top:2px;}
 
-  /* STATUS BAR */
   .status-bar{padding:14px 22px;background:var(--panel);border-bottom:1px solid var(--sep);display:flex;align-items:center;justify-content:space-between;}
   .status-phase{display:flex;align-items:center;gap:8px;}
   .phase-dot{width:8px;height:8px;border-radius:50%;background:var(--dim);}
@@ -33,43 +31,28 @@
   .phase-label{font-size:12px;font-weight:600;color:var(--white);letter-spacing:0.05em;text-transform:uppercase;}
   .session-id{font-size:10px;color:rgba(240,238,248,0.2);letter-spacing:0.05em;}
 
-  /* STATS ROW */
   .stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--sep);border-bottom:1px solid var(--sep);}
   .stat-cell{background:var(--panel);padding:12px 16px;text-align:center;}
   .stat-cell-val{font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;}
   .stat-cell-val.pink{color:var(--pink)}.stat-cell-val.cyan{color:var(--cyan)}.stat-cell-val.gold{color:var(--gold)}
   .stat-cell-lbl{font-size:9px;color:var(--dim);letter-spacing:0.2em;text-transform:uppercase;margin-top:2px;}
 
-  /* MAIN CONTROLS */
   .controls{padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
   .section-eye{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);font-weight:600;margin-bottom:4px;}
 
-  /* PRIMARY ACTION BUTTON */
-  .btn-primary{
-    width:100%;padding:22px;
-    font-family:'Bebas Neue';font-size:26px;letter-spacing:3px;
-    border:none;border-radius:14px;cursor:pointer;
-    transition:all 0.15s;color:white;
-  }
+  .btn-primary{width:100%;padding:22px;font-family:'Bebas Neue';font-size:26px;letter-spacing:3px;border:none;border-radius:14px;cursor:pointer;transition:all 0.15s;color:white;}
   .btn-primary:active{transform:scale(0.97);}
   .btn-primary.start{background:linear-gradient(135deg,var(--pink),var(--purple));}
   .btn-primary.pause{background:rgba(255,214,0,0.15);border:1.5px solid rgba(255,214,0,0.4);color:var(--gold);}
   .btn-primary.resume{background:rgba(57,255,107,0.15);border:1.5px solid rgba(57,255,107,0.4);color:var(--lime);}
   .btn-primary:disabled{opacity:0.35;cursor:default;}
 
-  /* SECONDARY BUTTONS */
   .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .btn-sec{
-    padding:16px;font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;
-    border:1.5px solid var(--sep);border-radius:12px;
-    background:rgba(240,238,248,0.05);color:var(--white);
-    cursor:pointer;transition:all 0.15s;text-align:center;
-  }
+  .btn-sec{padding:16px;font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;border:1.5px solid var(--sep);border-radius:12px;background:rgba(240,238,248,0.05);color:var(--white);cursor:pointer;transition:all 0.15s;text-align:center;}
   .btn-sec:active{transform:scale(0.97);}
   .btn-sec.danger{border-color:rgba(255,45,120,0.3);color:var(--pink);background:rgba(255,45,120,0.05);}
   .btn-sec:disabled{opacity:0.3;cursor:default;}
 
-  /* ROUND PROGRESS */
   .round-progress{background:var(--card);border:1px solid var(--sep);border-radius:12px;padding:16px 18px;}
   .round-track{display:flex;gap:6px;margin-top:10px;}
   .round-block{flex:1;height:8px;border-radius:4px;background:rgba(240,238,248,0.08);transition:all 0.4s;}
@@ -79,14 +62,12 @@
   .round-name-chip{flex:1;text-align:center;font-size:8px;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;}
   .round-name-chip.active{color:var(--cyan);}
 
-  /* CURRENT QUESTION */
   .current-q{background:var(--card);border:1px solid var(--sep);border-radius:12px;padding:16px 18px;}
   .cq-label{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
   .cq-text{font-size:16px;color:var(--white);line-height:1.4;font-weight:500;}
   .cq-meta{display:flex;gap:10px;margin-top:10px;}
   .cq-chip{font-size:10px;color:var(--dim);background:rgba(240,238,248,0.06);border:1px solid var(--sep);border-radius:6px;padding:3px 10px;}
 
-  /* ACTIVITY */
   .activity-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
   .act-item{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:8px;padding:8px 12px;border:1px solid var(--sep);animation:slideIn 0.3s ease both;}
   @keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
@@ -95,12 +76,10 @@
   .act-detail{font-size:11px;color:var(--dim);}
   .act-pts{font-size:13px;font-weight:700;color:var(--lime);}
 
-  /* TOAST */
   .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--sep);color:var(--white);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:100;display:none;white-space:nowrap;}
   .toast.show{display:block;animation:fadeUp 0.3s ease both;}
   @keyframes fadeUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 
-  /* NO SESSION */
   .no-session{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:40px;}
   .no-session-icon{font-size:56px;}
   .no-session-title{font-family:'Bebas Neue';font-size:32px;letter-spacing:3px;color:var(--white);}
@@ -114,7 +93,6 @@
 <body>
 <div class="app" id="app">
 
-  <!-- NO SESSION VIEW -->
   <div id="viewNoSession" style="display:flex;flex-direction:column;flex:1;">
     <div class="host-header">
       <div class="host-header-top">
@@ -134,7 +112,6 @@
     </div>
   </div>
 
-  <!-- MAIN HOST VIEW -->
   <div id="viewMain" style="display:none;flex-direction:column;flex:1;">
 
     <div class="host-header">
@@ -162,26 +139,22 @@
 
     <div class="controls">
 
-      <!-- PRIMARY ACTION -->
       <div>
         <div class="section-eye">Game Control</div>
         <button class="btn-primary start" id="primaryBtn" onclick="primaryAction()">Start Game</button>
       </div>
 
-      <!-- SECONDARY CONTROLS -->
       <div class="btn-row">
         <button class="btn-sec" id="pauseBtn" onclick="togglePause()" disabled>⏸ Pause</button>
         <button class="btn-sec danger" id="skipBtn" onclick="skipQuestion()" disabled>⏭ Skip Q</button>
       </div>
 
-      <!-- ROUND PROGRESS -->
       <div class="round-progress">
         <div class="section-eye">Round Progress</div>
         <div class="round-track" id="roundTrack"></div>
         <div class="round-names" id="roundNames"></div>
       </div>
 
-      <!-- CURRENT QUESTION -->
       <div class="current-q" id="currentQBox" style="display:none;">
         <div class="cq-label">Current Question</div>
         <div class="cq-text" id="cqText">—</div>
@@ -192,7 +165,6 @@
         </div>
       </div>
 
-      <!-- LIVE ACTIVITY -->
       <div>
         <div class="section-eye">Live Activity</div>
         <div class="activity-list" id="hostActivity"></div>
@@ -218,21 +190,19 @@ const ROUNDS_META=[
 
 const ROUND_NAMES=['Classic Rock','80s Hits','90s Bangers','Country Roads','Pop Anthems'];
 const QUESTIONS=[
-  // Mirrored from index/play for current-question display
-  ["Which band recorded 'Stairway to Heaven' on their 1971 untitled fourth album?","Finish the lyric: 'I can't get no… _____'","What year did Queen release 'Bohemian Rhapsody'?","Which band featured Mick Fleetwood and Lindsey Buckingham?","'Hotel California' was recorded by which band?"],
-  ["Which 80s pop star sang 'Like a Virgin' at the 1984 MTV VMAs?","'Don't You (Forget About Me)' was the theme to which 1985 film?","What band performed 'Take On Me' in 1985?","Michael Jackson's 'Thriller' album was released in which year?","Which song contains: 'Every breath you take, every move you make'?"],
-  ["Nirvana's 'Smells Like Teen Spirit' appeared on which album?","Who sang 'Baby Got Back' in 1992?","The 1997 hit 'MMMBop' was performed by which group?","Which Alanis Morissette album featured 'Ironic' and 'You Oughta Know'?","'I want it that way' — by which group?"],
-  ["Which country icon was known as 'The Man in Black'?","Who sang 'Before He Cheats' in 2005?","'On the road again, just can't wait to get on the road again' is by?","Garth Brooks' 'Friends in Low Places' is set at what type of event?","Which singer released 'Jolene' in 1973?"],
-  ["Taylor Swift's 'Shake It Off' was from which album?","Which artist sang 'Rolling in the Deep'?","'We found love in a hopeless place' — by which artist?","Which pop queen sang 'Roar' and 'Firework'?","How many Grammys has Beyoncé won — more than any artist in history?"]
+  ["Which AC/DC album, released in 1980, was a tribute to recently deceased lead singer Bon Scott?","Pink Floyd's 'Dark Side of the Moon' was released in what year?","Which guitarist played the iconic guitar solo on Guns N' Roses' 'November Rain'?","Which band's debut album cover features a baby underwater reaching for a dollar bill?","What Eric Clapton-led supergroup released 'Sunshine of Your Love' in 1967?"],
+  ["Which 1984 Prince film featured the hit song 'When Doves Cry'?","Which #1 hit was on Bon Jovi's 1986 album 'Slippery When Wet'?","What 1985 song became Whitney Houston's first US #1 single?","Cyndi Lauper's 'Girls Just Want to Have Fun' was originally written by which male artist?","Which 80s band's hits include 'Sweet Child O' Mine' and 'Welcome to the Jungle'?"],
+  ["Whitney Houston's 1992 cover of 'I Will Always Love You' was originally written by which country legend?","What grunge band, fronted by Eddie Vedder, released the album 'Ten' in 1991?","Which Spice Girl was nicknamed 'Posh'?","Which 1999 Santana album featuring 'Smooth' won 9 Grammy Awards?","What was the name of TLC's massively successful 1994 album?"],
+  ["Which country star's 1992 hit 'Achy Breaky Heart' launched a line dance craze?","What 1980 Kenny Rogers song advised: 'Know when to hold 'em, know when to fold 'em'?","Which trio recorded the 2009 hit 'Need You Now'?","Shania Twain's 1997 album 'Come On Over' has sold over how many copies worldwide?","Which Garth Brooks song, his first #1, is about regret over leaving an old love behind?"],
+  ["Which Dua Lipa album includes the hits 'Don't Start Now' and 'Levitating'?","Bruno Mars sang 'Uptown Funk' alongside which producer-singer?","Ed Sheeran's 'Shape of You' came from which 2017 album?","Which 2014 Sam Smith hit shared a melody with Tom Petty's 'I Won't Back Down'?","What 2022 Harry Styles song spent 15 weeks at #1 on the Billboard Hot 100?"]
 ];
-const PTS=[[200,100,200,200,100],[100,200,200,200,100],[200,100,200,200,100],[100,200,100,200,200],[200,100,200,200,300]];
+const PTS=[[200,200,100,100,200],[100,200,200,200,100],[100,200,100,200,200],[100,100,200,200,200],[200,100,100,200,300]];
 
 const AV_COLORS=['#FF2D78','#00E5FF','#9D4EDD','#FFD600','#39FF6B','#FF8C00'];
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let sessionId=null,currentSession=null,playerCount=0,answerCount=0;
 
-// Auto-connect from URL param ?s=sessionId
 const urlParams=new URLSearchParams(window.location.search);
 const autoSession=urlParams.get('s');
 if(autoSession){document.getElementById('sessionInput').value=autoSession;connectToSession();}
@@ -245,7 +215,6 @@ function showToast(msg,duration=2500){
 
 async function connectToSession(){
   const input=document.getElementById('sessionInput').value.trim();
-  // Accept full URL or just the UUID
   const uuidMatch=input.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
   if(!uuidMatch){document.getElementById('connectErr').textContent='Invalid session ID';document.getElementById('connectErr').style.display='block';return;}
   const sid=uuidMatch[0];
@@ -256,12 +225,10 @@ async function connectToSession(){
   sessionId=sid;
   currentSession=data;
 
-  // Switch views
   document.getElementById('viewNoSession').style.display='none';
   document.getElementById('viewMain').style.display='flex';
   document.getElementById('viewMain').style.flexDirection='column';
 
-  // Build round tracker
   const track=document.getElementById('roundTrack');
   const names=document.getElementById('roundNames');
   ROUNDS_META.forEach((_,i)=>{
@@ -269,22 +236,18 @@ async function connectToSession(){
     const n=document.createElement('div');n.className='round-name-chip';n.id=`rn-${i}`;n.textContent=ROUNDS_META[i].icon;names.appendChild(n);
   });
 
-  // Subscribe to session updates
   sb.channel('host-session-'+sessionId)
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${sessionId}`},p=>{currentSession=p.new;updateUI(p.new);})
     .subscribe();
 
-  // Subscribe to player joins
   sb.channel('host-players-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${sessionId}`},p=>onPlayerJoin(p.new))
     .subscribe();
 
-  // Subscribe to answers
   sb.channel('host-answers-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_answers',filter:`session_id=eq.${sessionId}`},p=>onAnswerIn(p.new))
     .subscribe();
 
-  // Load current player count
   const{data:players}=await sb.from('trivia_players').select('id').eq('session_id',sessionId);
   playerCount=players?.length||0;
   document.getElementById('hStatPlayers').textContent=playerCount;
@@ -313,12 +276,10 @@ function updateUI(s){
   const pauseBtn=document.getElementById('pauseBtn');
   const skipBtn=document.getElementById('skipBtn');
 
-  // Phase dot color
   dot.className='phase-dot';
   if(phase==='question')dot.classList.add('live');
   else if(phase==='paused')dot.classList.add('paused');
 
-  // Labels & buttons per phase
   switch(phase){
     case'lobby':
       lbl.textContent='Lobby — Waiting';
@@ -362,7 +323,6 @@ function updateUI(s){
       break;
   }
 
-  // Round tracker
   ROUNDS_META.forEach((_,i)=>{
     const b=document.getElementById(`rb-${i}`);
     const n=document.getElementById(`rn-${i}`);
@@ -390,20 +350,16 @@ async function primaryAction(){
   const phase=currentSession.phase;
 
   if(phase==='lobby'){
-    // Start game — update phase to intro round 0
     await sb.from('trivia_sessions').update({phase:'intro',round_index:0,question_index:0,updated_at:new Date().toISOString()}).eq('id',sessionId);
     showToast('Game started! 🎮');
   } else if(phase==='question'){
-    // Force end timer — jump to reveal
     const ri=currentSession.round_index,qi=currentSession.question_index;
     await sb.from('trivia_sessions').update({phase:'reveal',round_index:ri,question_index:qi,updated_at:new Date().toISOString()}).eq('id',sessionId);
     showToast('Timer ended early');
   } else if(phase==='paused'){
-    // Resume
     await sb.from('trivia_sessions').update({phase:'question',round_index:currentSession.round_index,question_index:currentSession.question_index,updated_at:new Date().toISOString()}).eq('id',sessionId);
     showToast('Resumed ▶');
   } else if(phase==='gameover'){
-    // Could reload — for now just show toast
     showToast('Reload the TV to start a new game');
   }
 }
@@ -423,7 +379,6 @@ async function skipQuestion(){
   if(!sessionId||!currentSession)return;
   if(currentSession.phase!=='question')return;
   const ri=currentSession.round_index,qi=currentSession.question_index;
-  // Jump to next question's reveal (TV will handle transition)
   await sb.from('trivia_sessions').update({phase:'reveal',round_index:ri,question_index:qi,updated_at:new Date().toISOString()}).eq('id',sessionId);
   showToast(`Q${qi+1} skipped ⏭`);
 }
