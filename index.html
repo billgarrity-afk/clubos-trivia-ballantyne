@@ -43,39 +43,21 @@
   .live-time{font-family:'Space Grotesk';font-size:30px;color:var(--white);font-weight:700;letter-spacing:1px;}
   .time-lbl{font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;text-align:right;margin-top:2px;}
 
-  /* PAUSE BUTTON in header */
-  .pause-btn{
-    display:flex;align-items:center;gap:8px;
-    background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);
-    border-radius:8px;padding:8px 16px;cursor:pointer;
-    font-family:'Bebas Neue';font-size:16px;letter-spacing:2px;color:var(--gold);
-    transition:all 0.2s;
-  }
+  .pause-btn{display:flex;align-items:center;gap:8px;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:'Bebas Neue';font-size:16px;letter-spacing:2px;color:var(--gold);transition:all 0.2s;}
   .pause-btn:hover{background:rgba(255,214,0,0.2);}
   .pause-btn.paused{background:rgba(57,255,107,0.1);border-color:rgba(57,255,107,0.4);color:var(--lime);}
 
-  /* MAIN */
   .main-grid{display:grid;grid-template-columns:1fr 400px;overflow:hidden;}
   .question-area{padding:0 56px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
   .screen{display:none;}
   .screen.active{display:flex;flex-direction:column;height:100%;justify-content:center;}
 
-  /* PAUSE OVERLAY */
-  .pause-overlay{
-    position:absolute;inset:0;
-    background:rgba(2,12,24,0.92);
-    backdrop-filter:blur(12px);
-    display:none;
-    flex-direction:column;align-items:center;justify-content:center;
-    gap:20px;z-index:50;
-    animation:fadeUp 0.3s ease both;
-  }
+  .pause-overlay{position:absolute;inset:0;background:rgba(2,12,24,0.92);backdrop-filter:blur(12px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:50;animation:fadeUp 0.3s ease both;}
   .pause-overlay.active{display:flex;}
   .pause-icon{font-size:80px;}
   .pause-title{font-family:'Bebas Neue';font-size:72px;letter-spacing:6px;color:var(--gold);}
   .pause-sub{font-size:18px;color:var(--dim);letter-spacing:2px;}
 
-  /* LOBBY */
   .lobby{text-align:center;align-items:center;}
   .lobby-icon{font-size:80px;margin-bottom:20px;animation:bounce 1.2s ease-in-out infinite alternate;}
   @keyframes bounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-14px) scale(1.06)}}
@@ -86,7 +68,6 @@
   .start-btn{margin-top:32px;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:14px;padding:20px 52px;font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:white;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
   .start-btn:hover,.start-btn:focus{transform:translateY(-3px);box-shadow:0 8px 32px rgba(255,45,120,0.4);outline:none;}
 
-  /* ROUND INTRO */
   .round-intro{text-align:center;align-items:center;}
   .ri-icon{font-size:88px;margin-bottom:20px;animation:bounce 1.2s ease-in-out infinite alternate;}
   .ri-eye{font-size:12px;letter-spacing:5px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;}
@@ -94,7 +75,6 @@
   .ri-sub{font-size:20px;color:var(--dim);max-width:640px;line-height:1.6;margin-bottom:28px;}
   .ri-countdown{font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--pink);}
 
-  /* QUESTION */
   .q-meta{display:flex;align-items:center;gap:16px;margin-bottom:24px;animation:fadeUp 0.45s ease both;}
   .q-num{font-family:'Bebas Neue';font-size:17px;letter-spacing:3px;color:var(--pink);background:rgba(255,45,120,0.1);border:1px solid rgba(255,45,120,0.3);padding:4px 14px;border-radius:4px;}
   .q-cat{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);font-weight:600;}
@@ -112,7 +92,6 @@
   .correct-sweep{position:absolute;inset:0;background:linear-gradient(90deg,rgba(57,255,107,0.06),transparent);animation:sweep 1s ease forwards;pointer-events:none;}
   @keyframes sweep{from{width:0}to{width:100%}}
 
-  /* TIMER */
   .timer-zone{position:absolute;top:36px;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
   .timer-ring{width:88px;height:88px;position:relative;}
   .timer-ring svg{transform:rotate(-90deg);width:88px;height:88px;}
@@ -122,12 +101,10 @@
   .timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:32px;color:var(--white);}
   .timer-lbl{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
 
-  /* REVEAL */
   .rev-fact-wrap{margin-top:24px;animation:fadeUp 0.5s ease 0.5s both;}
   .rev-fact-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
   .rev-fact-text{font-size:20px;color:var(--white);max-width:900px;line-height:1.65;opacity:0.85;}
 
-  /* LEADERBOARD */
   .lb-title{font-family:'Bebas Neue';font-size:56px;letter-spacing:4px;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fadeUp 0.4s ease both;}
   .lb-sub{font-size:12px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:28px;animation:fadeUp 0.4s ease 0.06s both;}
   .lb-list{display:flex;flex-direction:column;gap:10px;}
@@ -147,7 +124,6 @@
   .lb-bar-wrap{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--sep);}
   .lb-bar{height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width 1.6s cubic-bezier(0.16,1,0.3,1);}
 
-  /* GAME OVER */
   .game-over{text-align:center;align-items:center;}
   .go-trophy{font-size:100px;margin-bottom:20px;animation:bounce 1.2s ease-in-out infinite alternate;}
   .go-title{font-family:'Bebas Neue';font-size:96px;letter-spacing:6px;background:linear-gradient(135deg,var(--gold),var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
@@ -155,7 +131,6 @@
   .go-winner b{color:var(--gold);font-size:30px;}
   .go-restart{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);margin-top:24px;}
 
-  /* RIGHT PANEL */
   .right-panel{background:rgba(4,18,36,0.8);border-left:1px solid var(--sep);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(12px);}
   .qr-section{padding:20px 22px;border-bottom:1px solid var(--sep);display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;}
   .qr-eye{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--pink);font-weight:600;}
@@ -183,7 +158,6 @@
   .av-action{font-size:11px;color:var(--dim);}
   .av-pts{font-family:'Space Grotesk';font-size:15px;font-weight:700;color:var(--lime);}
 
-  /* FOOTER */
   .footer{background:rgba(2,10,20,0.95);border-top:1px solid var(--sep);display:flex;align-items:center;justify-content:space-between;padding:0 52px;backdrop-filter:blur(20px);}
   .footer-center{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:10px;}
   .fdot{width:4px;height:4px;border-radius:50%;background:var(--pink);}
@@ -191,11 +165,9 @@
   .clubos-powered{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,238,248,0.25);}
   .clubos-wordmark{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:0.04em;color:rgba(240,238,248,0.4);}
   .clubos-wordmark span{color:rgba(201,168,76,0.6);}
-  /* Keyboard hint */
   .key-hint{font-size:10px;color:rgba(240,238,248,0.2);letter-spacing:1px;}
   .key-hint kbd{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:3px;padding:1px 5px;font-size:10px;font-family:'DM Sans';}
 
-  /* CONFETTI */
   .cfwrap{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden;}
   .cp{position:absolute;width:9px;height:9px;top:-20px;opacity:0;animation:cfFall linear forwards;border-radius:2px;}
   @keyframes cfFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(1200px) rotate(720deg)}}
@@ -213,40 +185,40 @@ const CONFIG={
   footerMsg:'Scan to play · No app needed · Submit answers from your phone',
   questionSecs:20,revealSecs:7,introCDSecs:8,
   rounds:[
-    {name:'Classic Rock',icon:'🎸',intro:'Name that riff. Finish that lyric. Pure classic rock — let\'s see who really knows their stuff.',questions:[
-      {q:"Which band recorded 'Stairway to Heaven' on their 1971 untitled fourth album?",answers:["The Rolling Stones","Led Zeppelin","The Who","Deep Purple"],correct:1,fact:"Led Zeppelin IV has no official title — the band intentionally released it with zero text on the cover.",pts:200},
-      {q:"Finish the lyric: 'I can't get no… _____'",answers:["Satisfaction","Love from you","Sleep at night","Peace of mind"],correct:0,fact:"Keith Richards came up with the iconic riff in his sleep and recorded it on a cassette player by his bed.",pts:100},
-      {q:"What year did Queen release 'Bohemian Rhapsody'?",answers:["1971","1973","1975","1977"],correct:2,fact:"At nearly 6 minutes, radio execs called it too long. It became one of the best-selling singles of all time.",pts:200},
-      {q:"Which band featured Mick Fleetwood and Lindsey Buckingham?",answers:["The Eagles","Fleetwood Mac","Crosby Stills & Nash","Heart"],correct:1,fact:"'Rumours' (1977) spent 31 weeks at #1 and has sold over 40 million copies worldwide.",pts:200},
-      {q:"'Hotel California' was recorded by which band?",answers:["Lynyrd Skynyrd","Creedence Clearwater","The Eagles","Tom Petty & the Heartbreakers"],correct:2,fact:"The guitar outro took Don Felder and Joe Walsh 16 takes. The whole song is over 6 minutes.",pts:100}
+    {name:'Classic Rock',icon:'🎸',intro:"Riffs that defined a generation. Anthems sung in cars and crowds. Let's see who knows.",questions:[
+      {q:"Which AC/DC album, released in 1980, was a tribute to recently deceased lead singer Bon Scott?",answers:["Highway to Hell","Back in Black","For Those About to Rock","Powerage"],correct:1,fact:"'Back in Black' is the second best-selling album of all time — only behind Michael Jackson's 'Thriller.'",pts:200},
+      {q:"Pink Floyd's 'Dark Side of the Moon' was released in what year?",answers:["1971","1973","1975","1977"],correct:1,fact:"It spent over 700 consecutive weeks on the Billboard 200 — the longest run in chart history.",pts:200},
+      {q:"Which guitarist played the iconic guitar solo on Guns N' Roses' 'November Rain'?",answers:["Eddie Van Halen","Eric Clapton","Slash","Jimmy Page"],correct:2,fact:"The 9-minute 'November Rain' video was the most expensive music video ever made when it was released in 1992.",pts:100},
+      {q:"Which band's debut album cover features a baby underwater reaching for a dollar bill?",answers:["Pearl Jam","Soundgarden","Nirvana","Stone Temple Pilots"],correct:2,fact:"Nirvana's 'Nevermind' (1991) knocked Michael Jackson's 'Dangerous' off the #1 spot in early 1992.",pts:100},
+      {q:"What Eric Clapton-led supergroup released 'Sunshine of Your Love' in 1967?",answers:["Cream","Derek and the Dominos","Blind Faith","The Yardbirds"],correct:0,fact:"Cream existed for only about two years, but they're widely considered the first true rock supergroup.",pts:200}
     ]},
-    {name:'80s Hits',icon:'🕺',intro:'Big hair, synthesizers, and neon. If you know the decade, you know the music.',questions:[
-      {q:"Which 80s pop star sang 'Like a Virgin' at the 1984 MTV VMAs?",answers:["Cyndi Lauper","Pat Benatar","Madonna","Whitney Houston"],correct:2,fact:"Madonna's performance atop a giant wedding cake is considered one of the most iconic moments in VMA history.",pts:100},
-      {q:"'Don't You (Forget About Me)' was the theme to which 1985 film?",answers:["Ferris Bueller's Day Off","The Breakfast Club","Sixteen Candles","Pretty in Pink"],correct:1,fact:"Simple Minds almost turned the song down. It became their only #1 US hit.",pts:200},
-      {q:"What band performed 'Take On Me' in 1985?",answers:["Duran Duran","Flock of Seagulls","a-ha","Depeche Mode"],correct:2,fact:"The music video used rotoscoping — 3,000 individually drawn frames took 16 weeks to complete.",pts:200},
-      {q:"Michael Jackson's 'Thriller' album was released in which year?",answers:["1980","1982","1984","1986"],correct:1,fact:"Thriller is the best-selling album of all time with estimated sales between 66 and 70 million copies.",pts:200},
-      {q:"Which song contains: 'Every breath you take, every move you make'?",answers:["Roxanne","Every Little Thing She Does Is Magic","Every Breath You Take","Message in a Bottle"],correct:2,fact:"Sting wrote the song in 30 minutes at a piano in Jamaica. He calls it his most misunderstood — it's about obsession.",pts:100}
+    {name:'80s Hits',icon:'🕺',intro:"Synth-pop, hair metal, neon-lit ballads. The decade that wouldn't quit.",questions:[
+      {q:"Which 1984 Prince film featured the hit song 'When Doves Cry'?",answers:["Sign O' The Times","Purple Rain","Under the Cherry Moon","Graffiti Bridge"],correct:1,fact:"'Purple Rain' won Prince an Academy Award for Best Original Song Score.",pts:100},
+      {q:"Which #1 hit was on Bon Jovi's 1986 album 'Slippery When Wet'?",answers:["Wanted Dead or Alive","You Give Love a Bad Name","Bad Medicine","Always"],correct:1,fact:"'You Give Love a Bad Name' was Bon Jovi's first #1 hit on the Billboard Hot 100. The album sold over 28 million copies worldwide.",pts:200},
+      {q:"What 1985 song became Whitney Houston's first US #1 single?",answers:["I Wanna Dance with Somebody","How Will I Know","Saving All My Love for You","Greatest Love of All"],correct:2,fact:"She won her first Grammy for the song — Best Female Pop Vocal Performance, 1986.",pts:200},
+      {q:"Cyndi Lauper's 'Girls Just Want to Have Fun' was originally written by which male artist?",answers:["Phil Collins","Robert Hazard","Hall & Oates","Billy Joel"],correct:1,fact:"Robert Hazard wrote it from a male perspective in 1979. Cyndi rewrote the lyrics to make it a feminist anthem.",pts:200},
+      {q:"Which 80s band's hits include 'Sweet Child O' Mine' and 'Welcome to the Jungle'?",answers:["Aerosmith","Mötley Crüe","Guns N' Roses","Def Leppard"],correct:2,fact:"Slash wrote the 'Sweet Child O' Mine' opening riff as a warm-up exercise. The band turned it into a hit.",pts:100}
     ]},
-    {name:'90s Bangers',icon:'💿',intro:'From grunge to hip-hop to pop — if you grew up in the 90s, this one\'s yours.',questions:[
-      {q:"Nirvana's 'Smells Like Teen Spirit' appeared on which album?",answers:["Bleach","Nevermind","In Utero","Incesticide"],correct:1,fact:"The song's title came from graffiti Kathleen Hanna wrote on Kurt Cobain's wall as a joke.",pts:200},
-      {q:"Who sang 'Baby Got Back' in 1992?",answers:["LL Cool J","MC Hammer","Vanilla Ice","Sir Mix-a-Lot"],correct:3,fact:"MTV banned the video initially then reversed. It spent 5 weeks at #1.",pts:100},
-      {q:"The 1997 hit 'MMMBop' was performed by which group?",answers:["Backstreet Boys","Hanson","98 Degrees","New Kids on the Block"],correct:1,fact:"The Hanson brothers (ages 11, 14, and 16) co-wrote it. It debuted at #1 in 27 countries simultaneously.",pts:200},
-      {q:"Which Alanis Morissette album featured 'Ironic' and 'You Oughta Know'?",answers:["Supposed Former Infatuation Junkie","Jagged Little Pill","Under Rug Swept","So-Called Chaos"],correct:1,fact:"Jagged Little Pill won the 1996 Grammy for Album of the Year. Alanis was 20 years old.",pts:200},
-      {q:"'I want it that way' — by which group?",answers:["NSYNC","Boyz II Men","Backstreet Boys","98 Degrees"],correct:2,fact:"Producer Max Martin designed the lyrics to sound phonetically good — the song makes little literal sense.",pts:100}
+    {name:'90s Bangers',icon:'💿',intro:"From grunge to girl groups to hip-hop. The decade that broke every rule.",questions:[
+      {q:"Whitney Houston's 1992 cover of 'I Will Always Love You' was originally written by which country legend?",answers:["Loretta Lynn","Patsy Cline","Dolly Parton","Reba McEntire"],correct:2,fact:"Dolly originally recorded it in 1973. The Whitney version stayed at #1 for 14 weeks.",pts:100},
+      {q:"What grunge band, fronted by Eddie Vedder, released the album 'Ten' in 1991?",answers:["Soundgarden","Alice in Chains","Pearl Jam","Stone Temple Pilots"],correct:2,fact:"The band was originally called 'Mookie Blaylock' — named after the NBA player. Legal issues forced the name change.",pts:200},
+      {q:"Which Spice Girl was nicknamed 'Posh'?",answers:["Mel B","Emma Bunton","Geri Halliwell","Victoria Beckham"],correct:3,fact:"A reporter coined the Spice Girls' nicknames in 1996 — they stuck for life.",pts:100},
+      {q:"Which 1999 Santana album featuring 'Smooth' won 9 Grammy Awards?",answers:["Caravanserai","Supernatural","Shaman","Borboletta"],correct:1,fact:"Carlos Santana was 52 when he won. The 9-Grammy night tied Michael Jackson's 1984 record.",pts:200},
+      {q:"What was the name of TLC's massively successful 1994 album?",answers:["Ooooooohhh... On the TLC Tip","CrazySexyCool","FanMail","3D"],correct:1,fact:"It was the first album by a girl group to be certified Diamond — over 10 million copies sold in the US.",pts:200}
     ]},
-    {name:'Country Roads',icon:'🤠',intro:'Boot-scootin\' trivia. From old-school legends to modern country — who knows their honky-tonk?',questions:[
-      {q:"Which country icon was known as 'The Man in Black'?",answers:["Waylon Jennings","Willie Nelson","Johnny Cash","Merle Haggard"],correct:2,fact:"Johnny Cash wore black as a symbol of solidarity with the poor and working class — and never stopped.",pts:100},
-      {q:"Who sang 'Before He Cheats' in 2005?",answers:["Miranda Lambert","Carrie Underwood","Taylor Swift","Faith Hill"],correct:1,fact:"Carrie Underwood performed this song at her first American Idol audition.",pts:200},
-      {q:"'On the road again, just can't wait to get on the road again' is by?",answers:["Garth Brooks","John Denver","Willie Nelson","Kenny Rogers"],correct:2,fact:"Willie Nelson wrote the song on a barf bag on an airplane in 1980 for the film 'Honeysuckle Rose.'",pts:100},
-      {q:"Garth Brooks' 'Friends in Low Places' is set at what type of event?",answers:["A rodeo","A wedding","A bar fight","A county fair"],correct:1,fact:"The original full version includes a rarely heard third verse most radio edits cut.",pts:200},
-      {q:"Which singer released 'Jolene' in 1973?",answers:["Loretta Lynn","Tammy Wynette","Dolly Parton","Emmylou Harris"],correct:2,fact:"Dolly Parton has said she wrote 'Jolene' and 'I Will Always Love You' on the same day.",pts:200}
+    {name:'Country Roads',icon:'🤠',intro:"Twangy guitars, big trucks, bigger feelings. Honky-tonk to modern Nashville.",questions:[
+      {q:"Which country star's 1992 hit 'Achy Breaky Heart' launched a line dance craze?",answers:["Garth Brooks","Billy Ray Cyrus","Alan Jackson","Toby Keith"],correct:1,fact:"He's the father of Miley Cyrus. Their duet of 'Old Town Road' (with Lil Nas X) broke streaming records in 2019.",pts:100},
+      {q:"What 1980 Kenny Rogers song advised: 'Know when to hold 'em, know when to fold 'em'?",answers:["Lucille","The Gambler","Coward of the County","Lady"],correct:1,fact:"It was written by Don Schlitz and had been recorded by 7 other artists before Kenny made it a hit.",pts:100},
+      {q:"Which trio recorded the 2009 hit 'Need You Now'?",answers:["Rascal Flatts","Lady A","Little Big Town","Zac Brown Band"],correct:1,fact:"Formerly known as Lady Antebellum, the group renamed in 2020. The song won 5 Grammys including Song and Record of the Year.",pts:200},
+      {q:"Shania Twain's 1997 album 'Come On Over' has sold over how many copies worldwide?",answers:["20 million","30 million","40 million","60 million"],correct:2,fact:"It's the best-selling studio album by a female artist in any genre. Shania co-wrote every song with producer Mutt Lange.",pts:200},
+      {q:"Which Garth Brooks song, his first #1, is about regret over leaving an old love behind?",answers:["The Dance","The River","The Thunder Rolls","Friends in Low Places"],correct:0,fact:"'The Dance' was released in 1990 and remains one of his most-requested songs at concerts.",pts:200}
     ]},
-    {name:'Pop Anthems',icon:'🎤',intro:'Chart-toppers, stadium singalongs, and hooks you can\'t shake. Let\'s go.',questions:[
-      {q:"Taylor Swift's 'Shake It Off' was from which album?",answers:["Red","1989","Reputation","Fearless"],correct:1,fact:"1989 marked Taylor Swift's full shift to pop. It sold over 1.2 million copies in its first week.",pts:200},
-      {q:"Which artist sang 'Rolling in the Deep'?",answers:["Rihanna","Adele","Lorde","Amy Winehouse"],correct:1,fact:"Adele wrote 'Rolling in the Deep' in 40 minutes after a bad breakup. It spent 7 weeks at #1.",pts:100},
-      {q:"'We found love in a hopeless place' — by which artist?",answers:["Beyoncé","Katy Perry","Rihanna","Nicki Minaj"],correct:2,fact:"Calvin Harris reportedly wrote and produced the track in two hours. Rihanna's vocals were a single session.",pts:200},
-      {q:"Which pop queen sang 'Roar' and 'Firework'?",answers:["Lady Gaga","Rihanna","Katy Perry","Nicki Minaj"],correct:2,fact:"'Roar' and 'Firework' are two of Katy Perry's five #1 hits from 'Teenage Dream' — matching Michael Jackson's record.",pts:200},
-      {q:"How many Grammys has Beyoncé won — more than any artist in history?",answers:["28","32","40","47"],correct:2,fact:"Beyoncé holds the record with 40 Grammy wins as of 2024, surpassing Georg Solti's previous record of 31.",pts:300}
+    {name:'Pop Anthems',icon:'🎤',intro:"Stadium-fillers, viral hooks, songs you can't escape. Modern pop royalty.",questions:[
+      {q:"Which Dua Lipa album includes the hits 'Don't Start Now' and 'Levitating'?",answers:["Dua Lipa","Future Nostalgia","Radical Optimism","Funk Wav Bounces"],correct:1,fact:"Released March 2020 at the start of COVID lockdowns. It became one of the most-streamed pop albums of the year despite no tour.",pts:200},
+      {q:"Bruno Mars sang 'Uptown Funk' alongside which producer-singer?",answers:["Pharrell Williams","Mark Ronson","Calvin Harris","Diplo"],correct:1,fact:"It was the song of 2015 — 14 weeks at #1 on the Billboard Hot 100.",pts:100},
+      {q:"Ed Sheeran's 'Shape of You' came from which 2017 album?",answers:["÷ (Divide)","× (Multiply)","+ (Plus)","= (Equals)"],correct:0,fact:"'Shape of You' was the first song to reach 2 billion streams on Spotify.",pts:100},
+      {q:"Which 2014 Sam Smith hit shared a melody with Tom Petty's 'I Won't Back Down'?",answers:["Stay With Me","I'm Not the Only One","Like I Can","Lay Me Down"],correct:0,fact:"Tom Petty's lawyers reached out about the similarities. Smith credited him as a co-writer — settled amicably.",pts:200},
+      {q:"What 2022 Harry Styles song spent 15 weeks at #1 on the Billboard Hot 100?",answers:["Watermelon Sugar","Sign of the Times","As It Was","Adore You"],correct:2,fact:"It had the longest run at #1 of any song that year. The album 'Harry's House' won the 2023 Grammy for Album of the Year.",pts:300}
     ]}
   ]
 };
@@ -270,9 +242,7 @@ const CONFIG={
       <div class="round-label" id="roundLabel">—</div>
     </div>
     <div class="hdr-right">
-      <button class="pause-btn" id="pauseBtn" onclick="togglePause()" style="display:none">
-        ⏸ PAUSE
-      </button>
+      <button class="pause-btn" id="pauseBtn" onclick="togglePause()" style="display:none">⏸ PAUSE</button>
       <div>
         <div class="live-time" id="liveTime">—</div>
         <div class="time-lbl">Local Time</div>
@@ -283,7 +253,6 @@ const CONFIG={
   <div class="main-grid">
     <div class="question-area" style="position:relative;">
 
-      <!-- PAUSE OVERLAY -->
       <div class="pause-overlay" id="pauseOverlay">
         <div class="pause-icon">⏸</div>
         <div class="pause-title">Game Paused</div>
@@ -402,10 +371,9 @@ document.getElementById('liveTime').textContent=new Date().toLocaleTimeString('e
 
 function showErr(msg){const b=document.getElementById('errBanner');b.textContent=msg;b.style.display='block';setTimeout(()=>b.style.display='none',6000);}
 
-// ── SUPABASE ─────────────────────────────────────────────────
 const sb=supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey);
 let sessionId=null,playerCount=0,answerCount=0,maxStreak=0,playerStreaks={};
-let isPaused=false,pausedTimerVal=null,currentRi=0,currentQi=0;
+let isPaused=false,currentRi=0,currentQi=0;
 
 async function initSession(){
   try{
@@ -416,12 +384,9 @@ async function initSession(){
     document.getElementById('qrUrl').textContent=playUrl.replace('https://','');
     new QRCode(document.getElementById('qrCanvas'),{text:playUrl,width:172,height:172,colorDark:'#020C18',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
 
-    // Also write host URL to session for discovery
     await sb.from('trivia_sessions').update({updated_at:new Date().toISOString()}).eq('id',sessionId);
 
     sb.channel('players-'+sessionId).on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${sessionId}`},p=>onPlayerJoined(p.new)).subscribe();
-
-    // Listen for host commands (pause from host.html)
     sb.channel('session-cmds-'+sessionId).on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${sessionId}`},p=>onSessionUpdate(p.new)).subscribe();
 
     showScreen('screenLobby');
@@ -440,14 +405,11 @@ function onPlayerJoined(player){
   addActivity(player.name,AV_COLORS[playerCount%AV_COLORS.length],'Joined the game 🎮',null);
 }
 
-// ── FIX: accuracy only updates at reveal, not during question ──
 function updateAccuracy(answerTotal, correctCount){
   const acc=answerTotal>0?Math.round(correctCount/answerTotal*100):0;
   document.getElementById('statAcc').textContent=acc+'%';
 }
 
-// ── FIX: TV only counts answers, doesn't compute scoring ──────
-// Scoring is done by play.html on the player's device
 function onAnswerIn(answer){
   answerCount++;
   document.getElementById('statAnswers').textContent=answerCount;
@@ -470,7 +432,6 @@ async function fetchLB(){
   return data||[];
 }
 
-// ── ACCURACY: compute from DB at reveal time only ────────────
 async function computeAndShowAccuracy(ri,qi){
   const{data}=await sb.from('trivia_answers').select('is_correct').eq('session_id',sessionId).eq('round_index',ri).eq('question_index',qi);
   if(!data||!data.length)return;
@@ -478,13 +439,11 @@ async function computeAndShowAccuracy(ri,qi){
   updateAccuracy(data.length, correct);
 }
 
-// ── UI HELPERS ────────────────────────────────────────────────
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function updatePips(cur){CONFIG.rounds.forEach((_,i)=>{const p=document.getElementById(`pip-${i}`);p.className='round-pip';if(i<cur)p.classList.add('done');else if(i===cur)p.classList.add('active');});}
 function addActivity(name,color,action,pts){const f=document.getElementById('actFeed');const el=document.createElement('div');el.className='activity-item';el.innerHTML=`<div class="av" style="background:${color}">${name.substring(0,2).toUpperCase()}</div><div style="flex:1"><div class="av-name">${name}</div><div class="av-action">${action}</div></div>${pts?`<div class="av-pts">+${pts}</div>`:''}`;f.insertBefore(el,f.firstChild);while(f.children.length>9)f.removeChild(f.lastChild);}
 function confetti(n=50){const clrs=['#FF2D78','#00E5FF','#FFD600','#39FF6B','#9D4EDD'];const w=document.getElementById('cfWrap');for(let i=0;i<n;i++){const p=document.createElement('div');p.className='cp';p.style.cssText=`left:${Math.random()*100}%;background:${clrs[Math.floor(Math.random()*clrs.length)]};width:${Math.random()*7+5}px;height:${Math.random()*7+5}px;animation-duration:${Math.random()*2+2.5}s;animation-delay:${Math.random()*0.6}s;border-radius:${Math.random()>.5?'50%':'2px'};`;w.appendChild(p);setTimeout(()=>p.remove(),5000);}}
 
-// ── TIMER ─────────────────────────────────────────────────────
 let timerInt=null,timerVal=0;
 function startTimer(secs,onEnd){
   clearInterval(timerInt);
@@ -512,7 +471,6 @@ async function renderLB(cid,limit=6){
   return players;
 }
 
-// ── PAUSE ─────────────────────────────────────────────────────
 function doPause(){
   isPaused=true;
   document.getElementById('pauseOverlay').classList.add('active');
@@ -536,22 +494,18 @@ async function togglePause(){
   }
 }
 
-// ── KEYBOARD: remote control ──────────────────────────────────
 document.addEventListener('keydown',e=>{
   if(e.code==='Space'||e.key===' '){
     e.preventDefault();
-    // Pause/resume during question
     const qScreen=document.getElementById('screenQuestion');
     if(qScreen.classList.contains('active')) togglePause();
   }
   if(e.code==='Enter'||e.key==='Enter'){
-    // Start game from lobby
     const lobby=document.getElementById('screenLobby');
     if(lobby.classList.contains('active')) startGame();
   }
 });
 
-// ── GAME FLOW ─────────────────────────────────────────────────
 function startGame(){runIntro(0);}
 
 function runIntro(ri){
@@ -585,7 +539,6 @@ function runQuestion(ri,qi){
   document.getElementById('ansGrid').innerHTML=q.answers.map((a,i)=>`<div class="abtn"><div class="aletter">${LETTERS[i]}</div><div class="atext">${a}</div></div>`).join('');
   document.getElementById('pauseBtn').style.display='flex';
 
-  // Subscribe to answers for this question (count only, no scoring)
   const ch=sb.channel('q-answers-'+sessionId+'-'+ri+'-'+qi);
   ch.on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_answers',filter:`session_id=eq.${sessionId}`},p=>{
     if(p.new.round_index===ri&&p.new.question_index===qi) onAnswerIn(p.new);
@@ -601,7 +554,6 @@ async function runReveal(ri,qi){
   stopTimer();
   document.getElementById('pauseBtn').style.display='none';
 
-  // Compute accuracy from DB at reveal time (fix: not during question)
   await computeAndShowAccuracy(ri,qi);
 
   document.getElementById('revNum').textContent=`Q${qi+1}`;
