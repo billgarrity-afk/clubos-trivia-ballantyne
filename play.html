@@ -552,9 +552,9 @@ let timerInt=null;
 function setConn(ok,label){const dot=document.getElementById('connDot');dot.className='conn-dot'+(ok?'':' bad');document.getElementById('connText').textContent=label;}
 
 async function init(){
-  if(!SESSION_ID){setConn(false,'Waiting');document.getElementById('joinErr').textContent="You're in the right place — the game hasn't started yet. When the TV is live, scan the QR on screen to join.";document.getElementById('joinBtn').disabled=true;return;}
+  if(!SESSION_ID){setConn(false,'Waiting');document.getElementById('joinErr').textContent="Scan the QR code on the TV to join the game.";document.getElementById('joinBtn').disabled=true;return;}
   const{data,error}=await sb.from('trivia_sessions').select('phase,round_index,question_index').eq('id',SESSION_ID).single();
-  if(error||!data){setConn(false,'Waiting');document.getElementById('joinErr').textContent="You're in the right place — the game hasn't started yet. When the TV is live, scan the QR on screen to join.";document.getElementById('joinBtn').disabled=true;return;}
+  if(error||!data){setConn(false,'Waiting');document.getElementById('joinErr').textContent="Scan the QR code on the TV to join the game.";document.getElementById('joinBtn').disabled=true;return;}
   state.phase=data.phase;state.roundIndex=data.round_index;state.questionIndex=data.question_index;
   setConn(true,'Connected');
   if(data.phase!=='lobby') document.getElementById('joinErr').textContent='Game in progress — you can still join from the next round.';
