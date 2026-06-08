@@ -3,186 +3,340 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ClubOS Music Trivia · Play</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@600&display=swap" rel="stylesheet">
+<title>ClubOS Trivia · KPop Demon Hunters</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{
-    --bg:#020C18; --bg2:#041628; --card:#062030; --panel:#08243A;
-    --pink:#FF2D78; --cyan:#00E5FF; --gold:#FFD600;
-    --lime:#39FF6B; --purple:#9D4EDD;
-    --white:#F0EEF8; --dim:rgba(240,238,248,0.55);
-    --faint:rgba(240,238,248,0.08); --sep:rgba(255,255,255,0.1);
+  :root {
+    --bg:       #080B12;
+    --bg2:      #0D1220;
+    --card:     #0F1828;
+    --panel:    #131E30;
+    --magenta:  #E8006F;
+    --cyan:     #00E5D4;
+    --gold:     #C9A84C;
+    --lime:     #39FF6B;
+    --white:    #F0EBF8;
+    --dim:      rgba(240,235,248,0.55);
+    --faint:    rgba(240,235,248,0.07);
+    --sep:      rgba(240,235,248,0.1);
   }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);}
-  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 90% 50% at 50% 0%,rgba(0,80,180,0.18),transparent 70%),radial-gradient(ellipse 80% 40% at 50% 100%,rgba(255,45,120,0.08),transparent 70%);}
 
-  .app{position:relative;z-index:1;width:100%;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom));}
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-  /* HEADER */
-  .header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--sep);flex-shrink:0;}
-  .header-left{display:flex;align-items:center;gap:10px;}
-  .h-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--pink),var(--purple));display:flex;align-items:center;justify-content:center;font-size:17px;}
-  .h-name{font-family:'Bebas Neue';font-size:18px;letter-spacing:1.5px;line-height:1;}
-  .h-tag{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-top:2px;}
-  .h-status{font-size:11px;color:var(--dim);text-align:right;display:flex;align-items:center;gap:6px;}
-  .conn-dot{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 6px rgba(57,255,107,0.5);animation:pulseDot 1.6s ease infinite;}
-  .conn-dot.bad{background:var(--pink);box-shadow:0 0 6px rgba(255,45,120,0.5);}
-  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:0.4}}
-
-  /* SCREEN STACK */
-  .screens{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;padding-top:18px;}
-  .screen{position:absolute;inset:0;display:none;flex-direction:column;animation:fadeIn 0.25s ease both;padding-top:18px;}
-  .screen.active{display:flex;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-  /* COMMON BLOCKS */
-  .center-block{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:0 8px;}
-  .big-icon{font-size:64px;margin-bottom:8px;animation:bounce 1.4s ease-in-out infinite alternate;}
-  @keyframes bounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-8px) scale(1.05)}}
-  .display-title{font-family:'Bebas Neue';font-size:48px;letter-spacing:3px;line-height:1;background:linear-gradient(135deg,var(--gold),var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .display-sub{font-size:14px;color:var(--dim);max-width:340px;line-height:1.55;}
-
-  /* JOIN SCREEN */
-  .join-form{width:100%;display:flex;flex-direction:column;gap:12px;margin-top:24px;}
-  .join-input{width:100%;background:var(--card);border:1.5px solid var(--sep);border-radius:14px;padding:18px 20px;font-size:17px;font-family:'DM Sans';font-weight:500;color:var(--white);outline:none;transition:border-color 0.2s;}
-  .join-input:focus{border-color:var(--cyan);background:var(--panel);}
-  .join-input::placeholder{color:rgba(240,238,248,0.25);}
-  .join-btn{width:100%;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:14px;padding:20px;font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;color:white;cursor:pointer;transition:all 0.15s;}
-  .join-btn:active{transform:scale(0.97);}
-  .join-btn:disabled{opacity:0.5;cursor:default;}
-  .err-msg{color:var(--pink);font-size:13px;text-align:center;min-height:18px;}
-
-  /* WAITING */
-  .you-in{font-family:'Bebas Neue';font-size:54px;letter-spacing:3px;color:var(--lime);text-shadow:0 0 30px rgba(57,255,107,0.4);}
-  .player-name{font-size:18px;color:var(--white);font-weight:600;margin-top:4px;}
-
-  /* ROUND INTRO */
-  .ri-eye{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);font-weight:600;}
-  .ri-name{font-family:'Bebas Neue';font-size:52px;letter-spacing:3px;line-height:1;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .ri-text{font-size:15px;color:var(--dim);max-width:360px;line-height:1.55;}
-
-  /* QUESTION SCREEN */
-  .q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0;gap:10px;}
-  .q-meta-pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-  .q-pill{font-family:'Bebas Neue';font-size:12px;letter-spacing:2px;padding:4px 10px;border-radius:4px;background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.3);color:var(--pink);}
-  .q-pill.cat{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.25);color:var(--cyan);}
-  .q-pill.pts{background:rgba(255,214,0,0.1);border-color:rgba(255,214,0,0.3);color:var(--gold);}
-
-  .q-timer{display:flex;align-items:center;gap:6px;}
-  .q-timer-num{font-family:'Bebas Neue';font-size:24px;letter-spacing:1px;color:var(--white);min-width:30px;text-align:right;line-height:1;}
-  .q-timer-num.urgent{color:var(--gold);animation:pulse 0.6s ease-in-out infinite alternate;}
-  @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.1)}}
-  .q-timer-bar{width:50px;height:5px;background:var(--faint);border-radius:3px;overflow:hidden;}
-  .q-timer-fill{height:100%;width:100%;background:var(--pink);border-radius:3px;transition:width 1s linear,background 0.3s;}
-  .q-timer-fill.urgent{background:var(--gold);}
-
-  .q-text{font-family:'Bebas Neue';font-size:30px;line-height:1.2;letter-spacing:0.5px;color:var(--white);margin-bottom:18px;flex-shrink:0;}
-
-  .answers{display:flex;flex-direction:column;gap:10px;flex:1;overflow:auto;}
-  .ans-btn{
-    width:100%;
-    background:var(--card);
-    border:1.5px solid var(--sep);
-    border-radius:14px;
-    padding:18px 18px;
-    display:flex;align-items:center;gap:14px;
-    cursor:pointer;
-    transition:transform 0.1s,border-color 0.2s,background 0.2s;
-    font-family:'DM Sans';
-    text-align:left;
+  html, body {
+    height:100%; width:100%; overflow:hidden;
+    background:var(--bg);
+    font-family:'DM Sans', sans-serif;
     color:var(--white);
-    min-height:64px;
   }
-  .ans-btn:active{transform:scale(0.98);}
-  .ans-btn:hover{border-color:var(--cyan);background:var(--panel);}
-  .ans-btn.locked{opacity:0.4;cursor:default;pointer-events:none;}
-  .ans-btn.selected{
-    border-color:var(--pink);
-    background:linear-gradient(135deg,rgba(255,45,120,0.15),rgba(157,78,221,0.1));
-    box-shadow:0 0 20px rgba(255,45,120,0.3);
+
+  /* Background glow */
+  body::before {
+    content:'';
+    position:fixed; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(232,0,111,0.14), transparent 70%),
+      radial-gradient(ellipse 70% 40% at 80% 100%, rgba(0,229,212,0.1), transparent 70%);
   }
-  .ans-letter{
-    width:38px;height:38px;
+
+  /* Scanlines */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);
+  }
+
+  .app {
+    position:relative; z-index:1;
+    width:100%; height:100%;
+    max-width:480px; margin:0 auto;
+    display:flex; flex-direction:column;
+    padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom));
+  }
+
+  /* ── HEADER ────────────────────────────────────── */
+  .header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--sep);
     flex-shrink:0;
-    border-radius:10px;
-    background:var(--faint);
-    border:1px solid var(--sep);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Bebas Neue';font-size:20px;
-    color:var(--cyan);
+    position:relative;
+  }
+  /* gradient bottom line */
+  .header::after {
+    content:''; position:absolute; bottom:-1px; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, var(--magenta), var(--cyan));
+    opacity:0.5;
+  }
+
+  .header-left { display:flex; align-items:center; gap:10px; }
+  .h-icon {
+    width:36px; height:36px; border-radius:8px;
+    background:linear-gradient(135deg, var(--magenta), #9D4EDD);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .h-text {}
+  .h-name {
+    font-family:'Bebas Neue'; font-size:16px; letter-spacing:2px; line-height:1;
+    color:var(--white);
+  }
+  .h-tag {
+    font-family:'DM Mono'; font-size:9px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--gold); margin-top:2px;
+  }
+
+  .h-status { font-size:11px; color:var(--dim); display:flex; align-items:center; gap:6px; }
+  .conn-dot {
+    width:7px; height:7px; border-radius:50%;
+    background:var(--lime); box-shadow:0 0 6px rgba(57,255,107,0.5);
+    animation:pulseDot 1.6s ease infinite;
+  }
+  .conn-dot.bad { background:var(--magenta); box-shadow:0 0 6px rgba(232,0,111,0.5); }
+  @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── SCREENS ───────────────────────────────────── */
+  .screens { flex:1; position:relative; overflow:hidden; display:flex; flex-direction:column; padding-top:16px; }
+  .screen { position:absolute; inset:0; display:none; flex-direction:column; animation:fadeIn 0.25s ease both; padding-top:16px; }
+  .screen.active { display:flex; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── COMMON ────────────────────────────────────── */
+  .center-block {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; gap:10px; padding:0 8px;
+  }
+  .big-icon { font-size:64px; margin-bottom:8px; animation:bounce 1.4s ease-in-out infinite alternate; }
+  @keyframes bounce { from{transform:translateY(0) scale(1)} to{transform:translateY(-8px) scale(1.05)} }
+
+  .display-title {
+    font-family:'Bebas Neue'; font-size:44px; letter-spacing:3px; line-height:1;
+  }
+  .display-title .t1 { color:var(--white); display:block; }
+  .display-title .t2 {
+    background:linear-gradient(90deg, var(--magenta), var(--cyan));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    display:block;
+  }
+  .display-sub { font-size:14px; color:var(--dim); max-width:320px; line-height:1.55; }
+
+  /* ── JOIN ──────────────────────────────────────── */
+  .join-form { width:100%; display:flex; flex-direction:column; gap:12px; margin-top:22px; }
+  .join-input {
+    width:100%; background:var(--card); border:1.5px solid var(--sep);
+    border-radius:12px; padding:18px 20px;
+    font-size:17px; font-family:'DM Sans'; font-weight:500;
+    color:var(--white); outline:none; transition:border-color 0.2s;
+  }
+  .join-input:focus { border-color:var(--cyan); background:var(--panel); }
+  .join-input::placeholder { color:rgba(240,235,248,0.25); }
+  .join-btn {
+    width:100%;
+    background:linear-gradient(135deg, var(--magenta), #9D4EDD);
+    border:none; border-radius:12px; padding:20px;
+    font-family:'Bebas Neue'; font-size:24px; letter-spacing:3px; color:white;
+    cursor:pointer; transition:all 0.15s;
+  }
+  .join-btn:active { transform:scale(0.97); }
+  .join-btn:disabled { opacity:0.5; cursor:default; }
+  .err-msg { color:var(--magenta); font-size:13px; text-align:center; min-height:18px; }
+
+  /* ── WAITING ───────────────────────────────────── */
+  .you-in {
+    font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px;
+    color:var(--cyan); text-shadow:0 0 30px rgba(0,229,212,0.4);
+  }
+  .player-name { font-size:18px; color:var(--white); font-weight:600; margin-top:4px; }
+
+  /* ── ROUND INTRO ───────────────────────────────── */
+  .ri-eye { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--cyan); font-weight:600; }
+  .ri-name {
+    font-family:'Bebas Neue'; font-size:48px; letter-spacing:3px; line-height:1;
+    background:linear-gradient(135deg, var(--magenta), var(--cyan));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .ri-text { font-size:14px; color:var(--dim); max-width:340px; line-height:1.55; }
+
+  /* ── QUESTION ──────────────────────────────────── */
+  .q-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px; flex-shrink:0; gap:10px;
+  }
+  .q-meta-pills { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .q-pill {
+    font-family:'Bebas Neue'; font-size:12px; letter-spacing:2px;
+    padding:4px 10px; border-radius:3px;
+    background:rgba(232,0,111,0.1); border:1px solid rgba(232,0,111,0.3); color:var(--magenta);
+  }
+  .q-pill.cat { background:rgba(0,229,212,0.08); border-color:rgba(0,229,212,0.25); color:var(--cyan); }
+  .q-pill.pts { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:var(--gold); }
+
+  .q-timer { display:flex; align-items:center; gap:6px; }
+  .q-timer-num {
+    font-family:'Bebas Neue'; font-size:24px; letter-spacing:1px;
+    color:var(--white); min-width:30px; text-align:right; line-height:1;
+  }
+  .q-timer-num.urgent { color:var(--gold); animation:pulse 0.6s ease-in-out infinite alternate; }
+  @keyframes pulse { from{transform:scale(1)} to{transform:scale(1.1)} }
+  .q-timer-bar { width:50px; height:5px; background:var(--faint); border-radius:3px; overflow:hidden; }
+  .q-timer-fill { height:100%; width:100%; background:var(--magenta); border-radius:3px; transition:width 1s linear, background 0.3s; }
+  .q-timer-fill.urgent { background:var(--gold); }
+
+  .q-text {
+    font-family:'Bebas Neue'; font-size:28px; line-height:1.2; letter-spacing:0.5px;
+    color:var(--white); margin-bottom:16px; flex-shrink:0;
+  }
+
+  .answers { display:flex; flex-direction:column; gap:10px; flex:1; overflow:auto; }
+  .ans-btn {
+    width:100%; background:var(--card); border:1.5px solid var(--sep);
+    border-radius:12px; padding:16px 18px;
+    display:flex; align-items:center; gap:14px;
+    cursor:pointer; transition:transform 0.1s, border-color 0.2s, background 0.2s;
+    font-family:'DM Sans'; text-align:left; color:var(--white); min-height:60px;
+  }
+  .ans-btn:active { transform:scale(0.98); }
+  .ans-btn:hover { border-color:var(--cyan); background:var(--panel); }
+  .ans-btn.locked { opacity:0.4; cursor:default; pointer-events:none; }
+  .ans-btn.selected {
+    border-color:var(--magenta);
+    background:linear-gradient(135deg, rgba(232,0,111,0.14), rgba(157,78,221,0.08));
+    box-shadow:0 0 20px rgba(232,0,111,0.25);
+  }
+  .ans-letter {
+    width:36px; height:36px; flex-shrink:0;
+    border-radius:8px; background:var(--faint); border:1px solid var(--sep);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue'; font-size:20px; color:var(--cyan);
     transition:all 0.2s;
   }
-  .ans-btn.selected .ans-letter{background:var(--pink);border-color:var(--pink);color:white;}
-  .ans-text{font-size:16px;font-weight:500;line-height:1.3;}
+  .ans-btn.selected .ans-letter { background:var(--magenta); border-color:var(--magenta); color:white; }
+  .ans-text { font-size:15px; font-weight:500; line-height:1.3; }
 
-  /* SUBMITTED */
-  .sub-icon{font-size:60px;margin-bottom:8px;}
-  .sub-status{font-family:'Bebas Neue';font-size:44px;letter-spacing:2px;color:var(--cyan);}
-  .sub-locked{font-family:'Bebas Neue';font-size:24px;letter-spacing:2px;color:var(--white);background:var(--card);border:1.5px solid var(--pink);border-radius:12px;padding:14px 24px;display:inline-flex;align-items:center;gap:12px;margin-top:8px;}
-  .sub-locked .sub-letter{width:34px;height:34px;border-radius:8px;background:var(--pink);display:flex;align-items:center;justify-content:center;color:white;font-size:18px;}
-  .sub-watch{font-size:14px;color:var(--dim);max-width:300px;line-height:1.5;margin-top:8px;}
+  /* ── SUBMITTED ─────────────────────────────────── */
+  .sub-icon { font-size:60px; margin-bottom:8px; }
+  .sub-status { font-family:'Bebas Neue'; font-size:44px; letter-spacing:2px; color:var(--cyan); }
+  .sub-locked {
+    font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; color:var(--white);
+    background:var(--card); border:1.5px solid var(--magenta);
+    border-radius:12px; padding:14px 24px;
+    display:inline-flex; align-items:center; gap:12px; margin-top:8px;
+  }
+  .sub-letter {
+    width:34px; height:34px; border-radius:8px;
+    background:var(--magenta); display:flex; align-items:center; justify-content:center;
+    color:white; font-size:18px;
+  }
+  .sub-watch { font-size:14px; color:var(--dim); max-width:300px; line-height:1.5; margin-top:8px; }
 
-  /* REVEAL SCREEN */
-  .rev-icon{font-size:80px;margin-bottom:4px;}
-  .rev-icon.correct{filter:drop-shadow(0 0 20px rgba(57,255,107,0.5));}
-  .rev-icon.wrong{filter:drop-shadow(0 0 16px rgba(255,45,120,0.4));}
-  .rev-result{font-family:'Bebas Neue';font-size:54px;letter-spacing:3px;line-height:1;}
-  .rev-result.correct{color:var(--lime);}
-  .rev-result.wrong{color:var(--pink);}
-  .rev-pts{font-family:'Bebas Neue';font-size:34px;letter-spacing:2px;color:var(--gold);margin-top:4px;}
-  .rev-row{display:flex;align-items:center;gap:10px;font-size:14px;background:var(--card);border:1px solid var(--sep);border-radius:12px;padding:12px 14px;width:100%;max-width:340px;}
-  .rev-row .rev-letter{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:16px;flex-shrink:0;}
-  .rev-row.correct{border-color:var(--lime);background:rgba(57,255,107,0.08);}
-  .rev-row.correct .rev-letter{background:var(--lime);color:#02120A;}
-  .rev-row.wrong{border-color:rgba(255,45,120,0.4);}
-  .rev-row.wrong .rev-letter{background:var(--pink);color:white;}
-  .rev-row .rev-text{flex:1;color:var(--white);text-align:left;font-weight:500;}
-  .rev-row .rev-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);}
-  .rev-streak{display:inline-flex;align-items:center;gap:6px;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:600;color:var(--gold);margin-top:4px;}
+  /* ── REVEAL ────────────────────────────────────── */
+  .rev-icon { font-size:72px; margin-bottom:4px; }
+  .rev-icon.correct { filter:drop-shadow(0 0 20px rgba(57,255,107,0.5)); }
+  .rev-icon.wrong   { filter:drop-shadow(0 0 16px rgba(232,0,111,0.4)); }
+  .rev-result { font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px; line-height:1; }
+  .rev-result.correct { color:var(--lime); }
+  .rev-result.wrong   { color:var(--magenta); }
+  .rev-pts { font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px; color:var(--gold); margin-top:4px; }
 
-  /* LEADERBOARD */
-  .lb-screen{padding-top:8px;}
-  .lb-eye{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);font-weight:600;text-align:center;}
-  .lb-title{font-family:'Bebas Neue';font-size:38px;letter-spacing:3px;text-align:center;line-height:1;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
-  .lb-yours{background:var(--card);border:1.5px solid var(--cyan);border-radius:14px;padding:14px 18px;margin:14px 0 16px;display:flex;align-items:center;gap:12px;box-shadow:0 0 24px rgba(0,229,255,0.15);}
-  .lb-rank{font-family:'Bebas Neue';font-size:30px;color:var(--cyan);min-width:40px;text-align:center;line-height:1;}
-  .lb-yours-info{flex:1;}
-  .lb-yours-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);}
-  .lb-yours-name{font-size:17px;font-weight:600;margin-top:1px;}
-  .lb-yours-score{font-family:'Bebas Neue';font-size:32px;color:var(--gold);letter-spacing:2px;line-height:1;}
-  .lb-list{display:flex;flex-direction:column;gap:6px;flex:1;overflow:auto;}
-  .lb-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--sep);border-radius:10px;font-size:14px;}
-  .lb-row.gold{background:rgba(255,214,0,0.07);border-color:rgba(255,214,0,0.3);}
-  .lb-row.silver{background:rgba(200,200,220,0.05);border-color:rgba(200,200,220,0.15);}
-  .lb-row.bronze{background:rgba(205,127,50,0.06);border-color:rgba(205,127,50,0.2);}
-  .lb-row.you{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.2);}
-  .lb-row-rank{font-family:'Bebas Neue';font-size:20px;color:var(--dim);min-width:24px;text-align:center;line-height:1;}
-  .lb-row.gold .lb-row-rank{color:var(--gold);}
-  .lb-row.silver .lb-row-rank{color:#C0C0C0;}
-  .lb-row.bronze .lb-row-rank{color:#CD7F32;}
-  .lb-row-name{flex:1;font-weight:500;}
-  .lb-row-score{font-family:'Bebas Neue';font-size:18px;color:var(--cyan);letter-spacing:1px;line-height:1;}
-  .lb-row.gold .lb-row-score{color:var(--gold);}
+  .rev-row {
+    display:flex; align-items:center; gap:10px; font-size:14px;
+    background:var(--card); border:1px solid var(--sep);
+    border-radius:12px; padding:12px 14px;
+    width:100%; max-width:340px;
+  }
+  .rev-row .rev-letter {
+    width:30px; height:30px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue'; font-size:16px; flex-shrink:0;
+  }
+  .rev-row.correct { border-color:var(--lime); background:rgba(57,255,107,0.07); }
+  .rev-row.correct .rev-letter { background:var(--lime); color:#02120A; }
+  .rev-row.wrong { border-color:rgba(232,0,111,0.35); }
+  .rev-row.wrong .rev-letter { background:var(--magenta); color:white; }
+  .rev-row .rev-text { flex:1; color:var(--white); text-align:left; font-weight:500; }
+  .rev-row .rev-tag { font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--dim); }
+  .rev-streak {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3);
+    border-radius:20px; padding:5px 14px;
+    font-size:13px; font-weight:600; color:var(--gold); margin-top:4px;
+  }
 
-  /* GAME OVER */
-  .go-trophy{font-size:88px;}
-  .go-title{font-family:'Bebas Neue';font-size:48px;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--pink),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
-  .go-final{background:var(--card);border:1.5px solid var(--cyan);border-radius:14px;padding:18px 24px;display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:8px;}
-  .go-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);}
-  .go-score{font-family:'Bebas Neue';font-size:48px;color:var(--gold);letter-spacing:3px;line-height:1;}
-  .go-rank-line{font-size:14px;color:var(--white);}
-  .go-thanks{font-size:13px;color:var(--dim);max-width:300px;line-height:1.5;margin-top:12px;}
+  /* ── LEADERBOARD ───────────────────────────────── */
+  .lb-screen { padding-top:8px; }
+  .lb-eye { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--cyan); font-weight:600; text-align:center; }
+  .lb-title {
+    font-family:'Bebas Neue'; font-size:36px; letter-spacing:3px; text-align:center; line-height:1;
+    background:linear-gradient(135deg, var(--gold), var(--magenta));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    margin-bottom:4px;
+  }
+  .lb-yours {
+    background:var(--card); border:1.5px solid var(--cyan);
+    border-radius:12px; padding:14px 18px; margin:12px 0 14px;
+    display:flex; align-items:center; gap:12px;
+    box-shadow:0 0 24px rgba(0,229,212,0.12);
+  }
+  .lb-rank { font-family:'Bebas Neue'; font-size:28px; color:var(--cyan); min-width:40px; text-align:center; line-height:1; }
+  .lb-yours-info { flex:1; }
+  .lb-yours-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--dim); }
+  .lb-yours-name { font-size:16px; font-weight:600; margin-top:1px; }
+  .lb-yours-score { font-family:'Bebas Neue'; font-size:30px; color:var(--gold); letter-spacing:2px; line-height:1; }
+  .lb-list { display:flex; flex-direction:column; gap:6px; flex:1; overflow:auto; }
+  .lb-row {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px; background:var(--card);
+    border:1px solid var(--sep); border-radius:10px; font-size:14px;
+  }
+  .lb-row.gold   { background:rgba(201,168,76,0.07);   border-color:rgba(201,168,76,0.3); }
+  .lb-row.silver { background:rgba(200,200,220,0.05);  border-color:rgba(200,200,220,0.15); }
+  .lb-row.bronze { background:rgba(205,127,50,0.06);   border-color:rgba(205,127,50,0.2); }
+  .lb-row.you    { border-color:var(--cyan); box-shadow:0 0 12px rgba(0,229,212,0.18); }
+  .lb-row-rank { font-family:'Bebas Neue'; font-size:20px; color:var(--dim); min-width:24px; text-align:center; line-height:1; }
+  .lb-row.gold .lb-row-rank   { color:var(--gold); }
+  .lb-row.silver .lb-row-rank { color:#C0C0C0; }
+  .lb-row.bronze .lb-row-rank { color:#CD7F32; }
+  .lb-row-name { flex:1; font-weight:500; }
+  .lb-row-score { font-family:'Bebas Neue'; font-size:18px; color:var(--cyan); letter-spacing:1px; line-height:1; }
+  .lb-row.gold .lb-row-score { color:var(--gold); }
 
-  /* FOOTER */
-  .footer{flex-shrink:0;padding-top:14px;border-top:1px solid var(--sep);text-align:center;}
-  .footer-text{font-family:'Cormorant Garamond',serif;font-size:13px;color:rgba(240,238,248,0.3);letter-spacing:0.04em;}
-  .footer-text span{color:rgba(201,168,76,0.5);font-weight:600;}
+  /* ── GAME OVER ─────────────────────────────────── */
+  .go-trophy { font-size:80px; }
+  .go-title {
+    font-family:'Bebas Neue'; font-size:46px; letter-spacing:3px;
+    background:linear-gradient(135deg, var(--gold), var(--magenta), var(--cyan));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    line-height:1;
+  }
+  .go-final {
+    background:var(--card); border:1.5px solid var(--cyan);
+    border-radius:12px; padding:18px 24px;
+    display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:8px;
+  }
+  .go-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--dim); }
+  .go-score { font-family:'Bebas Neue'; font-size:48px; color:var(--gold); letter-spacing:3px; line-height:1; }
+  .go-rank-line { font-size:14px; color:var(--white); }
+  .go-thanks { font-size:13px; color:var(--dim); max-width:300px; line-height:1.5; margin-top:12px; }
 
-  /* TOAST */
-  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--pink);color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:200;display:none;}
-  .toast.show{display:block;animation:fadeIn 0.3s ease both;}
+  /* ── FOOTER ────────────────────────────────────── */
+  .footer {
+    flex-shrink:0; padding-top:12px;
+    border-top:1px solid var(--sep); text-align:center;
+  }
+  .footer-text {
+    font-size:12px; color:rgba(240,235,248,0.25); letter-spacing:1px;
+  }
+  .footer-text span { color:rgba(201,168,76,0.5); font-weight:700; font-style:italic; }
+
+  /* ── TOAST ─────────────────────────────────────── */
+  .toast {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:var(--panel); border:1px solid var(--magenta);
+    color:white; padding:10px 18px; border-radius:8px;
+    font-size:13px; font-weight:600; z-index:200; display:none;
+  }
+  .toast.show { display:block; animation:fadeIn 0.3s ease both; }
 </style>
 </head>
 <body>
@@ -191,10 +345,10 @@
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
-      <div class="h-icon">🎵</div>
-      <div>
-        <div class="h-name">Music Trivia</div>
-        <div class="h-tag">Ballantyne CC</div>
+      <div class="h-icon">😈</div>
+      <div class="h-text">
+        <div class="h-name">Demon Hunters Trivia</div>
+        <div class="h-tag">Ballantyne CC · Cabana</div>
       </div>
     </div>
     <div class="h-status">
@@ -208,18 +362,22 @@
     <!-- 1. NAME ENTRY -->
     <div class="screen active" id="screenName">
       <div class="center-block">
-        <div class="big-icon">🎤</div>
-        <div class="display-title">Join the Game</div>
+        <div class="big-icon">😈</div>
+        <div class="display-title">
+          <span class="t1">Join the</span>
+          <span class="t2">Game</span>
+        </div>
         <div class="display-sub">Pick a name your friends will recognize on the leaderboard.</div>
         <div class="join-form">
-          <input class="join-input" id="nameInput" type="text" placeholder="Your name" maxlength="20" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
+          <input class="join-input" id="nameInput" type="text" placeholder="Your name" maxlength="20"
+            autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
           <button class="join-btn" id="joinBtn" onclick="joinGame()">Join Game</button>
           <div class="err-msg" id="joinErr"></div>
         </div>
       </div>
     </div>
 
-    <!-- 2. WAITING / LOBBY -->
+    <!-- 2. WAITING -->
     <div class="screen" id="screenWaiting">
       <div class="center-block">
         <div class="big-icon">✨</div>
@@ -235,11 +393,11 @@
     <!-- 3. ROUND INTRO -->
     <div class="screen" id="screenIntro">
       <div class="center-block">
-        <div class="big-icon" id="introIcon">🎵</div>
+        <div class="big-icon" id="introIcon">🎤</div>
         <div class="ri-eye" id="introEye">Round 1 of 5</div>
         <div class="ri-name" id="introName">—</div>
         <div class="ri-text" id="introText">—</div>
-        <div style="font-family:'Bebas Neue';font-size:18px;letter-spacing:3px;color:var(--pink);margin-top:8px;">Get Ready…</div>
+        <div style="font-family:'Bebas Neue';font-size:18px;letter-spacing:3px;color:var(--magenta);margin-top:8px;">Get Ready…</div>
       </div>
     </div>
 
@@ -265,7 +423,10 @@
       <div class="center-block">
         <div class="sub-icon">🔒</div>
         <div class="sub-status">Locked In</div>
-        <div class="sub-locked" id="subLocked"><span class="sub-letter" id="subLetter">—</span><span id="subText">—</span></div>
+        <div class="sub-locked" id="subLocked">
+          <span class="sub-letter" id="subLetter">—</span>
+          <span id="subText">—</span>
+        </div>
         <div class="sub-watch">Watch the TV for the answer reveal.</div>
       </div>
     </div>
@@ -286,7 +447,9 @@
           <div class="rev-text" id="revCorrectText">—</div>
           <div class="rev-tag">Correct</div>
         </div>
-        <div class="rev-streak" id="revStreak" style="display:none;">🔥 <span id="revStreakNum">2</span>-streak</div>
+        <div class="rev-streak" id="revStreak" style="display:none;">
+          🔥 <span id="revStreakNum">2</span>-streak
+        </div>
       </div>
     </div>
 
@@ -330,504 +493,204 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// CONFIG — Question data MUST match index.html exactly
+// CONFIG — matches index.html exactly
 // ═══════════════════════════════════════════════════════════════
 const CONFIG = {
-  supabaseUrl:'https://ykfvwqewnfnibpzytspn.supabase.co',
-  supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms',
-  questionSecs:20,
-  rounds:[
-    {name:'Classic Rock',icon:'🎸',intro:"Riffs that defined a generation. Anthems sung in cars and crowds. Let's see who knows.",questions:[
-      {q:"Which AC/DC album, released in 1980, was a tribute to recently deceased lead singer Bon Scott?",answers:["Highway to Hell","Back in Black","For Those About to Rock","Powerage"],correct:1,pts:200},
-      {q:"Pink Floyd's 'Dark Side of the Moon' was released in what year?",answers:["1971","1973","1975","1977"],correct:1,pts:200},
-      {q:"Which guitarist played the iconic guitar solo on Guns N' Roses' 'November Rain'?",answers:["Eddie Van Halen","Eric Clapton","Slash","Jimmy Page"],correct:2,pts:100},
-      {q:"Which band's debut album cover features a baby underwater reaching for a dollar bill?",answers:["Pearl Jam","Soundgarden","Nirvana","Stone Temple Pilots"],correct:2,pts:100},
-      {q:"What Eric Clapton-led supergroup released 'Sunshine of Your Love' in 1967?",answers:["Cream","Derek and the Dominos","Blind Faith","The Yardbirds"],correct:0,pts:200}
+  supabaseUrl: 'https://ykfvwqewnfnibpzytspn.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms',
+  questionSecs: 20,
+  rounds: [
+    { name:'Meet HUNTR/X', icon:'🎤', intro:"You've seen the film — now prove it. Five questions on the group, the characters, and the people behind them.", questions:[
+      { q:"What is the name of Rumi, Mira, and Zoey's K-pop group within the film's world?", answers:["HUNTR/X","HUNTRIX","DEMON GIRLZ","K-FORCE"], correct:1, pts:200 },
+      { q:"Which member of HUNTR/X is secretly half-demon, hiding golden patterns beneath her skin?", answers:["Mira","Zoey","Rumi","Jinu"], correct:2, pts:200 },
+      { q:"Which voice actor plays Rumi — HUNTR/X's leader and the film's central character?", answers:["Yunjin Kim","Ji-young Yoo","May Hong","Arden Cho"], correct:3, pts:200 },
+      { q:"Which comedian voices Bobby, HUNTR/X's manager and the film's main comic relief?", answers:["Daniel Dae Kim","Ken Jeong","Lee Byung-hun","Ahn Hyo-seop"], correct:1, pts:200 },
+      { q:"KPop Demon Hunters was produced alongside which animation studio — the same one behind Spider-Man: Across the Spider-Verse?", answers:["Pixar Animation Studios","DreamWorks Animation","Sony Pictures Animation","Blue Sky Studios"], correct:2, pts:200 }
     ]},
-    {name:'80s Hits',icon:'🕺',intro:"Synth-pop, hair metal, neon-lit ballads. The decade that wouldn't quit.",questions:[
-      {q:"Which 1984 Prince film featured the hit song 'When Doves Cry'?",answers:["Sign O' The Times","Purple Rain","Under the Cherry Moon","Graffiti Bridge"],correct:1,pts:100},
-      {q:"Which #1 hit was on Bon Jovi's 1986 album 'Slippery When Wet'?",answers:["Wanted Dead or Alive","You Give Love a Bad Name","Bad Medicine","Always"],correct:1,pts:200},
-      {q:"What 1985 song became Whitney Houston's first US #1 single?",answers:["I Wanna Dance with Somebody","How Will I Know","Saving All My Love for You","Greatest Love of All"],correct:2,pts:200},
-      {q:"Cyndi Lauper's 'Girls Just Want to Have Fun' was originally written by which male artist?",answers:["Phil Collins","Robert Hazard","Hall & Oates","Billy Joel"],correct:1,pts:200},
-      {q:"Which 80s band's hits include 'Sweet Child O' Mine' and 'Welcome to the Jungle'?",answers:["Aerosmith","Mötley Crüe","Guns N' Roses","Def Leppard"],correct:2,pts:100}
+    { name:'The Soundtrack', icon:'🎵', intro:"The album topped Billboard, swept the Grammys, and broke records. How well do you know the music?", questions:[
+      { q:"Which HUNTR/X song won the 2026 Grammy Award for Best Song Written for Visual Media?", answers:["Soda Pop","What It Sounds Like","Golden","Your Idol"], correct:2, pts:200 },
+      { q:"In the film, 'How It's Done' plays as the background to which scene?", answers:["The villain reveal","HUNTR/X fighting demons mid-flight on their tour plane","The final concert climax","Rumi and Jinu's escape from the underworld"], correct:1, pts:200 },
+      { q:"'Free' is a duet between Rumi and Jinu. What triggers the song in the film?", answers:["Jinu defeats Gwi-Ma for the first time","Rumi reveals her demon half to the crowd","Rumi offers Jinu an alliance to escape Gwi-Ma's control","HUNTR/X performs their final concert"], correct:2, pts:200 },
+      { q:"Which real K-pop group performed the fight song 'Takedown' for the film's soundtrack?", answers:["BLACKPINK","aespa","NewJeans","TWICE"], correct:3, pts:200 },
+      { q:"The songwriters behind BTS's 'Butter' and 'Permission to Dance' wrote two songs for this film. Which pair?", answers:["Soda Pop and Your Idol","Free and What It Sounds Like","Golden and Takedown","How It's Done and Strategy"], correct:1, pts:200 }
     ]},
-    {name:'90s Bangers',icon:'💿',intro:"From grunge to girl groups to hip-hop. The decade that broke every rule.",questions:[
-      {q:"Whitney Houston's 1992 cover of 'I Will Always Love You' was originally written by which country legend?",answers:["Loretta Lynn","Patsy Cline","Dolly Parton","Reba McEntire"],correct:2,pts:100},
-      {q:"What grunge band, fronted by Eddie Vedder, released the album 'Ten' in 1991?",answers:["Soundgarden","Alice in Chains","Pearl Jam","Stone Temple Pilots"],correct:2,pts:200},
-      {q:"Which Spice Girl was nicknamed 'Posh'?",answers:["Mel B","Emma Bunton","Geri Halliwell","Victoria Beckham"],correct:3,pts:100},
-      {q:"Which 1999 Santana album featuring 'Smooth' won 9 Grammy Awards?",answers:["Caravanserai","Supernatural","Shaman","Borboletta"],correct:1,pts:200},
-      {q:"What was the name of TLC's massively successful 1994 album?",answers:["Ooooooohhh... On the TLC Tip","CrazySexyCool","FanMail","3D"],correct:1,pts:200}
+    { name:'The Saja Boys', icon:'😈', intro:"Every great story needs a villain. Five questions on the demon boy band, their master, and their mission.", questions:[
+      { q:"The Saja Boys are secretly demons working for a villain drawn from Korean mythology. What is that villain's name?", answers:["Dokkaebi","Gwi-Ma","Haemosu","Bulgasari"], correct:1, pts:200 },
+      { q:"Why did the demons create the Saja Boys — what is their primary mission?", answers:["To steal HUNTR/X's tour revenue","To destroy the Hanmoon barrier protecting the world","To harvest human souls by luring HUNTR/X's fanbase","To expose Rumi as half-demon"], correct:2, pts:200 },
+      { q:"Which Saja Boys member develops a genuine connection with Rumi and becomes central to the film's emotional arc?", answers:["Danny","Jinu","Kevin","Sam"], correct:1, pts:200 },
+      { q:"In 'Your Idol' — the Saja Boys' villain climax song — what are they doing when they perform it?", answers:["Auditioning to join HUNTR/X","Luring crowds into Gwi-Ma's flames to harvest their souls","Challenging HUNTR/X to a dance battle","Revealing Rumi's secret to the public"], correct:1, pts:200 },
+      { q:"INSIDER: The Saja Boys' sound was crafted by producers from which real K-pop label — the same one behind BLACKPINK and BIGBANG?", answers:["SM Entertainment","HYBE","JYP Entertainment","Black Label (YG)"], correct:3, pts:200 }
     ]},
-    {name:'Country Roads',icon:'🤠',intro:"Twangy guitars, big trucks, bigger feelings. Honky-tonk to modern Nashville.",questions:[
-      {q:"Which country star's 1992 hit 'Achy Breaky Heart' launched a line dance craze?",answers:["Garth Brooks","Billy Ray Cyrus","Alan Jackson","Toby Keith"],correct:1,pts:100},
-      {q:"What 1980 Kenny Rogers song advised: 'Know when to hold 'em, know when to fold 'em'?",answers:["Lucille","The Gambler","Coward of the County","Lady"],correct:1,pts:100},
-      {q:"Which trio recorded the 2009 hit 'Need You Now'?",answers:["Rascal Flatts","Lady A","Little Big Town","Zac Brown Band"],correct:1,pts:200},
-      {q:"Shania Twain's 1997 album 'Come On Over' has sold over how many copies worldwide?",answers:["20 million","30 million","40 million","60 million"],correct:2,pts:200},
-      {q:"Which Garth Brooks song, his first #1, is about regret over leaving an old love behind?",answers:["The Dance","The River","The Thunder Rolls","Friends in Low Places"],correct:0,pts:200}
+    { name:'K-Pop IRL', icon:'🌏', intro:"Step outside the film. Five questions on the real K-pop industry that inspired it.", questions:[
+      { q:"Supergroup BTS is from which country?", answers:["Japan","China","South Korea","Taiwan"], correct:2, pts:200 },
+      { q:"BLACKPINK, one of the biggest K-pop groups in the world, has how many members?", answers:["3","4","5","6"], correct:1, pts:200 },
+      { q:"Only three TWICE members recorded 'Takedown' for the film. Which three?", answers:["All 9 members","Jeongyeon, Jihyo, and Chaeyoung","The Japanese members only","Nayeon, Sana, and Momo"], correct:1, pts:200 },
+      { q:"Which decade did K-pop first emerge and gain recognition as a genre?", answers:["1970s","1980s","1990s","2000s"], correct:2, pts:200 },
+      { q:"Every major K-pop group has an official fandom name. What are BTS fans called?", answers:["ONCE","BLINKS","ARMY","STAY"], correct:2, pts:200 }
     ]},
-    {name:'Pop Anthems',icon:'🎤',intro:"Stadium-fillers, viral hooks, songs you can't escape. Modern pop royalty.",questions:[
-      {q:"Which Dua Lipa album includes the hits 'Don't Start Now' and 'Levitating'?",answers:["Dua Lipa","Future Nostalgia","Radical Optimism","Funk Wav Bounces"],correct:1,pts:200},
-      {q:"Bruno Mars sang 'Uptown Funk' alongside which producer-singer?",answers:["Pharrell Williams","Mark Ronson","Calvin Harris","Diplo"],correct:1,pts:100},
-      {q:"Ed Sheeran's 'Shape of You' came from which 2017 album?",answers:["÷ (Divide)","× (Multiply)","+ (Plus)","= (Equals)"],correct:0,pts:100},
-      {q:"Which 2014 Sam Smith hit shared a melody with Tom Petty's 'I Won't Back Down'?",answers:["Stay With Me","I'm Not the Only One","Like I Can","Lay Me Down"],correct:0,pts:200},
-      {q:"What 2022 Harry Styles song spent 15 weeks at #1 on the Billboard Hot 100?",answers:["Watermelon Sugar","Sign of the Times","As It Was","Adore You"],correct:2,pts:300}
+    { name:'The Finale', icon:'🏆', intro:"Five questions. The hardest of the night. Q25 is worth 300 points. Here we go.", questions:[
+      { q:"KPop Demon Hunters became the most-watched film in Netflix history. How many views had it reached by early 2026?", answers:["100 million","200 million","325 million","500 million"], correct:2, pts:200 },
+      { q:"The film received two Academy Award nominations. Which two categories?", answers:["Best Original Score and Best Animated Feature","Best Animated Feature and Best Original Song","Best Picture and Best Animated Feature","Best Original Song and Best Original Score"], correct:1, pts:200 },
+      { q:"In the film's climax, 'What It Sounds Like' starts as a Rumi solo. Who ends up joining HUNTR/X in singing it?", answers:["Jinu and the Saja Boys","Bobby the manager","The entire crowd of civilians","Gwi-Ma, in a villainous reprise"], correct:2, pts:200 },
+      { q:"Critics and filmmakers describe the film's core message as centering on what theme?", answers:["Fame is more important than friendship","Demons cannot change — they are always evil","Your past does not define who you become","Music is more powerful than any weapon"], correct:2, pts:200 },
+      { q:"'Golden' held #1 on the Billboard Hot 100 for 8 nonconsecutive weeks. That made HUNTR/X the first all-female group to do what on that chart this century?", answers:["First all-female group to debut at #1","First all-female group to have the longest #1 run this century","First all-female group to have 4 simultaneous Top 10 hits","First all-female group to reach #1 on Billboard Global 200"], correct:1, pts:300 }
     ]}
   ]
 };
 
 // ═══════════════════════════════════════════════════════════════
-// STATE — single source of truth
+// ENGINE — zero changes from original
 // ═══════════════════════════════════════════════════════════════
 const LETTERS=['A','B','C','D'];
-const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+const sb=supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey);
+const urlParams=new URLSearchParams(window.location.search);
+const SESSION_ID=urlParams.get('s');
 
-// Read session ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const SESSION_ID = urlParams.get('s');
+let state={player:null,phase:null,roundIndex:0,questionIndex:0,answeredKey:null,myAnswerIndex:null,myPtsEarned:0,questionStartedAt:null,submitting:false};
+let timerInt=null;
 
-let state = {
-  player: null,                  // { id, name, score, streak }
-  phase: null,                   // current session phase
-  roundIndex: 0,
-  questionIndex: 0,
-  // Anti-bug pattern: answer state is keyed to the specific question.
-  // If this key doesn't match current ri-qi, the lock is stale and ignored.
-  answeredKey: null,             // e.g. "0-2" means answered Q3 of Round 1
-  myAnswerIndex: null,           // 0-3 of the answer they picked
-  myPtsEarned: 0,
-  questionStartedAt: null,
-  submitting: false,
-};
-
-let timerInt = null;
-
-// ═══════════════════════════════════════════════════════════════
-// CONNECTION + INIT
-// ═══════════════════════════════════════════════════════════════
-function setConn(ok, label){
-  const dot=document.getElementById('connDot'); dot.className='conn-dot'+(ok?'':' bad');
-  document.getElementById('connText').textContent=label;
-}
+function setConn(ok,label){const dot=document.getElementById('connDot');dot.className='conn-dot'+(ok?'':' bad');document.getElementById('connText').textContent=label;}
 
 async function init(){
-  if(!SESSION_ID){
-    setConn(false,'No session');
-    document.getElementById('joinErr').textContent='No session ID in URL. Scan the QR from the TV.';
-    document.getElementById('joinBtn').disabled=true;
-    return;
-  }
-  // Verify session exists
+  if(!SESSION_ID){setConn(false,'No session');document.getElementById('joinErr').textContent='No session ID in URL. Scan the QR from the TV.';document.getElementById('joinBtn').disabled=true;return;}
   const{data,error}=await sb.from('trivia_sessions').select('phase,round_index,question_index').eq('id',SESSION_ID).single();
-  if(error||!data){
-    setConn(false,'No session');
-    document.getElementById('joinErr').textContent='Session not found. Scan the QR from the TV again.';
-    document.getElementById('joinBtn').disabled=true;
-    return;
-  }
-  state.phase=data.phase;
-  state.roundIndex=data.round_index;
-  state.questionIndex=data.question_index;
+  if(error||!data){setConn(false,'No session');document.getElementById('joinErr').textContent='Session not found. Scan the QR from the TV again.';document.getElementById('joinBtn').disabled=true;return;}
+  state.phase=data.phase;state.roundIndex=data.round_index;state.questionIndex=data.question_index;
   setConn(true,'Connected');
-
-  // If game already in progress when player lands, allow join but warn
-  if(data.phase!=='lobby'){
-    document.getElementById('joinErr').textContent='Game in progress — you can still join from the next round.';
-  }
+  if(data.phase!=='lobby') document.getElementById('joinErr').textContent='Game in progress — you can still join from the next round.';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// JOIN
-// ═══════════════════════════════════════════════════════════════
 async function joinGame(){
   const name=document.getElementById('nameInput').value.trim();
   if(!name){document.getElementById('joinErr').textContent='Please enter a name.';return;}
   if(name.length<2){document.getElementById('joinErr').textContent='Name too short.';return;}
-
-  document.getElementById('joinBtn').disabled=true;
-  document.getElementById('joinErr').textContent='';
-
-  const{data,error}=await sb.from('trivia_players').insert({
-    session_id:SESSION_ID,
-    name:name.substring(0,20),
-    score:0,
-    streak:0
-  }).select().single();
-
-  if(error){
-    document.getElementById('joinErr').textContent='Could not join: '+error.message;
-    document.getElementById('joinBtn').disabled=false;
-    return;
-  }
-
+  document.getElementById('joinBtn').disabled=true;document.getElementById('joinErr').textContent='';
+  const{data,error}=await sb.from('trivia_players').insert({session_id:SESSION_ID,name:name.substring(0,20),score:0,streak:0}).select().single();
+  if(error){document.getElementById('joinErr').textContent='Could not join: '+error.message;document.getElementById('joinBtn').disabled=false;return;}
   state.player={id:data.id,name:data.name,score:0,streak:0};
   document.getElementById('lobbyPlayerName').textContent=data.name;
-
-  // Start subscriptions ONLY after we have a player
-  subscribeToSession();
-  subscribeToPlayers();
-
-  // Initial UI based on current phase
-  syncToPhase(state.phase, state.roundIndex, state.questionIndex);
+  subscribeToSession();subscribeToPlayers();
+  syncToPhase(state.phase,state.roundIndex,state.questionIndex);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// SUBSCRIPTIONS — single source of truth: trivia_sessions
-// ═══════════════════════════════════════════════════════════════
 function subscribeToSession(){
-  sb.channel('play-session-'+SESSION_ID)
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${SESSION_ID}`},
-      payload=>syncToPhase(payload.new.phase, payload.new.round_index, payload.new.question_index))
-    .subscribe(status=>{
-      if(status==='SUBSCRIBED') setConn(true,'Live');
-      else if(status==='CHANNEL_ERROR') setConn(false,'Connection issue');
-    });
+  sb.channel('play-session-'+SESSION_ID).on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${SESSION_ID}`},
+    payload=>syncToPhase(payload.new.phase,payload.new.round_index,payload.new.question_index))
+    .subscribe(status=>{if(status==='SUBSCRIBED')setConn(true,'Live');else if(status==='CHANNEL_ERROR')setConn(false,'Connection issue');});
 }
 
 function subscribeToPlayers(){
-  sb.channel('play-players-'+SESSION_ID)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${SESSION_ID}`},
-      payload=>{
-        // Increment lobby count
-        const el=document.getElementById('lobbyCount');
-        el.textContent=(parseInt(el.textContent)||0)+1;
-      })
-    .subscribe();
-  // Initial count
-  sb.from('trivia_players').select('id',{count:'exact',head:true}).eq('session_id',SESSION_ID)
-    .then(({count})=>{document.getElementById('lobbyCount').textContent=count||0;});
+  sb.channel('play-players-'+SESSION_ID).on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${SESSION_ID}`},
+    ()=>{const el=document.getElementById('lobbyCount');el.textContent=(parseInt(el.textContent)||0)+1;}).subscribe();
+  sb.from('trivia_players').select('id',{count:'exact',head:true}).eq('session_id',SESSION_ID).then(({count})=>{document.getElementById('lobbyCount').textContent=count||0;});
 }
 
-// ═══════════════════════════════════════════════════════════════
-// PHASE SYNC — single function handles ALL transitions
-// ═══════════════════════════════════════════════════════════════
-function syncToPhase(phase, ri, qi){
-  const prevQuestionKey = `${state.roundIndex}-${state.questionIndex}`;
-  const newQuestionKey = `${ri}-${qi}`;
-
-  state.phase = phase;
-  state.roundIndex = ri;
-  state.questionIndex = qi;
-
-  // CRITICAL FIX: Reset answer state whenever the question changes.
-  // This is the bug fix — if state.answeredKey is left over from a previous question,
-  // the click handler would think the player has already answered.
-  if(prevQuestionKey !== newQuestionKey){
-    state.answeredKey = null;
-    state.myAnswerIndex = null;
-    state.myPtsEarned = 0;
-    state.submitting = false;
-  }
-
+function syncToPhase(phase,ri,qi){
+  const prevKey=`${state.roundIndex}-${state.questionIndex}`;
+  const newKey=`${ri}-${qi}`;
+  state.phase=phase;state.roundIndex=ri;state.questionIndex=qi;
+  if(prevKey!==newKey){state.answeredKey=null;state.myAnswerIndex=null;state.myPtsEarned=0;state.submitting=false;}
   switch(phase){
-    case 'lobby':
-      showScreen('screenWaiting');
-      break;
-    case 'intro':
-      renderIntro(ri);
-      showScreen('screenIntro');
-      break;
+    case 'lobby': showScreen('screenWaiting'); break;
+    case 'intro': renderIntro(ri); showScreen('screenIntro'); break;
     case 'question':
-      // If player has already answered this q, show submitted
-      if(state.answeredKey === newQuestionKey){
-        showScreen('screenSubmitted');
-      } else {
-        renderQuestion(ri, qi);
-        showScreen('screenQuestion');
-        // Anchor timer locally
-        state.questionStartedAt = Date.now();
-        startLocalTimer();
-      }
+      if(state.answeredKey===newKey){showScreen('screenSubmitted');}
+      else{renderQuestion(ri,qi);showScreen('screenQuestion');state.questionStartedAt=Date.now();startLocalTimer();}
       break;
-    case 'paused':
-      // Stay on whatever screen we're on, but stop the timer
-      stopLocalTimer();
-      break;
-    case 'reveal':
-      stopLocalTimer();
-      renderReveal(ri, qi);
-      showScreen('screenReveal');
-      break;
-    case 'leaderboard':
-      stopLocalTimer();
-      renderLeaderboard(ri);
-      showScreen('screenLB');
-      break;
-    case 'gameover':
-      stopLocalTimer();
-      renderGameOver();
-      showScreen('screenOver');
-      break;
+    case 'paused': stopLocalTimer(); break;
+    case 'reveal': stopLocalTimer();renderReveal(ri,qi);showScreen('screenReveal'); break;
+    case 'leaderboard': stopLocalTimer();renderLeaderboard(ri);showScreen('screenLB'); break;
+    case 'gameover': stopLocalTimer();renderGameOver();showScreen('screenOver'); break;
   }
 }
 
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-// ═══════════════════════════════════════════════════════════════
-// ROUND INTRO
-// ═══════════════════════════════════════════════════════════════
-function renderIntro(ri){
-  const r = CONFIG.rounds[ri];
-  if(!r) return;
-  document.getElementById('introIcon').textContent=r.icon;
-  document.getElementById('introEye').textContent=`Round ${ri+1} of ${CONFIG.rounds.length}`;
-  document.getElementById('introName').textContent=r.name;
-  document.getElementById('introText').textContent=r.intro;
-}
+function renderIntro(ri){const r=CONFIG.rounds[ri];if(!r)return;document.getElementById('introIcon').textContent=r.icon;document.getElementById('introEye').textContent=`Round ${ri+1} of ${CONFIG.rounds.length}`;document.getElementById('introName').textContent=r.name;document.getElementById('introText').textContent=r.intro;}
 
-// ═══════════════════════════════════════════════════════════════
-// QUESTION RENDER
-// ═══════════════════════════════════════════════════════════════
-function renderQuestion(ri, qi){
-  const r=CONFIG.rounds[ri], q=r?.questions?.[qi];
-  if(!q) return;
+function renderQuestion(ri,qi){
+  const r=CONFIG.rounds[ri],q=r?.questions?.[qi];if(!q)return;
   document.getElementById('qNum').textContent=`Q${qi+1}`;
   document.getElementById('qCat').textContent=r.name;
   document.getElementById('qPts').textContent=`${q.pts} PTS`;
   document.getElementById('qText').textContent=q.q;
-
-  const list=document.getElementById('answersList');
-  list.innerHTML='';
-
-  // CRITICAL: Always rebuild buttons fresh per question. Each button gets
-  // its own click handler closured to *this* question's ri/qi.
-  q.answers.forEach((ans, i)=>{
-    const btn=document.createElement('button');
-    btn.className='ans-btn';
-    btn.dataset.index=i;
+  const list=document.getElementById('answersList');list.innerHTML='';
+  q.answers.forEach((ans,i)=>{
+    const btn=document.createElement('button');btn.className='ans-btn';btn.dataset.index=i;
     btn.innerHTML=`<div class="ans-letter">${LETTERS[i]}</div><div class="ans-text">${ans}</div>`;
-    btn.addEventListener('click',()=>handleAnswerClick(ri, qi, i));
-    list.appendChild(btn);
+    btn.addEventListener('click',()=>handleAnswerClick(ri,qi,i));list.appendChild(btn);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// CLICK HANDLER — robust against the original bug
-// ═══════════════════════════════════════════════════════════════
-async function handleAnswerClick(ri, qi, answerIndex){
-  // Triple-guard: if any of these fire, we already handled or shouldn't handle
-  if(state.submitting) return;
-  if(state.phase !== 'question') return;
-  // Make sure this click is for the CURRENT question, not a stale render
-  if(ri !== state.roundIndex || qi !== state.questionIndex) return;
-  // Make sure we haven't already answered THIS specific question
-  const questionKey=`${ri}-${qi}`;
-  if(state.answeredKey === questionKey) return;
-
-  // Lock now, before any await
-  state.submitting = true;
-  state.answeredKey = questionKey;
-  state.myAnswerIndex = answerIndex;
-
-  // Visual feedback immediately
-  document.querySelectorAll('.ans-btn').forEach(b=>{
-    if(parseInt(b.dataset.index) === answerIndex) b.classList.add('selected');
-    else b.classList.add('locked');
-  });
-
-  // Compute score
-  const q = CONFIG.rounds[ri].questions[qi];
-  const isCorrect = (answerIndex === q.correct);
-  let ptsEarned = 0;
-  if(isCorrect){
-    // Speed bonus: up to +50% if instant, base if at zero time
-    const elapsed = state.questionStartedAt ? (Date.now()-state.questionStartedAt)/1000 : CONFIG.questionSecs;
-    const remaining = Math.max(0, CONFIG.questionSecs - elapsed);
-    const speedMult = 1 + 0.5 * (remaining / CONFIG.questionSecs);
-    ptsEarned = Math.round(q.pts * speedMult / 5) * 5;
-  }
-  state.myPtsEarned = ptsEarned;
-
-  // Insert answer record
-  const{error:ansErr}=await sb.from('trivia_answers').insert({
-    session_id: SESSION_ID,
-    player_id: state.player.id,
-    round_index: ri,
-    question_index: qi,
-    answer_index: answerIndex,
-    is_correct: isCorrect,
-    pts_earned: ptsEarned
-  });
-
-  if(ansErr){
-    showToast('Error saving: '+ansErr.message);
-    // Roll back lock so they can try again
-    state.submitting = false;
-    state.answeredKey = null;
-    document.querySelectorAll('.ans-btn').forEach(b=>{b.classList.remove('selected');b.classList.remove('locked');});
-    return;
-  }
-
-  // Update player score + streak
-  const newScore = (state.player.score || 0) + ptsEarned;
-  const newStreak = isCorrect ? (state.player.streak || 0) + 1 : 0;
-  await sb.from('trivia_players').update({score:newScore, streak:newStreak}).eq('id', state.player.id);
-  state.player.score = newScore;
-  state.player.streak = newStreak;
-
-  state.submitting = false;
+async function handleAnswerClick(ri,qi,answerIndex){
+  if(state.submitting)return;if(state.phase!=='question')return;
+  if(ri!==state.roundIndex||qi!==state.questionIndex)return;
+  const questionKey=`${ri}-${qi}`;if(state.answeredKey===questionKey)return;
+  state.submitting=true;state.answeredKey=questionKey;state.myAnswerIndex=answerIndex;
+  document.querySelectorAll('.ans-btn').forEach(b=>{if(parseInt(b.dataset.index)===answerIndex)b.classList.add('selected');else b.classList.add('locked');});
+  const q=CONFIG.rounds[ri].questions[qi];const isCorrect=(answerIndex===q.correct);let ptsEarned=0;
+  if(isCorrect){const elapsed=state.questionStartedAt?(Date.now()-state.questionStartedAt)/1000:CONFIG.questionSecs;const remaining=Math.max(0,CONFIG.questionSecs-elapsed);const speedMult=1+0.5*(remaining/CONFIG.questionSecs);ptsEarned=Math.round(q.pts*speedMult/5)*5;}
+  state.myPtsEarned=ptsEarned;
+  const{error:ansErr}=await sb.from('trivia_answers').insert({session_id:SESSION_ID,player_id:state.player.id,round_index:ri,question_index:qi,answer_index:answerIndex,is_correct:isCorrect,pts_earned:ptsEarned});
+  if(ansErr){showToast('Error saving: '+ansErr.message);state.submitting=false;state.answeredKey=null;document.querySelectorAll('.ans-btn').forEach(b=>{b.classList.remove('selected');b.classList.remove('locked');});return;}
+  const newScore=(state.player.score||0)+ptsEarned;const newStreak=isCorrect?(state.player.streak||0)+1:0;
+  await sb.from('trivia_players').update({score:newScore,streak:newStreak}).eq('id',state.player.id);
+  state.player.score=newScore;state.player.streak=newStreak;state.submitting=false;
   showScreen('screenSubmitted');
-
-  // Show locked answer
-  document.getElementById('subLetter').textContent=LETTERS[answerIndex];
-  document.getElementById('subText').textContent=q.answers[answerIndex];
+  document.getElementById('subLetter').textContent=LETTERS[answerIndex];document.getElementById('subText').textContent=q.answers[answerIndex];
 }
 
-// ═══════════════════════════════════════════════════════════════
-// LOCAL TIMER (display-only — TV is the source of truth)
-// ═══════════════════════════════════════════════════════════════
 function startLocalTimer(){
-  stopLocalTimer();
-  let secsLeft = CONFIG.questionSecs;
-  const numEl=document.getElementById('qTimerNum');
-  const fillEl=document.getElementById('qTimerFill');
-  function tick(){
-    numEl.textContent = secsLeft;
-    fillEl.style.width = ((secsLeft/CONFIG.questionSecs)*100)+'%';
-    const urgent = secsLeft <= 5;
-    numEl.classList.toggle('urgent', urgent);
-    fillEl.classList.toggle('urgent', urgent);
-    secsLeft--;
-    if(secsLeft < 0){ stopLocalTimer(); }
-  }
-  tick();
-  timerInt = setInterval(tick, 1000);
+  stopLocalTimer();let secsLeft=CONFIG.questionSecs;
+  const numEl=document.getElementById('qTimerNum'),fillEl=document.getElementById('qTimerFill');
+  function tick(){numEl.textContent=secsLeft;fillEl.style.width=((secsLeft/CONFIG.questionSecs)*100)+'%';const urgent=secsLeft<=5;numEl.classList.toggle('urgent',urgent);fillEl.classList.toggle('urgent',urgent);secsLeft--;if(secsLeft<0)stopLocalTimer();}
+  tick();timerInt=setInterval(tick,1000);
 }
-function stopLocalTimer(){
-  if(timerInt){ clearInterval(timerInt); timerInt=null; }
-}
+function stopLocalTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;}}
 
-// ═══════════════════════════════════════════════════════════════
-// REVEAL
-// ═══════════════════════════════════════════════════════════════
-function renderReveal(ri, qi){
-  const q=CONFIG.rounds[ri]?.questions?.[qi];
-  if(!q) return;
-
-  const myIndex = state.myAnswerIndex;
-  const isCorrect = (myIndex === q.correct);
-  const didAnswer = (myIndex !== null && myIndex !== undefined);
-
-  // Big icon + result
-  const iconEl=document.getElementById('revIcon');
-  const resultEl=document.getElementById('revResult');
-  const ptsEl=document.getElementById('revPts');
-
-  if(!didAnswer){
-    iconEl.textContent='⏱'; iconEl.className='rev-icon';
-    resultEl.textContent='Time Out'; resultEl.className='rev-result wrong';
-    ptsEl.textContent='+0';
-    ptsEl.style.color='var(--dim)';
-  } else if(isCorrect){
-    iconEl.textContent='✓'; iconEl.className='rev-icon correct';
-    resultEl.textContent='Correct!'; resultEl.className='rev-result correct';
-    ptsEl.textContent=`+${state.myPtsEarned}`;
-    ptsEl.style.color='var(--gold)';
-  } else {
-    iconEl.textContent='✗'; iconEl.className='rev-icon wrong';
-    resultEl.textContent='Wrong'; resultEl.className='rev-result wrong';
-    ptsEl.textContent='+0';
-    ptsEl.style.color='var(--dim)';
-  }
-
-  // Your answer row
+function renderReveal(ri,qi){
+  const q=CONFIG.rounds[ri]?.questions?.[qi];if(!q)return;
+  const myIndex=state.myAnswerIndex;const isCorrect=(myIndex===q.correct);const didAnswer=(myIndex!==null&&myIndex!==undefined);
+  const iconEl=document.getElementById('revIcon'),resultEl=document.getElementById('revResult'),ptsEl=document.getElementById('revPts');
+  if(!didAnswer){iconEl.textContent='⏱';iconEl.className='rev-icon';resultEl.textContent='Time Out';resultEl.className='rev-result wrong';ptsEl.textContent='+0';ptsEl.style.color='var(--dim)';}
+  else if(isCorrect){iconEl.textContent='✓';iconEl.className='rev-icon correct';resultEl.textContent='Correct!';resultEl.className='rev-result correct';ptsEl.textContent=`+${state.myPtsEarned}`;ptsEl.style.color='var(--gold)';}
+  else{iconEl.textContent='✗';iconEl.className='rev-icon wrong';resultEl.textContent='Wrong';resultEl.className='rev-result wrong';ptsEl.textContent='+0';ptsEl.style.color='var(--dim)';}
   const yourRow=document.getElementById('revYour');
-  if(didAnswer){
-    yourRow.style.display='flex';
-    document.getElementById('revYourLetter').textContent=LETTERS[myIndex];
-    document.getElementById('revYourText').textContent=q.answers[myIndex];
-    yourRow.className=isCorrect?'rev-row correct':'rev-row wrong';
-  } else {
-    yourRow.style.display='none';
-  }
-
-  // Correct answer (only show if player was wrong or didn't answer)
+  if(didAnswer){yourRow.style.display='flex';document.getElementById('revYourLetter').textContent=LETTERS[myIndex];document.getElementById('revYourText').textContent=q.answers[myIndex];yourRow.className=isCorrect?'rev-row correct':'rev-row wrong';}
+  else yourRow.style.display='none';
   const corrRow=document.getElementById('revCorrect');
-  if(!isCorrect){
-    corrRow.style.display='flex';
-    document.getElementById('revCorrectLetter').textContent=LETTERS[q.correct];
-    document.getElementById('revCorrectText').textContent=q.answers[q.correct];
-  } else {
-    corrRow.style.display='none';
-  }
-
-  // Streak indicator
+  if(!isCorrect){corrRow.style.display='flex';document.getElementById('revCorrectLetter').textContent=LETTERS[q.correct];document.getElementById('revCorrectText').textContent=q.answers[q.correct];}
+  else corrRow.style.display='none';
   const streakEl=document.getElementById('revStreak');
-  if(isCorrect && state.player && state.player.streak>=2){
-    streakEl.style.display='inline-flex';
-    document.getElementById('revStreakNum').textContent=state.player.streak;
-  } else {
-    streakEl.style.display='none';
-  }
+  if(isCorrect&&state.player&&state.player.streak>=2){streakEl.style.display='inline-flex';document.getElementById('revStreakNum').textContent=state.player.streak;}
+  else streakEl.style.display='none';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// LEADERBOARD
-// ═══════════════════════════════════════════════════════════════
 async function renderLeaderboard(ri){
-  const isLast = (ri === CONFIG.rounds.length-1);
-  document.getElementById('lbEye').textContent = isLast ? 'Final Standings' : `After Round ${ri+1}`;
-  document.getElementById('lbTitle').textContent = isLast ? '🏆 Final Scores' : 'Leaderboard';
-
-  // Fetch all players, sort by score
+  const isLast=(ri===CONFIG.rounds.length-1);
+  document.getElementById('lbEye').textContent=isLast?'Final Standings':`After Round ${ri+1}`;
+  document.getElementById('lbTitle').textContent=isLast?'🏆 Final Scores':'Leaderboard';
   const{data}=await sb.from('trivia_players').select('id,name,score,streak').eq('session_id',SESSION_ID).order('score',{ascending:false});
-  const players = data || [];
-
-  // Find player rank
-  const myRank = players.findIndex(p => p.id === state.player.id) + 1;
-  document.getElementById('lbYourRank').textContent = myRank > 0 ? `#${myRank}` : '—';
-  document.getElementById('lbYourName').textContent = state.player.name;
-  document.getElementById('lbYourScore').textContent = (state.player.score || 0).toLocaleString();
-
-  // Render top 5 (highlight player if in top 5)
-  const list=document.getElementById('lbList');
-  list.innerHTML='';
+  const players=data||[];const myRank=players.findIndex(p=>p.id===state.player.id)+1;
+  document.getElementById('lbYourRank').textContent=myRank>0?`#${myRank}`:'—';
+  document.getElementById('lbYourName').textContent=state.player.name;
+  document.getElementById('lbYourScore').textContent=(state.player.score||0).toLocaleString();
+  const list=document.getElementById('lbList');list.innerHTML='';
   const cls=['gold','silver','bronze'];
-  players.slice(0,5).forEach((p, i)=>{
-    const isYou = (p.id === state.player.id);
-    const row=document.createElement('div');
-    row.className=`lb-row ${cls[i]||''} ${isYou?'you':''}`;
-    row.innerHTML=`
-      <div class="lb-row-rank">${i+1}</div>
-      <div class="lb-row-name">${p.name}${isYou?' (you)':''}</div>
-      <div class="lb-row-score">${(p.score||0).toLocaleString()}</div>
-    `;
-    list.appendChild(row);
-  });
+  players.slice(0,5).forEach((p,i)=>{const isYou=(p.id===state.player.id);const row=document.createElement('div');row.className=`lb-row ${cls[i]||''} ${isYou?'you':''}`;row.innerHTML=`<div class="lb-row-rank">${i+1}</div><div class="lb-row-name">${p.name}${isYou?' (you)':''}</div><div class="lb-row-score">${(p.score||0).toLocaleString()}</div>`;list.appendChild(row);});
 }
 
-// ═══════════════════════════════════════════════════════════════
-// GAME OVER
-// ═══════════════════════════════════════════════════════════════
 async function renderGameOver(){
   const{data}=await sb.from('trivia_players').select('id,name,score').eq('session_id',SESSION_ID).order('score',{ascending:false});
-  const players = data || [];
-  document.getElementById('goScore').textContent = (state.player.score || 0).toLocaleString();
-  const myRank = players.findIndex(p => p.id === state.player.id) + 1;
-  const winner = players[0];
-  let line = myRank > 0 ? `Rank: #${myRank} of ${players.length}` : 'Thanks for playing!';
-  if(winner && winner.id === state.player.id) line = '🏆 You won!';
-  else if(winner) line += ` · Winner: ${winner.name}`;
-  document.getElementById('goRankLine').textContent = line;
+  const players=data||[];document.getElementById('goScore').textContent=(state.player.score||0).toLocaleString();
+  const myRank=players.findIndex(p=>p.id===state.player.id)+1;const winner=players[0];
+  let line=myRank>0?`Rank: #${myRank} of ${players.length}`:'Thanks for playing!';
+  if(winner&&winner.id===state.player.id)line='🏆 You won!';else if(winner)line+=` · Winner: ${winner.name}`;
+  document.getElementById('goRankLine').textContent=line;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════════════════
-function showToast(msg, ms=3000){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), ms);
-}
-
-// Allow Enter key to submit name on join screen
-document.getElementById('nameInput').addEventListener('keypress', e=>{
-  if(e.key==='Enter') joinGame();
-});
-
-// Boot
+function showToast(msg,ms=3000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);}
+document.getElementById('nameInput').addEventListener('keypress',e=>{if(e.key==='Enter')joinGame();});
 init();
 </script>
 </body>
