@@ -583,25 +583,69 @@ function renderQuestion(ri, qi){
   startClientTimer(20);
 }
 
-async function fetchQuestion(ri, qi){
-  // Questions are stored in CONFIG on the TV side.
-  // We pull from the session to get the current question data
-  // via a dedicated questions table or — since we embed CONFIG in TV —
-  // we re-embed a minimal question set here for answer rendering.
-  // The answers are submitted by index, server validates nothing client-side.
-  // We just show "Awaiting question…" and the TV phase drives us.
-  // The question text comes from a separate fetch if available.
+// ── QUESTION DATA — mirrors index.html CONFIG exactly ────────────
+const QUESTIONS = [
+  // Round 0 — The Host Nation
+  [
+    { q:"The USA opened the 2026 World Cup with a dominant win over which South American team?", answers:["Brazil","Colombia","Paraguay","Uruguay"] },
+    { q:"Who scored twice for the USMNT against Australia, becoming the first American to score more than once in a World Cup match since 1930?", answers:["Christian Pulisic","Folarin Balogun","Timothy Weah","Alex Freeman"] },
+    { q:"The US is playing in Group D. Which of these teams is NOT in their group?", answers:["Paraguay","Australia","Türkiye","Mexico"] },
+    { q:"The 2026 World Cup is being co-hosted by three countries. Which three?", answers:["USA, Canada, Brazil","USA, Canada, Mexico","USA, Mexico, Argentina","Canada, Mexico, Cuba"] },
+    { q:"How many teams are competing in the 2026 World Cup — more than any previous tournament?", answers:["32","40","48","64"] }
+  ],
+  // Round 1 — The Stars
+  [
+    { q:"Lamine Yamal opened Spain's World Cup account in 2026. Which club does he play for?", answers:["Real Madrid","Barcelona","Atlético Madrid","Sevilla"] },
+    { q:"Mohamed Salah fired Egypt to a memorable World Cup victory. Which English club does he play for?", answers:["Manchester City","Arsenal","Liverpool","Chelsea"] },
+    { q:"Norway's Erling Haaland scored all four goals in their opening match against Iraq. Which club does he play for?", answers:["Bayern Munich","Real Madrid","Manchester City","PSG"] },
+    { q:"How many World Cup titles has Argentina won going into 2026?", answers:["1","2","3","4"] },
+    { q:"France's Kylian Mbappé plays his club soccer for which team in 2026?", answers:["PSG","Barcelona","Real Madrid","Manchester United"] }
+  ],
+  // Round 2 — This Tournament
+  [
+    { q:"Which co-host country scored the very first goal of the 2026 World Cup?", answers:["USA","Canada","Mexico","Brazil"] },
+    { q:"Canada crushed Qatar 6-0 in the group stage. What was notable about this result for Canada?", answers:["Their first ever World Cup win","Their biggest win in any sport","Their first shutout in history","Jonathan David scored a hat-trick"] },
+    { q:"Germany beat Curaçao 7-1 — the highest scoring result of the first round. How many goals did Germany score?", answers:["5","6","7","8"] },
+    { q:"Which unlikely nation drew 2-2 with Uruguay in one of the tournament's biggest early surprises?", answers:["Haiti","DR Congo","Cabo Verde","New Zealand"] },
+    { q:"INSIDER: The June 20 match between Japan and Tunisia in Monterrey was historic. Why?", answers:["First game decided by penalty shootout","First 0-0 draw of the tournament","The 1,000th match in World Cup history","First time both teams were eliminated in the same match"] }
+  ],
+  // Round 3 — World Cup Classics
+  [
+    { q:"Which country has won the most World Cup titles in history?", answers:["Germany","Argentina","Brazil","Italy"] },
+    { q:"In which year did the USA famously beat England 1-0 in one of the biggest upsets in World Cup history?", answers:["1930","1950","1966","1990"] },
+    { q:"Diego Maradona's 'Hand of God' goal was scored against which country in the 1986 quarterfinal?", answers:["England","Germany","Brazil","Italy"] },
+    { q:"Who holds the record for most goals scored in World Cup history?", answers:["Pelé","Miroslav Klose","Ronaldo (Brazil)","Gerd Müller"] },
+    { q:"The 2022 World Cup in Qatar was played in which unusual month?", answers:["September","October","November","December"] }
+  ],
+  // Round 4 — The Finale
+  [
+    { q:"How many cities across the US, Canada, and Mexico are hosting 2026 World Cup matches?", answers:["10","14","16","20"] },
+    { q:"Which stadium is hosting the 2026 World Cup Final on July 19?", answers:["SoFi Stadium","AT&T Stadium","MetLife Stadium","Hard Rock Stadium"] },
+    { q:"England beat Croatia 4-2 in their opening match. How many World Cup titles has England won in total?", answers:["0","1","2","3"] },
+    { q:"Alex Freeman scored for the USMNT at this World Cup. Against which team did he score?", answers:["Paraguay","Australia","Türkiye","Colombia"] },
+    { q:"The 2026 World Cup introduced a rule penalizing players for covering their mouths during confrontations. What happened in the US vs. Paraguay match related to this rule?", answers:["Christian Pulisic was given a yellow card","A Paraguay player was sent off","Miguel Almirón received a straight red card after a VAR review","The referee issued a team warning"] }
+  ]
+];
 
-  // Attempt to get question details from session metadata or a questions store
-  const {data} = await sb.from('trivia_sessions').select('*').eq('id',sessionId).single();
-  // We won't have question text in DB — that's fine, player just sees the answer buttons
-  // and matches what's on TV. This is the canonical ClubOS pattern.
-  document.getElementById('qTextStr').textContent = 'See the TV for the question ⬆';
-  document.getElementById('ansListEl').innerHTML = LETTERS.map((l,i)=>
-    `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i})">`+
-    `<div class="ans-letter">${l}</div>`+
-    `<div class="ans-text">Option ${l}</div>`+
-    `</button>`
+function fetchQuestion(ri, qi){
+  const round = QUESTIONS[ri];
+  const q = round ? round[qi] : null;
+
+  if(!q){
+    document.getElementById('qTextStr').textContent = 'See the TV for the question ⬆';
+    document.getElementById('ansListEl').innerHTML = LETTERS.map((l,i)=>
+      `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i})">` +
+      `<div class="ans-letter">${l}</div><div class="ans-text">Option ${l}</div></button>`
+    ).join('');
+    return;
+  }
+
+  const pts = (ri === 4 && qi === 4) ? 300 : 200;
+  document.getElementById('qPtsBadge').textContent = `${pts} PTS`;
+  document.getElementById('qTextStr').textContent = q.q;
+  document.getElementById('ansListEl').innerHTML = q.answers.map((a,i)=>
+    `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i})">` +
+    `<div class="ans-letter">${LETTERS[i]}</div><div class="ans-text">${a}</div></button>`
   ).join('');
 }
 
