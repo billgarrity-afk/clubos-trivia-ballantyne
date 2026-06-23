@@ -372,33 +372,56 @@ function renderQuestion(ri, qi){
   const q     = round ? round.questions[qi] : null;
   const qNum  = ri * 5 + qi + 1;
   const pts   = (q && q.pts) ? q.pts : 200;
+  const correctIndex = q ? q.correct : -1;
 
   document.getElementById('qTopTitle').textContent = `Round ${ri+1}`;
   document.getElementById('qTopSub').textContent   = `Question ${qNum} of 25`;
   updateScoreDisplays();
 
   const body = document.getElementById('qPageBody');
+
+  // Scaffold structure — set text via textContent, build buttons via DOM
   body.innerHTML = `
     <div class="q-meta-bar">
       <div class="q-label">Q${qNum} · Round ${ri+1}</div>
       <div class="q-pts-badge">${pts} PTS</div>
     </div>
     <div class="q-timer-bar-wrap"><div class="q-timer-bar" id="qTimerBar"></div></div>
-    <div class="q-text-box"><div class="q-text-str">${q ? q.q : 'Watch the TV for the question ⬆'}</div></div>
-    <div class="ans-list" id="ansListEl">
-      ${q ? q.answers.map((a,i)=>
-        `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i},${q.correct},${pts})">
-          <div class="ans-letter">${LETTERS[i]}</div>
-          <div class="ans-text">${a}</div>
-        </button>`
-      ).join('') : LETTERS.map((l,i)=>
-        `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i},-1,${pts})">
-          <div class="ans-letter">${l}</div><div class="ans-text">Option ${l}</div>
-        </button>`
-      ).join('')}
-    </div>
+    <div class="q-text-box"><div class="q-text-str" id="qTextStr"></div></div>
+    <div class="ans-list" id="ansListEl"></div>
     <div id="resultBannerEl"></div>
   `;
+
+  // Set question text safely — no innerHTML injection
+  document.getElementById('qTextStr').textContent = q ? q.q : 'Watch the TV for the question \u2b06';
+
+  // Build buttons via DOM so addEventListener fires reliably on mobile Safari
+  const ansListEl = document.getElementById('ansListEl');
+  const answerTexts = q ? q.answers : ['Option A','Option B','Option C','Option D'];
+
+  answerTexts.forEach((ansText, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.id = 'aBtn' + i;
+
+    const letter = document.createElement('div');
+    letter.className = 'ans-letter';
+    letter.textContent = LETTERS[i];
+    letter.style.pointerEvents = 'none';
+
+    const text = document.createElement('div');
+    text.className = 'ans-text';
+    text.textContent = ansText;
+    text.style.pointerEvents = 'none';
+
+    btn.appendChild(letter);
+    btn.appendChild(text);
+
+    // Capture i, correctIndex, pts at this iteration
+    btn.addEventListener('click', (function(idx){ return function(){ submitAnswer(ri, qi, idx, correctIndex, pts); }; })(i));
+
+    ansListEl.appendChild(btn);
+  });
 
   showPage('pageQuestion');
   startClientTimer(20, ri, qi);
