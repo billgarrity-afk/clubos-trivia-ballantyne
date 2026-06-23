@@ -497,8 +497,8 @@ const CONFIG = {
   clubSlug:     'ballantyne-cc',
   footerMsg:    'Scan to play · No app needed · Submit answers from your phone',
   questionSecs: 20,
-  revealSecs:   7,
-  introCDSecs:  8,
+  revealSecs:   5,
+  introCDSecs:  5,
   rounds: [
     {
       name: 'The Host Nation', icon: '🇺🇸',
@@ -876,7 +876,7 @@ async function showMidLB(ri){
   document.getElementById('lbSub').textContent=isLast?'Thanks for playing! See you next trivia night.':`After Round ${ri+1} · ${CONFIG.rounds.length-ri-1} round${CONFIG.rounds.length-ri-1!==1?'s':''} remaining`;
   document.getElementById('pauseBtn').style.display='none';
   showScreen('screenLB');updatePhase('leaderboard',ri,0);confetti(60);
-  setTimeout(()=>{if(isLast)showGameOver(players);else runIntro(ri+1);},10000);
+  setTimeout(()=>{if(isLast)showGameOver(players);else runIntro(ri+1);},7000);
 }
 
 function showGameOver(players){
