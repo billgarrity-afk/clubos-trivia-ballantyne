@@ -9,388 +9,180 @@
 <style>
   :root {
     --bg:          #04100A;
-    --bg2:         #071A0F;
-    --bg-card:     #0A1C10;
-    --pitch:       #0D2B16;
     --green-turf:  #1A5C2A;
     --green-bright:#2E9B48;
     --green-glow:  #3DBF5A;
     --gold:        #C9A84C;
-    --gold-dim:    #8B6B28;
     --red:         #D93025;
     --white:       #F0F4F0;
     --dim:         rgba(240,244,240,0.5);
     --faint:       rgba(240,244,240,0.05);
     --sep:         rgba(240,244,240,0.09);
   }
-
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-  html, body {
-    width:100%; min-height:100vh;
-    font-family:'DM Sans', sans-serif;
-    background:var(--bg);
-    color:var(--white);
-    overflow-x:hidden;
-  }
-
-  /* Pitch stripe background */
-  body::before {
-    content:'';
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background-image:repeating-linear-gradient(
-      180deg,
-      rgba(13,43,22,0.0) 0px, rgba(13,43,22,0.0) 80px,
-      rgba(26,92,42,0.15) 80px, rgba(26,92,42,0.15) 160px
-    );
-  }
+  html,body { width:100%; min-height:100vh; font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--white); overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image:repeating-linear-gradient(180deg,rgba(13,43,22,0) 0px,rgba(13,43,22,0) 80px,rgba(26,92,42,0.15) 80px,rgba(26,92,42,0.15) 160px); }
 
   .page { position:relative; z-index:1; display:none; flex-direction:column; min-height:100vh; }
   .page.active { display:flex; }
 
-  /* ── SHARED HEADER ───────────────────────────────── */
-  .top-bar {
-    background:rgba(4,16,10,0.95);
-    border-bottom:1px solid var(--sep);
-    padding:14px 20px;
-    display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:100;
-    backdrop-filter:blur(16px);
-  }
-  .top-bar::after {
-    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
-    background:linear-gradient(90deg, var(--green-bright), var(--gold), var(--green-bright));
-    background-size:300% 100%;
-    animation:ticker 6s linear infinite;
-  }
+  /* TOP BAR */
+  .top-bar { background:rgba(4,16,10,0.95); border-bottom:1px solid var(--sep); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; backdrop-filter:blur(16px); }
+  .top-bar::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--green-bright),var(--gold),var(--green-bright)); background-size:300% 100%; animation:ticker 6s linear infinite; }
   @keyframes ticker { 0%{background-position:0%} 100%{background-position:300%} }
-
   .tb-brand { display:flex; flex-direction:column; gap:2px; }
   .tb-title { font-family:'Oswald'; font-size:16px; font-weight:600; color:var(--white); letter-spacing:1px; line-height:1; }
   .tb-sub   { font-size:10px; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
-
   .tb-right { text-align:right; }
   .tb-score { font-family:'Bebas Neue'; font-size:26px; color:var(--green-glow); letter-spacing:1px; line-height:1; }
   .tb-score-lbl { font-size:9px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; }
 
-  /* ── JOIN PAGE ───────────────────────────────────── */
-  .join-body {
-    flex:1; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; padding:32px 24px; gap:24px;
-    text-align:center;
-  }
-
+  /* JOIN */
+  .join-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; gap:24px; text-align:center; }
   .join-icon { font-size:64px; animation:bounce 1.4s ease-in-out infinite alternate; }
   @keyframes bounce { from{transform:translateY(0)} to{transform:translateY(-10px)} }
-
-  .join-title {
-    font-family:'Bebas Neue'; font-size:52px; letter-spacing:2px; line-height:0.95;
-  }
+  .join-title { font-family:'Bebas Neue'; font-size:52px; letter-spacing:2px; line-height:0.95; }
   .join-title .j1 { color:var(--white); display:block; }
-  .join-title .j2 {
-    background:linear-gradient(90deg, var(--gold), var(--green-bright));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    display:block;
-  }
-
+  .join-title .j2 { background:linear-gradient(90deg,var(--gold),var(--green-bright)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; }
   .join-sub { font-size:15px; color:var(--dim); line-height:1.6; max-width:280px; }
-
-  .name-input-wrap { width:100%; max-width:320px; }
-  .name-input {
-    width:100%; padding:16px 20px;
-    background:rgba(255,255,255,0.06);
-    border:1.5px solid var(--sep);
-    border-radius:10px;
-    font-family:'DM Sans'; font-size:18px; font-weight:600;
-    color:var(--white); text-align:center;
-    outline:none; transition:border-color 0.2s;
-    letter-spacing:0.5px;
-    -webkit-appearance:none;
-  }
+  .name-input { width:100%; max-width:320px; padding:16px 20px; background:rgba(255,255,255,0.06); border:1.5px solid var(--sep); border-radius:10px; font-family:'DM Sans'; font-size:18px; font-weight:600; color:var(--white); text-align:center; outline:none; transition:border-color 0.2s; -webkit-appearance:none; }
   .name-input::placeholder { color:rgba(240,244,240,0.25); font-weight:400; }
   .name-input:focus { border-color:var(--green-glow); background:rgba(46,155,72,0.06); }
-
-  .join-btn {
-    width:100%; max-width:320px;
-    padding:18px;
-    background:linear-gradient(135deg, var(--green-turf), var(--green-bright));
-    border:none; border-radius:10px;
-    font-family:'Oswald'; font-size:20px; font-weight:600;
-    letter-spacing:2px; color:white; text-transform:uppercase;
-    cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
-  }
+  .join-btn { width:100%; max-width:320px; padding:18px; background:linear-gradient(135deg,var(--green-turf),var(--green-bright)); border:none; border-radius:10px; font-family:'Oswald'; font-size:20px; font-weight:600; letter-spacing:2px; color:white; text-transform:uppercase; cursor:pointer; transition:transform 0.15s; }
   .join-btn:active { transform:scale(0.97); }
   .join-btn:disabled { opacity:0.5; cursor:not-allowed; }
-
   .join-notice { font-size:12px; color:var(--dim); text-align:center; line-height:1.6; }
 
-  /* ── LOBBY WAIT ──────────────────────────────────── */
-  .lobby-wait {
-    flex:1; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; padding:32px 24px; text-align:center; gap:20px;
-  }
-
-  .wait-icon { font-size:56px; }
+  /* LOBBY WAIT */
+  .lobby-wait { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; text-align:center; gap:20px; }
   .wait-title { font-family:'Bebas Neue'; font-size:40px; letter-spacing:2px; color:var(--white); }
   .wait-sub { font-size:15px; color:var(--dim); line-height:1.6; }
-
-  .player-tag {
-    display:inline-flex; align-items:center; gap:8px;
-    background:rgba(201,168,76,0.1);
-    border:1px solid rgba(201,168,76,0.3);
-    border-radius:6px; padding:10px 18px;
-  }
+  .player-tag { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:6px; padding:10px 18px; }
   .player-tag-name { font-family:'Oswald'; font-size:20px; font-weight:600; color:var(--gold); letter-spacing:1px; }
-
-  .wait-score-row {
-    display:flex; gap:16px;
-  }
-  .wait-stat {
-    background:var(--faint); border:1px solid var(--sep);
-    border-radius:8px; padding:12px 20px; text-align:center;
-  }
+  .wait-score-row { display:flex; gap:16px; }
+  .wait-stat { background:var(--faint); border:1px solid var(--sep); border-radius:8px; padding:12px 20px; text-align:center; }
   .wait-stat-val { font-family:'Bebas Neue'; font-size:28px; color:var(--green-glow); }
   .wait-stat-lbl { font-size:10px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
-
-  .pulse-ring {
-    width:72px; height:72px; border-radius:50%;
-    border:2px solid var(--green-bright);
-    display:flex; align-items:center; justify-content:center;
-    font-size:28px;
-    animation:ringPulse 2s ease-in-out infinite;
-  }
+  .pulse-ring { width:72px; height:72px; border-radius:50%; border:2px solid var(--green-bright); display:flex; align-items:center; justify-content:center; font-size:28px; animation:ringPulse 2s ease-in-out infinite; }
   @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 rgba(46,155,72,0.4)} 50%{box-shadow:0 0 0 16px rgba(46,155,72,0)} }
 
-  /* ── QUESTION PAGE ───────────────────────────────── */
-  .q-page-body { flex:1; display:flex; flex-direction:column; padding:16px 16px 24px; gap:16px; }
-
-  .q-header {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px 16px;
-    background:var(--faint); border:1px solid var(--sep); border-radius:10px;
-  }
+  /* QUESTION PAGE */
+  .q-page-body { flex:1; display:flex; flex-direction:column; padding:16px 16px 32px; gap:14px; }
+  .q-meta-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:var(--faint); border:1px solid var(--sep); border-radius:10px; }
   .q-label { font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--green-glow); letter-spacing:2px; text-transform:uppercase; }
-  .q-pts-badge {
-    font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--gold);
-    background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.25);
-    border-radius:4px; padding:3px 10px; letter-spacing:1px;
-  }
-
-  .q-timer-bar-wrap {
-    height:5px; background:var(--faint); border-radius:3px; overflow:hidden;
-  }
-  .q-timer-bar {
-    height:100%; border-radius:3px;
-    background:linear-gradient(90deg, var(--green-bright), var(--gold));
-    transition:width 1s linear, background 0.5s;
-  }
-
-  .q-text-box {
-    background:var(--faint); border:1px solid var(--sep); border-radius:12px;
-    padding:20px; flex-shrink:0;
-  }
-  .q-text-str {
-    font-family:'Oswald'; font-size:20px; font-weight:600;
-    color:var(--white); line-height:1.45; letter-spacing:0.3px;
-  }
-
+  .q-pts-badge { font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--gold); background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.25); border-radius:4px; padding:3px 10px; letter-spacing:1px; }
+  .q-timer-bar-wrap { height:5px; background:var(--faint); border-radius:3px; overflow:hidden; }
+  .q-timer-bar { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--green-bright),var(--gold)); transition:width 1s linear, background 0.5s; width:100%; }
+  .q-text-box { background:var(--faint); border:1px solid var(--sep); border-radius:12px; padding:20px; }
+  .q-text-str { font-family:'Oswald'; font-size:20px; font-weight:600; color:var(--white); line-height:1.45; letter-spacing:0.3px; }
   .ans-list { display:flex; flex-direction:column; gap:10px; }
-
-  .ans-btn {
-    width:100%; display:flex; align-items:center; gap:14px;
-    background:var(--faint); border:1.5px solid var(--sep);
-    border-radius:12px; padding:16px 18px;
-    cursor:pointer; transition:all 0.15s;
-    text-align:left; position:relative; overflow:hidden;
-  }
-  .ans-btn:active { transform:scale(0.98); }
-  .ans-btn.selected { background:rgba(46,155,72,0.1); border-color:var(--green-glow); }
+  .ans-btn { width:100%; display:flex; align-items:center; gap:14px; background:var(--faint); border:1.5px solid var(--sep); border-radius:12px; padding:16px 18px; cursor:pointer; transition:all 0.15s; text-align:left; }
+  .ans-btn:active:not(:disabled) { transform:scale(0.98); }
+  .ans-btn.selected { background:rgba(46,155,72,0.08); border-color:rgba(46,155,72,0.5); }
   .ans-btn.correct  { background:rgba(46,155,72,0.15); border-color:var(--green-glow); }
   .ans-btn.wrong    { background:rgba(217,48,37,0.06); border-color:rgba(217,48,37,0.2); opacity:0.55; }
   .ans-btn:disabled { cursor:not-allowed; }
-
-  .ans-letter {
-    width:36px; height:36px; border-radius:8px; flex-shrink:0;
-    background:rgba(255,255,255,0.06); border:1px solid var(--sep);
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Oswald'; font-size:16px; font-weight:700; color:var(--green-glow);
-    transition:all 0.15s;
-  }
-  .ans-btn.selected .ans-letter { background:var(--green-bright); border-color:var(--green-bright); color:white; }
+  .ans-letter { width:36px; height:36px; border-radius:8px; flex-shrink:0; background:rgba(255,255,255,0.06); border:1px solid var(--sep); display:flex; align-items:center; justify-content:center; font-family:'Oswald'; font-size:16px; font-weight:700; color:var(--green-glow); transition:all 0.15s; }
+  .ans-btn.selected .ans-letter { background:rgba(46,155,72,0.3); border-color:var(--green-bright); color:white; }
   .ans-btn.correct  .ans-letter { background:var(--green-bright); border-color:var(--green-bright); color:white; }
   .ans-btn.wrong    .ans-letter { background:rgba(217,48,37,0.1); color:var(--red); border-color:transparent; }
   .ans-text { font-size:16px; font-weight:500; color:var(--white); line-height:1.35; }
-
-  /* Ripple */
-  .ans-btn::after {
-    content:''; position:absolute; inset:0; border-radius:12px;
-    background:radial-gradient(circle at center, rgba(46,155,72,0.18) 0%, transparent 70%);
-    opacity:0; transition:opacity 0.2s;
-  }
-  .ans-btn.selected::after { opacity:1; }
-
-  /* ── RESULT / FEEDBACK ───────────────────────────── */
-  .result-banner {
-    padding:14px 18px; border-radius:10px; text-align:center;
-    animation:fadeUp 0.3s ease;
-  }
-  .result-banner.correct-banner { background:rgba(46,155,72,0.15); border:1px solid rgba(46,155,72,0.3); }
-  .result-banner.wrong-banner   { background:rgba(217,48,37,0.1);  border:1px solid rgba(217,48,37,0.2); }
-  .result-banner.late-banner    { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); }
-
-  .result-title { font-family:'Oswald'; font-size:22px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
-  .result-banner.correct-banner .result-title { color:var(--green-glow); }
-  .result-banner.wrong-banner   .result-title { color:var(--red); }
-  .result-banner.late-banner    .result-title { color:var(--gold); }
+  .result-banner { padding:14px 18px; border-radius:10px; text-align:center; margin-top:4px; }
+  .result-banner.correct-b { background:rgba(46,155,72,0.15); border:1px solid rgba(46,155,72,0.3); }
+  .result-banner.wrong-b   { background:rgba(217,48,37,0.1);  border:1px solid rgba(217,48,37,0.2); }
+  .result-banner.locked-b  { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); }
+  .result-title { font-family:'Oswald'; font-size:20px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+  .result-banner.correct-b .result-title { color:var(--green-glow); }
+  .result-banner.wrong-b   .result-title { color:var(--red); }
+  .result-banner.locked-b  .result-title { color:var(--gold); }
   .result-pts { font-size:13px; color:var(--dim); margin-top:4px; }
 
-  /* ── WAITING BETWEEN QUESTIONS ───────────────────── */
-  .between-state {
-    flex:1; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:16px; text-align:center; padding:24px;
-  }
-  .between-icon { font-size:48px; }
+  /* BETWEEN */
+  .between-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; padding:24px; }
+  .between-icon  { font-size:56px; }
   .between-title { font-family:'Oswald'; font-size:28px; font-weight:600; color:var(--white); letter-spacing:1px; }
-  .between-sub { font-size:14px; color:var(--dim); line-height:1.6; }
-
-  /* Score summary during wait */
-  .score-card {
-    background:var(--faint); border:1px solid var(--sep);
-    border-radius:12px; padding:20px 28px; text-align:center;
-    width:100%; max-width:280px;
-  }
+  .between-sub   { font-size:14px; color:var(--dim); line-height:1.6; }
+  .score-card { background:var(--faint); border:1px solid var(--sep); border-radius:12px; padding:20px 32px; text-align:center; }
   .score-card-val { font-family:'Bebas Neue'; font-size:52px; color:var(--green-glow); letter-spacing:2px; line-height:1; }
   .score-card-lbl { font-size:11px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
 
-  /* ── GAME OVER PHONE ─────────────────────────────── */
-  .final-body {
-    flex:1; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; padding:32px 24px; gap:20px; text-align:center;
-  }
+  /* GAME OVER */
+  .final-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; gap:20px; text-align:center; }
   .final-trophy { font-size:72px; animation:bounce 1.2s ease-in-out infinite alternate; }
   .final-title { font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px; color:var(--gold); }
-  .final-sub { font-size:16px; color:var(--dim); line-height:1.6; }
-  .final-score-card {
-    background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25);
-    border-radius:12px; padding:24px 36px; text-align:center;
-  }
+  .final-score-card { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25); border-radius:12px; padding:24px 40px; text-align:center; }
   .final-score-val { font-family:'Bebas Neue'; font-size:64px; color:var(--gold); letter-spacing:2px; line-height:1; }
   .final-score-lbl { font-size:12px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
+  .final-sub { font-size:16px; color:var(--dim); line-height:1.7; }
 
-  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-  .err-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--red); color:white; padding:12px 24px; border-radius:8px; font-size:14px; font-weight:600; z-index:999; display:none; white-space:nowrap; }
+  .err-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--red); color:white; padding:12px 24px; border-radius:8px; font-size:14px; font-weight:600; z-index:999; display:none; white-space:nowrap; max-width:90vw; text-align:center; }
 </style>
 </head>
 <body>
-
 <div class="err-toast" id="errToast"></div>
 
-<!-- JOIN PAGE -->
+<!-- ── JOIN ───────────────────────────────────────── -->
 <div class="page active" id="pageJoin">
   <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">World Cup Trivia</div>
-      <div class="tb-sub">Ballantyne CC · June 23</div>
-    </div>
-    <div>⚽🏆</div>
+    <div class="tb-brand"><div class="tb-title">World Cup Trivia</div><div class="tb-sub">Ballantyne CC · June 23</div></div>
+    <div style="font-size:22px">⚽</div>
   </div>
   <div class="join-body">
     <div class="join-icon">⚽</div>
-    <div class="join-title">
-      <span class="j1">Join the</span>
-      <span class="j2">Game</span>
-    </div>
+    <div class="join-title"><span class="j1">Join the</span><span class="j2">Game</span></div>
     <div class="join-sub">Enter your name to join. Answers submitted from your phone appear on the TV in real time.</div>
-    <div class="name-input-wrap">
-      <input class="name-input" type="text" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
-    </div>
+    <input class="name-input" type="text" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
     <button class="join-btn" id="joinBtn" onclick="joinGame()">Join Game</button>
     <div class="join-notice">🏟️ No account needed · Your name appears on the leaderboard</div>
   </div>
 </div>
 
-<!-- LOBBY WAIT PAGE -->
+<!-- ── LOBBY WAIT ──────────────────────────────────── -->
 <div class="page" id="pageLobby">
   <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">World Cup Trivia</div>
-      <div class="tb-sub">Ballantyne CC · June 23</div>
-    </div>
-    <div class="tb-right">
-      <div class="tb-score" id="lobbyScoreDisplay">0</div>
-      <div class="tb-score-lbl">Points</div>
-    </div>
+    <div class="tb-brand"><div class="tb-title">World Cup Trivia</div><div class="tb-sub">Ballantyne CC · June 23</div></div>
+    <div class="tb-right"><div class="tb-score" id="lobbyScoreDisplay">0</div><div class="tb-score-lbl">Points</div></div>
   </div>
   <div class="lobby-wait">
     <div class="pulse-ring">⚽</div>
     <div class="wait-title">You're In!</div>
     <div class="player-tag"><div class="player-tag-name" id="lobbyPlayerName">—</div></div>
-    <div class="wait-sub">Stand by — the host will kick off when everyone is ready. Watch the TV screen.</div>
+    <div class="wait-sub">Stand by — the host will kick off when everyone is ready. Watch the TV.</div>
     <div class="wait-score-row">
-      <div class="wait-stat">
-        <div class="wait-stat-val" id="lobbyPlayerCount">—</div>
-        <div class="wait-stat-lbl">Players</div>
-      </div>
-      <div class="wait-stat">
-        <div class="wait-stat-val" id="lobbyRoundCount">5</div>
-        <div class="wait-stat-lbl">Rounds</div>
-      </div>
-      <div class="wait-stat">
-        <div class="wait-stat-val">25</div>
-        <div class="wait-stat-lbl">Questions</div>
-      </div>
+      <div class="wait-stat"><div class="wait-stat-val" id="lobbyPlayerCount">—</div><div class="wait-stat-lbl">Players</div></div>
+      <div class="wait-stat"><div class="wait-stat-val">5</div><div class="wait-stat-lbl">Rounds</div></div>
+      <div class="wait-stat"><div class="wait-stat-val">25</div><div class="wait-stat-lbl">Questions</div></div>
     </div>
   </div>
 </div>
 
-<!-- QUESTION PAGE -->
+<!-- ── QUESTION ────────────────────────────────────── -->
 <div class="page" id="pageQuestion">
   <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title" id="qTopTitle">Round 1</div>
-      <div class="tb-sub" id="qTopSub">Question 1 of 25</div>
-    </div>
-    <div class="tb-right">
-      <div class="tb-score" id="qScoreDisplay">0</div>
-      <div class="tb-score-lbl">Points</div>
-    </div>
+    <div class="tb-brand"><div class="tb-title" id="qTopTitle">Round 1</div><div class="tb-sub" id="qTopSub">Question 1 of 25</div></div>
+    <div class="tb-right"><div class="tb-score" id="qScoreDisplay">0</div><div class="tb-score-lbl">Points</div></div>
   </div>
-  <div class="q-page-body" id="qPageBody">
-    <!-- dynamic -->
-  </div>
+  <div class="q-page-body" id="qPageBody"></div>
 </div>
 
-<!-- BETWEEN / WAIT PAGE -->
+<!-- ── BETWEEN ────────────────────────────────────── -->
 <div class="page" id="pageBetween">
   <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">World Cup Trivia</div>
-      <div class="tb-sub" id="btSub">Next question coming…</div>
-    </div>
-    <div class="tb-right">
-      <div class="tb-score" id="btScoreDisplay">0</div>
-      <div class="tb-score-lbl">Points</div>
-    </div>
+    <div class="tb-brand"><div class="tb-title">World Cup Trivia</div><div class="tb-sub" id="btSubLabel">Next question coming…</div></div>
+    <div class="tb-right"><div class="tb-score" id="btScoreDisplay">0</div><div class="tb-score-lbl">Points</div></div>
   </div>
   <div class="between-state">
     <div class="between-icon" id="btIcon">⏱</div>
     <div class="between-title" id="btTitle">Standby</div>
     <div class="between-sub" id="btMessage">Watch the TV for the answer reveal.</div>
-    <div class="score-card">
-      <div class="score-card-val" id="btScore">0</div>
-      <div class="score-card-lbl">Your Score</div>
-    </div>
+    <div class="score-card"><div class="score-card-val" id="btScore">0</div><div class="score-card-lbl">Your Score</div></div>
   </div>
 </div>
 
-<!-- GAME OVER PAGE -->
+<!-- ── GAME OVER ───────────────────────────────────── -->
 <div class="page" id="pageOver">
   <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">Game Over</div>
-      <div class="tb-sub">World Cup Trivia 2026</div>
-    </div>
+    <div class="tb-brand"><div class="tb-title">Game Over</div><div class="tb-sub">World Cup Trivia 2026</div></div>
   </div>
   <div class="final-body">
     <div class="final-trophy">🏆</div>
@@ -404,74 +196,115 @@
 </div>
 
 <script>
+// ── CONFIG ────────────────────────────────────────
 const SUPABASE_URL = 'https://ykfvwqewnfnibpzytspn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms';
-
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 const LETTERS = ['A','B','C','D'];
 
+// ── QUESTION DATA ─────────────────────────────────
+// correct index is 0-based, matches index.html CONFIG exactly
+const ROUNDS = [
+  { name:'The Host Nation', questions:[
+    { q:"The USA opened the 2026 World Cup with a dominant win over which South American team?",              answers:["Brazil","Colombia","Paraguay","Uruguay"],                                                                                                             correct:3 },
+    { q:"Who scored twice for the USMNT against Australia, becoming the first American to score more than once in a World Cup match since 1930?", answers:["Christian Pulisic","Folarin Balogun","Timothy Weah","Alex Freeman"],                                          correct:1 },
+    { q:"The US is playing in Group D. Which of these teams is NOT in their group?",                         answers:["Paraguay","Australia","Türkiye","Mexico"],                                                                                                          correct:3 },
+    { q:"The 2026 World Cup is being co-hosted by three countries. Which three?",                            answers:["USA, Canada, Brazil","USA, Canada, Mexico","USA, Mexico, Argentina","Canada, Mexico, Cuba"],                                                        correct:1 },
+    { q:"How many teams are competing in the 2026 World Cup — more than any previous tournament?",           answers:["32","40","48","64"],                                                                                                                                correct:2 }
+  ]},
+  { name:'The Stars', questions:[
+    { q:"Lamine Yamal opened Spain's World Cup account in 2026. Which club does he play for?",               answers:["Real Madrid","Barcelona","Atlético Madrid","Sevilla"],                                                                                              correct:1 },
+    { q:"Mohamed Salah fired Egypt to a memorable World Cup victory. Which English club does he play for?",  answers:["Manchester City","Arsenal","Liverpool","Chelsea"],                                                                                                  correct:2 },
+    { q:"Norway's Erling Haaland scored all four goals in their opening match against Iraq. Which club does he play for?", answers:["Bayern Munich","Real Madrid","Manchester City","PSG"],                                                                               correct:2 },
+    { q:"How many World Cup titles has Argentina won going into 2026?",                                      answers:["1","2","3","4"],                                                                                                                                    correct:2 },
+    { q:"France's Kylian Mbappé plays his club soccer for which team in 2026?",                              answers:["PSG","Barcelona","Real Madrid","Manchester United"],                                                                                                correct:2 }
+  ]},
+  { name:'This Tournament', questions:[
+    { q:"Which co-host country scored the very first goal of the 2026 World Cup?",                           answers:["USA","Canada","Mexico","Brazil"],                                                                                                                   correct:2 },
+    { q:"Canada crushed Qatar 6-0 in the group stage. What was notable about this result for Canada?",       answers:["Their first ever World Cup win","Their biggest win in any sport","Their first shutout in history","Jonathan David scored a hat-trick"],             correct:0 },
+    { q:"Germany beat Curaçao 7-1 — the highest scoring result of the first round. How many goals did Germany score?", answers:["5","6","7","8"],                                                                                                                        correct:2 },
+    { q:"Which unlikely nation drew 2-2 with Uruguay in one of the tournament's biggest early surprises?",  answers:["Haiti","DR Congo","Cabo Verde","New Zealand"],                                                                                                     correct:2 },
+    { q:"INSIDER: The June 20 match between Japan and Tunisia in Monterrey was historic. Why?",              answers:["First game decided by penalty shootout","First 0-0 draw of the tournament","The 1,000th match in World Cup history","First time both teams were eliminated in the same match"], correct:2 }
+  ]},
+  { name:'World Cup Classics', questions:[
+    { q:"Which country has won the most World Cup titles in history?",                                       answers:["Germany","Argentina","Brazil","Italy"],                                                                                                             correct:2 },
+    { q:"In which year did the USA famously beat England 1-0 in one of the biggest upsets in World Cup history?", answers:["1930","1950","1966","1990"],                                                                                                                 correct:1 },
+    { q:"Diego Maradona's 'Hand of God' goal was scored against which country in the 1986 quarterfinal?",   answers:["England","Germany","Brazil","Italy"],                                                                                                              correct:0 },
+    { q:"Who holds the record for most goals scored in World Cup history?",                                  answers:["Pelé","Miroslav Klose","Ronaldo (Brazil)","Gerd Müller"],                                                                                         correct:1 },
+    { q:"The 2022 World Cup in Qatar was played in which unusual month?",                                    answers:["September","October","November","December"],                                                                                                       correct:2 }
+  ]},
+  { name:'The Finale', questions:[
+    { q:"How many cities across the US, Canada, and Mexico are hosting 2026 World Cup matches?",             answers:["10","14","16","20"],                                                                                                                               correct:2 },
+    { q:"Which stadium is hosting the 2026 World Cup Final on July 19?",                                     answers:["SoFi Stadium","AT&T Stadium","MetLife Stadium","Hard Rock Stadium"],                                                                               correct:2 },
+    { q:"England beat Croatia 4-2 in their opening match. How many World Cup titles has England won in total?", answers:["0","1","2","3"],                                                                                                                               correct:1 },
+    { q:"Alex Freeman scored for the USMNT at this World Cup. Against which team did he score?",             answers:["Paraguay","Australia","Türkiye","Colombia"],                                                                                                      correct:1 },
+    { q:"The 2026 World Cup introduced a rule penalizing players for covering their mouths during confrontations. What happened in the US vs. Paraguay match related to this rule?", answers:["Christian Pulisic was given a yellow card","A Paraguay player was sent off","Miguel Almirón received a straight red card after a VAR review","The referee issued a team warning"], correct:2, pts:300 }
+  ]}
+];
+
 // ── STATE ─────────────────────────────────────────
-let sessionId = null;
-let playerId  = null;
+let sessionId  = null;
+let playerId   = null;
 let playerName = '';
-let myScore   = 0;
-let myStreak  = 0;
-let currentPhase = 'lobby';
-let currentRi = 0, currentQi = 0;
+let myScore    = 0;
+let myStreak   = 0;
+let currentRi  = -1; // -1 so first question always renders
+let currentQi  = -1;
 let hasAnswered = false;
 let timerInterval = null;
-let timerSecs = 20;
+let timerSecs  = 20;
 
 // ── INIT ──────────────────────────────────────────
 (function(){
   const params = new URLSearchParams(window.location.search);
   sessionId = params.get('s');
-  if(!sessionId){ showErr('No session ID in URL'); return; }
-  watchSession();
+  if(!sessionId){ showErr('No session ID — scan the QR code on the TV'); return; }
+  document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') joinGame(); });
 })();
 
 function showErr(msg){
-  const t=document.getElementById('errToast');
-  t.textContent=msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none', 5000);
+  const t = document.getElementById('errToast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(()=> t.style.display = 'none', 5000);
 }
 
-// ── PAGES ─────────────────────────────────────────
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-// ── JOIN ──────────────────────────────────────────
-document.getElementById('nameInput').addEventListener('keydown', e=>{
-  if(e.key==='Enter') joinGame();
-});
+function updateScoreDisplays(){
+  ['qScoreDisplay','btScoreDisplay','lobbyScoreDisplay','btScore'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = myScore.toLocaleString();
+  });
+}
 
+// ── JOIN ──────────────────────────────────────────
 async function joinGame(){
   const name = document.getElementById('nameInput').value.trim();
   if(!name){ showErr('Enter your name to join'); return; }
-  if(!sessionId){ showErr('No active session'); return; }
 
   const btn = document.getElementById('joinBtn');
-  btn.disabled = true;
-  btn.textContent = 'Joining…';
+  btn.disabled = true; btn.textContent = 'Joining…';
 
   try {
-    const{data,error}=await sb.from('trivia_players').insert({
+    const { data, error } = await sb.from('trivia_players').insert({
       session_id: sessionId,
       name,
       score: 0,
       streak: 0
     }).select().single();
 
-    if(error){ showErr('Could not join: '+error.message); btn.disabled=false; btn.textContent='Join Game'; return; }
+    if(error){ showErr('Could not join — try again'); btn.disabled=false; btn.textContent='Join Game'; return; }
 
-    playerId = data.id;
+    playerId   = data.id;
     playerName = name;
     document.getElementById('lobbyPlayerName').textContent = name;
-    document.getElementById('lobbyScoreDisplay').textContent = '0';
     updateScoreDisplays();
+
+    // Subscribe BEFORE showing lobby so we don't miss the question event
+    watchSession();
     showPage('pageLobby');
 
   } catch(e){ showErr('Connection error'); btn.disabled=false; btn.textContent='Join Game'; }
@@ -479,239 +312,191 @@ async function joinGame(){
 
 // ── WATCH SESSION ─────────────────────────────────
 function watchSession(){
-  if(!sessionId) return;
+  // Real-time session phase changes
+  sb.channel('session-play-'+sessionId)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${sessionId}`},
+      p => handleState(p.new))
+    .subscribe();
 
-  sb.channel('session-watch-'+sessionId)
-    .on('postgres_changes', {event:'*', schema:'public', table:'trivia_sessions', filter:`id=eq.${sessionId}`}, p=>{
-      handleSessionState(p.new);
-    }).subscribe();
-
-  // Also get initial state
-  sb.from('trivia_sessions').select('*').eq('id',sessionId).single().then(({data})=>{ if(data) handleSessionState(data); });
-
-  // Watch player count for lobby
-  sb.channel('players-watch-'+sessionId)
+  // Player count updates in lobby
+  sb.channel('players-count-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${sessionId}`}, ()=>{
-      sb.from('trivia_players').select('id',{count:'exact'}).eq('session_id',sessionId).then(({count})=>{
-        document.getElementById('lobbyPlayerCount').textContent = count||'—';
-      });
+      sb.from('trivia_players').select('*',{count:'exact',head:true}).eq('session_id',sessionId)
+        .then(({count}) => { document.getElementById('lobbyPlayerCount').textContent = count || '—'; });
     }).subscribe();
+
+  // Fetch current state immediately in case game already in progress
+  sb.from('trivia_sessions').select('*').eq('id',sessionId).single()
+    .then(({ data }) => { if(data) handleState(data); });
 }
 
-function handleSessionState(s){
-  const newPhase = s.phase;
-  const newRi    = s.round_index;
-  const newQi    = s.question_index;
+// ── STATE MACHINE ─────────────────────────────────
+function handleState(s){
+  const phase = s.phase;
+  const ri    = s.round_index;
+  const qi    = s.question_index;
 
-  if(newPhase === 'gameover'){
-    showGameOver();
+  if(phase === 'lobby')       { /* stay on lobby/join */ return; }
+  if(phase === 'gameover')    { showGameOver(); return; }
+  if(phase === 'leaderboard') { setBetween('🏆','Round Complete','Check the TV for the leaderboard.','lb'); return; }
+  if(phase === 'intro')       { setBetween('⚽','Get Ready','New round starting on the TV…','intro'); return; }
+  if(phase === 'paused')      { setBetween('⏸','Game Paused','The host has paused. Hang tight.','pause'); return; }
+
+  if(phase === 'reveal'){
+    // Show locked-in state if already answered, or time's-up if not
+    if(!hasAnswered){
+      setBetween('⏰',"Time's Up!",'You didn\'t answer in time. Watch the TV for the answer.','reveal');
+    } else {
+      setBetween('✅','Answer Locked','Watch the TV for the answer reveal and fun fact.','reveal');
+    }
     return;
   }
 
-  if(newPhase === 'leaderboard'){
-    setBetween('🏆', 'Round Complete', 'Check the TV for the leaderboard.', 'leaderboard');
-    return;
-  }
-
-  if(newPhase === 'intro'){
-    setBetween('⚽', 'Get Ready', 'New round starting on the TV…', 'intro');
-    return;
-  }
-
-  if(newPhase === 'paused'){
-    setBetween('⏸', 'Game Paused', 'The host has paused the game. Hang tight.', 'paused');
-    return;
-  }
-
-  if(newPhase === 'lobby'){
-    if(playerId) showPage('pageLobby');
-    return;
-  }
-
-  if(newPhase === 'question'){
-    if(newRi !== currentRi || newQi !== currentQi){
-      currentRi = newRi;
-      currentQi = newQi;
+  if(phase === 'question'){
+    // NEW question OR joining mid-question — always render
+    if(ri !== currentRi || qi !== currentQi){
+      currentRi = ri; currentQi = qi;
       hasAnswered = false;
-      renderQuestion(newRi, newQi);
-    } else if(newPhase === 'question' && !hasAnswered){
+      renderQuestion(ri, qi);
+    } else if(!hasAnswered){
+      // Same question, not answered — make sure question page is showing
       showPage('pageQuestion');
     }
     return;
-  }
-
-  if(newPhase === 'reveal'){
-    if(!hasAnswered){
-      setBetween('⏰', 'Time\'s Up!', 'You didn\'t answer in time. Watch the TV for the answer.', 'reveal');
-    } else {
-      setBetween('✅', 'Answer Locked', 'Watch the TV for the answer reveal and fun fact.', 'reveal');
-    }
   }
 }
 
 // ── RENDER QUESTION ───────────────────────────────
 function renderQuestion(ri, qi){
-  if(!playerId){ return; } // not joined yet
+  const round = ROUNDS[ri];
+  const q     = round ? round.questions[qi] : null;
+  const qNum  = ri * 5 + qi + 1;
+  const pts   = (q && q.pts) ? q.pts : 200;
 
-  const body = document.getElementById('qPageBody');
-  const qNum = ri * 5 + qi + 1;
-
-  // Update header
   document.getElementById('qTopTitle').textContent = `Round ${ri+1}`;
-  document.getElementById('qTopSub').textContent = `Question ${qNum} of 25`;
+  document.getElementById('qTopSub').textContent   = `Question ${qNum} of 25`;
   updateScoreDisplays();
 
+  const body = document.getElementById('qPageBody');
   body.innerHTML = `
-    <div class="q-header">
+    <div class="q-meta-bar">
       <div class="q-label">Q${qNum} · Round ${ri+1}</div>
-      <div class="q-pts-badge" id="qPtsBadge">200 PTS</div>
+      <div class="q-pts-badge">${pts} PTS</div>
     </div>
-    <div class="q-timer-bar-wrap">
-      <div class="q-timer-bar" id="qTimerBar" style="width:100%"></div>
+    <div class="q-timer-bar-wrap"><div class="q-timer-bar" id="qTimerBar"></div></div>
+    <div class="q-text-box"><div class="q-text-str">${q ? q.q : 'Watch the TV for the question ⬆'}</div></div>
+    <div class="ans-list" id="ansListEl">
+      ${q ? q.answers.map((a,i)=>
+        `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i},${q.correct},${pts})">
+          <div class="ans-letter">${LETTERS[i]}</div>
+          <div class="ans-text">${a}</div>
+        </button>`
+      ).join('') : LETTERS.map((l,i)=>
+        `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i},-1,${pts})">
+          <div class="ans-letter">${l}</div><div class="ans-text">Option ${l}</div>
+        </button>`
+      ).join('')}
     </div>
-    <div class="q-text-box">
-      <div class="q-text-str" id="qTextStr">Loading…</div>
-    </div>
-    <div class="ans-list" id="ansListEl"></div>
     <div id="resultBannerEl"></div>
   `;
 
   showPage('pageQuestion');
-
-  // Fetch question from session
-  fetchQuestion(ri, qi);
-  startClientTimer(20);
-}
-
-// ── QUESTION DATA — mirrors index.html CONFIG exactly ────────────
-const QUESTIONS = [
-  // Round 0 — The Host Nation
-  [
-    { q:"The USA opened the 2026 World Cup with a dominant win over which South American team?", answers:["Brazil","Colombia","Paraguay","Uruguay"] },
-    { q:"Who scored twice for the USMNT against Australia, becoming the first American to score more than once in a World Cup match since 1930?", answers:["Christian Pulisic","Folarin Balogun","Timothy Weah","Alex Freeman"] },
-    { q:"The US is playing in Group D. Which of these teams is NOT in their group?", answers:["Paraguay","Australia","Türkiye","Mexico"] },
-    { q:"The 2026 World Cup is being co-hosted by three countries. Which three?", answers:["USA, Canada, Brazil","USA, Canada, Mexico","USA, Mexico, Argentina","Canada, Mexico, Cuba"] },
-    { q:"How many teams are competing in the 2026 World Cup — more than any previous tournament?", answers:["32","40","48","64"] }
-  ],
-  // Round 1 — The Stars
-  [
-    { q:"Lamine Yamal opened Spain's World Cup account in 2026. Which club does he play for?", answers:["Real Madrid","Barcelona","Atlético Madrid","Sevilla"] },
-    { q:"Mohamed Salah fired Egypt to a memorable World Cup victory. Which English club does he play for?", answers:["Manchester City","Arsenal","Liverpool","Chelsea"] },
-    { q:"Norway's Erling Haaland scored all four goals in their opening match against Iraq. Which club does he play for?", answers:["Bayern Munich","Real Madrid","Manchester City","PSG"] },
-    { q:"How many World Cup titles has Argentina won going into 2026?", answers:["1","2","3","4"] },
-    { q:"France's Kylian Mbappé plays his club soccer for which team in 2026?", answers:["PSG","Barcelona","Real Madrid","Manchester United"] }
-  ],
-  // Round 2 — This Tournament
-  [
-    { q:"Which co-host country scored the very first goal of the 2026 World Cup?", answers:["USA","Canada","Mexico","Brazil"] },
-    { q:"Canada crushed Qatar 6-0 in the group stage. What was notable about this result for Canada?", answers:["Their first ever World Cup win","Their biggest win in any sport","Their first shutout in history","Jonathan David scored a hat-trick"] },
-    { q:"Germany beat Curaçao 7-1 — the highest scoring result of the first round. How many goals did Germany score?", answers:["5","6","7","8"] },
-    { q:"Which unlikely nation drew 2-2 with Uruguay in one of the tournament's biggest early surprises?", answers:["Haiti","DR Congo","Cabo Verde","New Zealand"] },
-    { q:"INSIDER: The June 20 match between Japan and Tunisia in Monterrey was historic. Why?", answers:["First game decided by penalty shootout","First 0-0 draw of the tournament","The 1,000th match in World Cup history","First time both teams were eliminated in the same match"] }
-  ],
-  // Round 3 — World Cup Classics
-  [
-    { q:"Which country has won the most World Cup titles in history?", answers:["Germany","Argentina","Brazil","Italy"] },
-    { q:"In which year did the USA famously beat England 1-0 in one of the biggest upsets in World Cup history?", answers:["1930","1950","1966","1990"] },
-    { q:"Diego Maradona's 'Hand of God' goal was scored against which country in the 1986 quarterfinal?", answers:["England","Germany","Brazil","Italy"] },
-    { q:"Who holds the record for most goals scored in World Cup history?", answers:["Pelé","Miroslav Klose","Ronaldo (Brazil)","Gerd Müller"] },
-    { q:"The 2022 World Cup in Qatar was played in which unusual month?", answers:["September","October","November","December"] }
-  ],
-  // Round 4 — The Finale
-  [
-    { q:"How many cities across the US, Canada, and Mexico are hosting 2026 World Cup matches?", answers:["10","14","16","20"] },
-    { q:"Which stadium is hosting the 2026 World Cup Final on July 19?", answers:["SoFi Stadium","AT&T Stadium","MetLife Stadium","Hard Rock Stadium"] },
-    { q:"England beat Croatia 4-2 in their opening match. How many World Cup titles has England won in total?", answers:["0","1","2","3"] },
-    { q:"Alex Freeman scored for the USMNT at this World Cup. Against which team did he score?", answers:["Paraguay","Australia","Türkiye","Colombia"] },
-    { q:"The 2026 World Cup introduced a rule penalizing players for covering their mouths during confrontations. What happened in the US vs. Paraguay match related to this rule?", answers:["Christian Pulisic was given a yellow card","A Paraguay player was sent off","Miguel Almirón received a straight red card after a VAR review","The referee issued a team warning"] }
-  ]
-];
-
-function fetchQuestion(ri, qi){
-  const round = QUESTIONS[ri];
-  const q = round ? round[qi] : null;
-
-  if(!q){
-    document.getElementById('qTextStr').textContent = 'See the TV for the question ⬆';
-    document.getElementById('ansListEl').innerHTML = LETTERS.map((l,i)=>
-      `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i})">` +
-      `<div class="ans-letter">${l}</div><div class="ans-text">Option ${l}</div></button>`
-    ).join('');
-    return;
-  }
-
-  const pts = (ri === 4 && qi === 4) ? 300 : 200;
-  document.getElementById('qPtsBadge').textContent = `${pts} PTS`;
-  document.getElementById('qTextStr').textContent = q.q;
-  document.getElementById('ansListEl').innerHTML = q.answers.map((a,i)=>
-    `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i})">` +
-    `<div class="ans-letter">${LETTERS[i]}</div><div class="ans-text">${a}</div></button>`
-  ).join('');
+  startClientTimer(20, ri, qi);
 }
 
 // ── TIMER ─────────────────────────────────────────
-function startClientTimer(secs){
+function startClientTimer(secs, ri, qi){
   clearInterval(timerInterval);
   timerSecs = secs;
   const bar = document.getElementById('qTimerBar');
   if(!bar) return;
+  bar.style.width = '100%';
+  bar.style.background = 'linear-gradient(90deg,var(--green-bright),var(--gold))';
 
-  function tick(){
-    timerSecs--;
-    const pct = Math.max(0, (timerSecs / secs) * 100);
-    if(bar){
-      bar.style.width = pct + '%';
-      if(timerSecs <= 5) bar.style.background = 'linear-gradient(90deg, var(--red), var(--gold))';
+  timerInterval = setInterval(()=>{
+    timerSecs = Math.max(0, timerSecs - 1);
+    const pct = (timerSecs / secs) * 100;
+    const barEl = document.getElementById('qTimerBar');
+    if(barEl){
+      barEl.style.width = pct + '%';
+      if(timerSecs <= 5) barEl.style.background = 'linear-gradient(90deg,var(--red),var(--gold))';
     }
     if(timerSecs <= 0){ clearInterval(timerInterval); }
-  }
-  timerInterval = setInterval(tick, 1000);
+  }, 1000);
 }
 
 // ── SUBMIT ANSWER ─────────────────────────────────
-async function submitAnswer(ri, qi, answerIndex){
+async function submitAnswer(ri, qi, answerIndex, correctIndex, pts){
   if(hasAnswered || !playerId) return;
   hasAnswered = true;
   clearInterval(timerInterval);
 
-  // Disable all buttons, mark selected
-  LETTERS.forEach((_,i)=>{
-    const b=document.getElementById(`aBtn${i}`);
-    if(b){ b.disabled=true; if(i===answerIndex) b.classList.add('selected'); }
-  });
+  const isCorrect = (answerIndex === correctIndex);
 
-  const speedBonus = Math.max(0, timerSecs * 5); // up to 100 bonus for instant answer
-
-  try {
-    const{data,error}=await sb.from('trivia_answers').insert({
-      session_id: sessionId,
-      player_id: playerId,
-      round_index: ri,
-      question_index: qi,
-      answer_index: answerIndex,
-      is_correct: false,  // TV-side engine validates and updates score
-      speed_bonus: speedBonus,
-      answered_at: new Date().toISOString()
-    }).select().single();
-
-    if(error) showErr('Submit error');
-
-    // Show waiting state
-    const banner = document.getElementById('resultBannerEl');
-    if(banner){
-      banner.innerHTML = `<div class="result-banner late-banner"><div class="result-title">⏳ Locked In!</div><div class="result-pts">Watch the TV for the answer reveal.</div></div>`;
+  // Visual feedback immediately — don't wait for DB
+  for(let i = 0; i < 4; i++){
+    const b = document.getElementById(`aBtn${i}`);
+    if(!b) continue;
+    b.disabled = true;
+    if(correctIndex >= 0){
+      if(i === correctIndex)   b.classList.add('correct');
+      else if(i === answerIndex && !isCorrect) b.classList.add('wrong');
+    } else {
+      if(i === answerIndex) b.classList.add('selected');
     }
+  }
 
-  } catch(e){ showErr('Connection error'); }
+  // Score
+  if(isCorrect){
+    myStreak++;
+    myScore += pts;
+  } else {
+    myStreak = 0;
+  }
+  updateScoreDisplays();
+
+  // Result banner
+  const banner = document.getElementById('resultBannerEl');
+  if(banner){
+    if(correctIndex < 0){
+      banner.innerHTML = `<div class="result-banner locked-b"><div class="result-title">⏳ Locked In!</div><div class="result-pts">Watch the TV for the reveal.</div></div>`;
+    } else if(isCorrect){
+      banner.innerHTML = `<div class="result-banner correct-b"><div class="result-title">✅ Correct!</div><div class="result-pts">+${pts} points · Score: ${myScore.toLocaleString()}</div></div>`;
+    } else {
+      banner.innerHTML = `<div class="result-banner wrong-b"><div class="result-title">❌ Wrong</div><div class="result-pts">Watch the TV for the correct answer.</div></div>`;
+    }
+  }
+
+  // Persist to DB — only columns that exist in trivia_answers
+  try {
+    await sb.from('trivia_answers').insert({
+      session_id:     sessionId,
+      player_id:      playerId,
+      round_index:    ri,
+      question_index: qi,
+      answer_index:   answerIndex,
+      is_correct:     isCorrect,
+      pts_earned:     isCorrect ? pts : 0
+    });
+  } catch(e){ /* non-fatal — score already shown locally */ }
+
+  // Update player score + streak in trivia_players
+  try {
+    await sb.from('trivia_players').update({
+      score:  myScore,
+      streak: myStreak
+    }).eq('id', playerId);
+  } catch(e){ /* non-fatal */ }
 }
 
 // ── BETWEEN STATE ─────────────────────────────────
 function setBetween(icon, title, msg, type){
   clearInterval(timerInterval);
-  document.getElementById('btIcon').textContent = icon;
-  document.getElementById('btTitle').textContent = title;
+  document.getElementById('btIcon').textContent    = icon;
+  document.getElementById('btTitle').textContent   = title;
   document.getElementById('btMessage').textContent = msg;
-  document.getElementById('btSub').textContent = type === 'leaderboard' ? 'Leaderboard time' : type === 'paused' ? 'Paused' : 'Next question coming…';
+  const subMap = { lb:'Leaderboard', intro:'Next round…', pause:'Paused', reveal:'Answer revealing…' };
+  document.getElementById('btSubLabel').textContent = subMap[type] || 'Next question coming…';
   updateScoreDisplays();
   showPage('pageBetween');
 }
@@ -719,19 +504,13 @@ function setBetween(icon, title, msg, type){
 // ── GAME OVER ─────────────────────────────────────
 async function showGameOver(){
   clearInterval(timerInterval);
-  // Fetch final score
+  // Refresh score from DB as final source of truth
   if(playerId){
-    const{data}=await sb.from('trivia_players').select('score').eq('id',playerId).single();
-    if(data) myScore = data.score || 0;
+    const { data } = await sb.from('trivia_players').select('score').eq('id',playerId).single();
+    if(data && data.score > myScore) myScore = data.score;
   }
   document.getElementById('finalScore').textContent = myScore.toLocaleString();
   showPage('pageOver');
-}
-
-// ── SCORE DISPLAY ─────────────────────────────────
-function updateScoreDisplays(){
-  const displays = ['qScoreDisplay','btScoreDisplay','lobbyScoreDisplay','btScore'];
-  displays.forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=myScore.toLocaleString(); });
 }
 </script>
 </body>
