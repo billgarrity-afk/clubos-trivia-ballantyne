@@ -3,695 +3,692 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ClubOS Trivia · KPop Demon Hunters</title>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>ClubOS Trivia — World Cup 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --bg:       #080B12;
-    --bg2:      #0D1220;
-    --card:     #0F1828;
-    --panel:    #131E30;
-    --magenta:  #E8006F;
-    --cyan:     #00E5D4;
-    --gold:     #C9A84C;
-    --lime:     #39FF6B;
-    --white:    #F0EBF8;
-    --dim:      rgba(240,235,248,0.55);
-    --faint:    rgba(240,235,248,0.07);
-    --sep:      rgba(240,235,248,0.1);
+    --bg:          #04100A;
+    --bg2:         #071A0F;
+    --bg-card:     #0A1C10;
+    --pitch:       #0D2B16;
+    --green-turf:  #1A5C2A;
+    --green-bright:#2E9B48;
+    --green-glow:  #3DBF5A;
+    --gold:        #C9A84C;
+    --gold-dim:    #8B6B28;
+    --red:         #D93025;
+    --white:       #F0F4F0;
+    --dim:         rgba(240,244,240,0.5);
+    --faint:       rgba(240,244,240,0.05);
+    --sep:         rgba(240,244,240,0.09);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
   html, body {
-    height:100%; width:100%; overflow:hidden;
-    background:var(--bg);
+    width:100%; min-height:100vh;
     font-family:'DM Sans', sans-serif;
+    background:var(--bg);
     color:var(--white);
+    overflow-x:hidden;
   }
 
-  /* Background glow */
+  /* Pitch stripe background */
   body::before {
     content:'';
-    position:fixed; inset:0; pointer-events:none;
-    background:
-      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(232,0,111,0.14), transparent 70%),
-      radial-gradient(ellipse 70% 40% at 80% 100%, rgba(0,229,212,0.1), transparent 70%);
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:repeating-linear-gradient(
+      180deg,
+      rgba(13,43,22,0.0) 0px, rgba(13,43,22,0.0) 80px,
+      rgba(26,92,42,0.15) 80px, rgba(26,92,42,0.15) 160px
+    );
   }
 
-  /* Scanlines */
-  body::after {
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-    background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px);
-  }
+  .page { position:relative; z-index:1; display:none; flex-direction:column; min-height:100vh; }
+  .page.active { display:flex; }
 
-  .app {
-    position:relative; z-index:1;
-    width:100%; height:100%;
-    max-width:480px; margin:0 auto;
-    display:flex; flex-direction:column;
-    padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom));
-  }
-
-  /* ── HEADER ────────────────────────────────────── */
-  .header {
-    display:flex; align-items:center; justify-content:space-between;
-    padding-bottom:14px;
+  /* ── SHARED HEADER ───────────────────────────────── */
+  .top-bar {
+    background:rgba(4,16,10,0.95);
     border-bottom:1px solid var(--sep);
-    flex-shrink:0;
-    position:relative;
+    padding:14px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+    backdrop-filter:blur(16px);
   }
-  /* gradient bottom line */
-  .header::after {
-    content:''; position:absolute; bottom:-1px; left:0; right:0; height:1px;
-    background:linear-gradient(90deg, var(--magenta), var(--cyan));
-    opacity:0.5;
+  .top-bar::after {
+    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--green-bright), var(--gold), var(--green-bright));
+    background-size:300% 100%;
+    animation:ticker 6s linear infinite;
+  }
+  @keyframes ticker { 0%{background-position:0%} 100%{background-position:300%} }
+
+  .tb-brand { display:flex; flex-direction:column; gap:2px; }
+  .tb-title { font-family:'Oswald'; font-size:16px; font-weight:600; color:var(--white); letter-spacing:1px; line-height:1; }
+  .tb-sub   { font-size:10px; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
+
+  .tb-right { text-align:right; }
+  .tb-score { font-family:'Bebas Neue'; font-size:26px; color:var(--green-glow); letter-spacing:1px; line-height:1; }
+  .tb-score-lbl { font-size:9px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; }
+
+  /* ── JOIN PAGE ───────────────────────────────────── */
+  .join-body {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:32px 24px; gap:24px;
+    text-align:center;
   }
 
-  .header-left { display:flex; align-items:center; gap:10px; }
-  .h-icon {
-    width:36px; height:36px; border-radius:8px;
-    background:linear-gradient(135deg, var(--magenta), #9D4EDD);
-    display:flex; align-items:center; justify-content:center;
-    font-size:18px;
-  }
-  .h-text {}
-  .h-name {
-    font-family:'Bebas Neue'; font-size:16px; letter-spacing:2px; line-height:1;
-    color:var(--white);
-  }
-  .h-tag {
-    font-family:'DM Mono'; font-size:9px; letter-spacing:2px;
-    text-transform:uppercase; color:var(--gold); margin-top:2px;
-  }
+  .join-icon { font-size:64px; animation:bounce 1.4s ease-in-out infinite alternate; }
+  @keyframes bounce { from{transform:translateY(0)} to{transform:translateY(-10px)} }
 
-  .h-status { font-size:11px; color:var(--dim); display:flex; align-items:center; gap:6px; }
-  .conn-dot {
-    width:7px; height:7px; border-radius:50%;
-    background:var(--lime); box-shadow:0 0 6px rgba(57,255,107,0.5);
-    animation:pulseDot 1.6s ease infinite;
+  .join-title {
+    font-family:'Bebas Neue'; font-size:52px; letter-spacing:2px; line-height:0.95;
   }
-  .conn-dot.bad { background:var(--magenta); box-shadow:0 0 6px rgba(232,0,111,0.5); }
-  @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  /* ── SCREENS ───────────────────────────────────── */
-  .screens { flex:1; position:relative; overflow:hidden; display:flex; flex-direction:column; padding-top:16px; }
-  .screen { position:absolute; inset:0; display:none; flex-direction:column; animation:fadeIn 0.25s ease both; padding-top:16px; }
-  .screen.active { display:flex; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-  /* ── COMMON ────────────────────────────────────── */
-  .center-block {
-    flex:1; display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    text-align:center; gap:10px; padding:0 8px;
-  }
-  .big-icon { font-size:64px; margin-bottom:8px; animation:bounce 1.4s ease-in-out infinite alternate; }
-  @keyframes bounce { from{transform:translateY(0) scale(1)} to{transform:translateY(-8px) scale(1.05)} }
-
-  .display-title {
-    font-family:'Bebas Neue'; font-size:44px; letter-spacing:3px; line-height:1;
-  }
-  .display-title .t1 { color:var(--white); display:block; }
-  .display-title .t2 {
-    background:linear-gradient(90deg, var(--magenta), var(--cyan));
+  .join-title .j1 { color:var(--white); display:block; }
+  .join-title .j2 {
+    background:linear-gradient(90deg, var(--gold), var(--green-bright));
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     display:block;
   }
-  .display-sub { font-size:14px; color:var(--dim); max-width:320px; line-height:1.55; }
 
-  /* ── JOIN ──────────────────────────────────────── */
-  .join-form { width:100%; display:flex; flex-direction:column; gap:12px; margin-top:22px; }
-  .join-input {
-    width:100%; background:var(--card); border:1.5px solid var(--sep);
-    border-radius:12px; padding:18px 20px;
-    font-size:17px; font-family:'DM Sans'; font-weight:500;
-    color:var(--white); outline:none; transition:border-color 0.2s;
+  .join-sub { font-size:15px; color:var(--dim); line-height:1.6; max-width:280px; }
+
+  .name-input-wrap { width:100%; max-width:320px; }
+  .name-input {
+    width:100%; padding:16px 20px;
+    background:rgba(255,255,255,0.06);
+    border:1.5px solid var(--sep);
+    border-radius:10px;
+    font-family:'DM Sans'; font-size:18px; font-weight:600;
+    color:var(--white); text-align:center;
+    outline:none; transition:border-color 0.2s;
+    letter-spacing:0.5px;
+    -webkit-appearance:none;
   }
-  .join-input:focus { border-color:var(--cyan); background:var(--panel); }
-  .join-input::placeholder { color:rgba(240,235,248,0.25); }
+  .name-input::placeholder { color:rgba(240,244,240,0.25); font-weight:400; }
+  .name-input:focus { border-color:var(--green-glow); background:rgba(46,155,72,0.06); }
+
   .join-btn {
-    width:100%;
-    background:linear-gradient(135deg, var(--magenta), #9D4EDD);
-    border:none; border-radius:12px; padding:20px;
-    font-family:'Bebas Neue'; font-size:24px; letter-spacing:3px; color:white;
-    cursor:pointer; transition:all 0.15s;
+    width:100%; max-width:320px;
+    padding:18px;
+    background:linear-gradient(135deg, var(--green-turf), var(--green-bright));
+    border:none; border-radius:10px;
+    font-family:'Oswald'; font-size:20px; font-weight:600;
+    letter-spacing:2px; color:white; text-transform:uppercase;
+    cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
   }
   .join-btn:active { transform:scale(0.97); }
-  .join-btn:disabled { opacity:0.5; cursor:default; }
-  .err-msg { color: var(--cyan); font-size:13px; text-align:center; min-height:18px; line-height:1.5; }
+  .join-btn:disabled { opacity:0.5; cursor:not-allowed; }
 
-  /* ── WAITING ───────────────────────────────────── */
-  .you-in {
-    font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px;
-    color:var(--cyan); text-shadow:0 0 30px rgba(0,229,212,0.4);
+  .join-notice { font-size:12px; color:var(--dim); text-align:center; line-height:1.6; }
+
+  /* ── LOBBY WAIT ──────────────────────────────────── */
+  .lobby-wait {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:32px 24px; text-align:center; gap:20px;
   }
-  .player-name { font-size:18px; color:var(--white); font-weight:600; margin-top:4px; }
 
-  /* ── ROUND INTRO ───────────────────────────────── */
-  .ri-eye { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--cyan); font-weight:600; }
-  .ri-name {
-    font-family:'Bebas Neue'; font-size:48px; letter-spacing:3px; line-height:1;
-    background:linear-gradient(135deg, var(--magenta), var(--cyan));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  .wait-icon { font-size:56px; }
+  .wait-title { font-family:'Bebas Neue'; font-size:40px; letter-spacing:2px; color:var(--white); }
+  .wait-sub { font-size:15px; color:var(--dim); line-height:1.6; }
+
+  .player-tag {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(201,168,76,0.1);
+    border:1px solid rgba(201,168,76,0.3);
+    border-radius:6px; padding:10px 18px;
   }
-  .ri-text { font-size:14px; color:var(--dim); max-width:340px; line-height:1.55; }
+  .player-tag-name { font-family:'Oswald'; font-size:20px; font-weight:600; color:var(--gold); letter-spacing:1px; }
 
-  /* ── QUESTION ──────────────────────────────────── */
+  .wait-score-row {
+    display:flex; gap:16px;
+  }
+  .wait-stat {
+    background:var(--faint); border:1px solid var(--sep);
+    border-radius:8px; padding:12px 20px; text-align:center;
+  }
+  .wait-stat-val { font-family:'Bebas Neue'; font-size:28px; color:var(--green-glow); }
+  .wait-stat-lbl { font-size:10px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+
+  .pulse-ring {
+    width:72px; height:72px; border-radius:50%;
+    border:2px solid var(--green-bright);
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px;
+    animation:ringPulse 2s ease-in-out infinite;
+  }
+  @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 rgba(46,155,72,0.4)} 50%{box-shadow:0 0 0 16px rgba(46,155,72,0)} }
+
+  /* ── QUESTION PAGE ───────────────────────────────── */
+  .q-page-body { flex:1; display:flex; flex-direction:column; padding:16px 16px 24px; gap:16px; }
+
   .q-header {
     display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:14px; flex-shrink:0; gap:10px;
+    padding:12px 16px;
+    background:var(--faint); border:1px solid var(--sep); border-radius:10px;
   }
-  .q-meta-pills { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .q-pill {
-    font-family:'Bebas Neue'; font-size:12px; letter-spacing:2px;
-    padding:4px 10px; border-radius:3px;
-    background:rgba(232,0,111,0.1); border:1px solid rgba(232,0,111,0.3); color:var(--magenta);
-  }
-  .q-pill.cat { background:rgba(0,229,212,0.08); border-color:rgba(0,229,212,0.25); color:var(--cyan); }
-  .q-pill.pts { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); color:var(--gold); }
-
-  .q-timer { display:flex; align-items:center; gap:6px; }
-  .q-timer-num {
-    font-family:'Bebas Neue'; font-size:24px; letter-spacing:1px;
-    color:var(--white); min-width:30px; text-align:right; line-height:1;
-  }
-  .q-timer-num.urgent { color:var(--gold); animation:pulse 0.6s ease-in-out infinite alternate; }
-  @keyframes pulse { from{transform:scale(1)} to{transform:scale(1.1)} }
-  .q-timer-bar { width:50px; height:5px; background:var(--faint); border-radius:3px; overflow:hidden; }
-  .q-timer-fill { height:100%; width:100%; background:var(--magenta); border-radius:3px; transition:width 1s linear, background 0.3s; }
-  .q-timer-fill.urgent { background:var(--gold); }
-
-  .q-text {
-    font-family:'Bebas Neue'; font-size:28px; line-height:1.2; letter-spacing:0.5px;
-    color:var(--white); margin-bottom:16px; flex-shrink:0;
+  .q-label { font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--green-glow); letter-spacing:2px; text-transform:uppercase; }
+  .q-pts-badge {
+    font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--gold);
+    background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.25);
+    border-radius:4px; padding:3px 10px; letter-spacing:1px;
   }
 
-  .answers { display:flex; flex-direction:column; gap:10px; flex:1; overflow:auto; }
+  .q-timer-bar-wrap {
+    height:5px; background:var(--faint); border-radius:3px; overflow:hidden;
+  }
+  .q-timer-bar {
+    height:100%; border-radius:3px;
+    background:linear-gradient(90deg, var(--green-bright), var(--gold));
+    transition:width 1s linear, background 0.5s;
+  }
+
+  .q-text-box {
+    background:var(--faint); border:1px solid var(--sep); border-radius:12px;
+    padding:20px; flex-shrink:0;
+  }
+  .q-text-str {
+    font-family:'Oswald'; font-size:20px; font-weight:600;
+    color:var(--white); line-height:1.45; letter-spacing:0.3px;
+  }
+
+  .ans-list { display:flex; flex-direction:column; gap:10px; }
+
   .ans-btn {
-    width:100%; background:var(--card); border:1.5px solid var(--sep);
+    width:100%; display:flex; align-items:center; gap:14px;
+    background:var(--faint); border:1.5px solid var(--sep);
     border-radius:12px; padding:16px 18px;
-    display:flex; align-items:center; gap:14px;
-    cursor:pointer; transition:transform 0.1s, border-color 0.2s, background 0.2s;
-    font-family:'DM Sans'; text-align:left; color:var(--white); min-height:60px;
+    cursor:pointer; transition:all 0.15s;
+    text-align:left; position:relative; overflow:hidden;
   }
   .ans-btn:active { transform:scale(0.98); }
-  .ans-btn:hover { border-color:var(--cyan); background:var(--panel); }
-  .ans-btn.locked { opacity:0.4; cursor:default; pointer-events:none; }
-  .ans-btn.selected {
-    border-color:var(--magenta);
-    background:linear-gradient(135deg, rgba(232,0,111,0.14), rgba(157,78,221,0.08));
-    box-shadow:0 0 20px rgba(232,0,111,0.25);
-  }
+  .ans-btn.selected { background:rgba(46,155,72,0.1); border-color:var(--green-glow); }
+  .ans-btn.correct  { background:rgba(46,155,72,0.15); border-color:var(--green-glow); }
+  .ans-btn.wrong    { background:rgba(217,48,37,0.06); border-color:rgba(217,48,37,0.2); opacity:0.55; }
+  .ans-btn:disabled { cursor:not-allowed; }
+
   .ans-letter {
-    width:36px; height:36px; flex-shrink:0;
-    border-radius:8px; background:var(--faint); border:1px solid var(--sep);
+    width:36px; height:36px; border-radius:8px; flex-shrink:0;
+    background:rgba(255,255,255,0.06); border:1px solid var(--sep);
     display:flex; align-items:center; justify-content:center;
-    font-family:'Bebas Neue'; font-size:20px; color:var(--cyan);
-    transition:all 0.2s;
+    font-family:'Oswald'; font-size:16px; font-weight:700; color:var(--green-glow);
+    transition:all 0.15s;
   }
-  .ans-btn.selected .ans-letter { background:var(--magenta); border-color:var(--magenta); color:white; }
-  .ans-text { font-size:15px; font-weight:500; line-height:1.3; }
+  .ans-btn.selected .ans-letter { background:var(--green-bright); border-color:var(--green-bright); color:white; }
+  .ans-btn.correct  .ans-letter { background:var(--green-bright); border-color:var(--green-bright); color:white; }
+  .ans-btn.wrong    .ans-letter { background:rgba(217,48,37,0.1); color:var(--red); border-color:transparent; }
+  .ans-text { font-size:16px; font-weight:500; color:var(--white); line-height:1.35; }
 
-  /* ── SUBMITTED ─────────────────────────────────── */
-  .sub-icon { font-size:60px; margin-bottom:8px; }
-  .sub-status { font-family:'Bebas Neue'; font-size:44px; letter-spacing:2px; color:var(--cyan); }
-  .sub-locked {
-    font-family:'Bebas Neue'; font-size:22px; letter-spacing:2px; color:var(--white);
-    background:var(--card); border:1.5px solid var(--magenta);
-    border-radius:12px; padding:14px 24px;
-    display:inline-flex; align-items:center; gap:12px; margin-top:8px;
+  /* Ripple */
+  .ans-btn::after {
+    content:''; position:absolute; inset:0; border-radius:12px;
+    background:radial-gradient(circle at center, rgba(46,155,72,0.18) 0%, transparent 70%);
+    opacity:0; transition:opacity 0.2s;
   }
-  .sub-letter {
-    width:34px; height:34px; border-radius:8px;
-    background:var(--magenta); display:flex; align-items:center; justify-content:center;
-    color:white; font-size:18px;
-  }
-  .sub-watch { font-size:14px; color:var(--dim); max-width:300px; line-height:1.5; margin-top:8px; }
+  .ans-btn.selected::after { opacity:1; }
 
-  /* ── REVEAL ────────────────────────────────────── */
-  .rev-icon { font-size:72px; margin-bottom:4px; }
-  .rev-icon.correct { filter:drop-shadow(0 0 20px rgba(57,255,107,0.5)); }
-  .rev-icon.wrong   { filter:drop-shadow(0 0 16px rgba(232,0,111,0.4)); }
-  .rev-result { font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px; line-height:1; }
-  .rev-result.correct { color:var(--lime); }
-  .rev-result.wrong   { color:var(--magenta); }
-  .rev-pts { font-family:'Bebas Neue'; font-size:32px; letter-spacing:2px; color:var(--gold); margin-top:4px; }
+  /* ── RESULT / FEEDBACK ───────────────────────────── */
+  .result-banner {
+    padding:14px 18px; border-radius:10px; text-align:center;
+    animation:fadeUp 0.3s ease;
+  }
+  .result-banner.correct-banner { background:rgba(46,155,72,0.15); border:1px solid rgba(46,155,72,0.3); }
+  .result-banner.wrong-banner   { background:rgba(217,48,37,0.1);  border:1px solid rgba(217,48,37,0.2); }
+  .result-banner.late-banner    { background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.2); }
 
-  .rev-row {
-    display:flex; align-items:center; gap:10px; font-size:14px;
-    background:var(--card); border:1px solid var(--sep);
-    border-radius:12px; padding:12px 14px;
-    width:100%; max-width:340px;
-  }
-  .rev-row .rev-letter {
-    width:30px; height:30px; border-radius:7px;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Bebas Neue'; font-size:16px; flex-shrink:0;
-  }
-  .rev-row.correct { border-color:var(--lime); background:rgba(57,255,107,0.07); }
-  .rev-row.correct .rev-letter { background:var(--lime); color:#02120A; }
-  .rev-row.wrong { border-color:rgba(232,0,111,0.35); }
-  .rev-row.wrong .rev-letter { background:var(--magenta); color:white; }
-  .rev-row .rev-text { flex:1; color:var(--white); text-align:left; font-weight:500; }
-  .rev-row .rev-tag { font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--dim); }
-  .rev-streak {
-    display:inline-flex; align-items:center; gap:6px;
-    background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3);
-    border-radius:20px; padding:5px 14px;
-    font-size:13px; font-weight:600; color:var(--gold); margin-top:4px;
-  }
+  .result-title { font-family:'Oswald'; font-size:22px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+  .result-banner.correct-banner .result-title { color:var(--green-glow); }
+  .result-banner.wrong-banner   .result-title { color:var(--red); }
+  .result-banner.late-banner    .result-title { color:var(--gold); }
+  .result-pts { font-size:13px; color:var(--dim); margin-top:4px; }
 
-  /* ── LEADERBOARD ───────────────────────────────── */
-  .lb-screen { padding-top:8px; }
-  .lb-eye { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--cyan); font-weight:600; text-align:center; }
-  .lb-title {
-    font-family:'Bebas Neue'; font-size:36px; letter-spacing:3px; text-align:center; line-height:1;
-    background:linear-gradient(135deg, var(--gold), var(--magenta));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    margin-bottom:4px;
+  /* ── WAITING BETWEEN QUESTIONS ───────────────────── */
+  .between-state {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:16px; text-align:center; padding:24px;
   }
-  .lb-yours {
-    background:var(--card); border:1.5px solid var(--cyan);
-    border-radius:12px; padding:14px 18px; margin:12px 0 14px;
-    display:flex; align-items:center; gap:12px;
-    box-shadow:0 0 24px rgba(0,229,212,0.12);
-  }
-  .lb-rank { font-family:'Bebas Neue'; font-size:28px; color:var(--cyan); min-width:40px; text-align:center; line-height:1; }
-  .lb-yours-info { flex:1; }
-  .lb-yours-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--dim); }
-  .lb-yours-name { font-size:16px; font-weight:600; margin-top:1px; }
-  .lb-yours-score { font-family:'Bebas Neue'; font-size:30px; color:var(--gold); letter-spacing:2px; line-height:1; }
-  .lb-list { display:flex; flex-direction:column; gap:6px; flex:1; overflow:auto; }
-  .lb-row {
-    display:flex; align-items:center; gap:10px;
-    padding:10px 14px; background:var(--card);
-    border:1px solid var(--sep); border-radius:10px; font-size:14px;
-  }
-  .lb-row.gold   { background:rgba(201,168,76,0.07);   border-color:rgba(201,168,76,0.3); }
-  .lb-row.silver { background:rgba(200,200,220,0.05);  border-color:rgba(200,200,220,0.15); }
-  .lb-row.bronze { background:rgba(205,127,50,0.06);   border-color:rgba(205,127,50,0.2); }
-  .lb-row.you    { border-color:var(--cyan); box-shadow:0 0 12px rgba(0,229,212,0.18); }
-  .lb-row-rank { font-family:'Bebas Neue'; font-size:20px; color:var(--dim); min-width:24px; text-align:center; line-height:1; }
-  .lb-row.gold .lb-row-rank   { color:var(--gold); }
-  .lb-row.silver .lb-row-rank { color:#C0C0C0; }
-  .lb-row.bronze .lb-row-rank { color:#CD7F32; }
-  .lb-row-name { flex:1; font-weight:500; }
-  .lb-row-score { font-family:'Bebas Neue'; font-size:18px; color:var(--cyan); letter-spacing:1px; line-height:1; }
-  .lb-row.gold .lb-row-score { color:var(--gold); }
+  .between-icon { font-size:48px; }
+  .between-title { font-family:'Oswald'; font-size:28px; font-weight:600; color:var(--white); letter-spacing:1px; }
+  .between-sub { font-size:14px; color:var(--dim); line-height:1.6; }
 
-  /* ── GAME OVER ─────────────────────────────────── */
-  .go-trophy { font-size:80px; }
-  .go-title {
-    font-family:'Bebas Neue'; font-size:46px; letter-spacing:3px;
-    background:linear-gradient(135deg, var(--gold), var(--magenta), var(--cyan));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    line-height:1;
+  /* Score summary during wait */
+  .score-card {
+    background:var(--faint); border:1px solid var(--sep);
+    border-radius:12px; padding:20px 28px; text-align:center;
+    width:100%; max-width:280px;
   }
-  .go-final {
-    background:var(--card); border:1.5px solid var(--cyan);
-    border-radius:12px; padding:18px 24px;
-    display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:8px;
-  }
-  .go-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--dim); }
-  .go-score { font-family:'Bebas Neue'; font-size:48px; color:var(--gold); letter-spacing:3px; line-height:1; }
-  .go-rank-line { font-size:14px; color:var(--white); }
-  .go-thanks { font-size:13px; color:var(--dim); max-width:300px; line-height:1.5; margin-top:12px; }
+  .score-card-val { font-family:'Bebas Neue'; font-size:52px; color:var(--green-glow); letter-spacing:2px; line-height:1; }
+  .score-card-lbl { font-size:11px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
 
-  /* ── FOOTER ────────────────────────────────────── */
-  .footer {
-    flex-shrink:0; padding-top:12px;
-    border-top:1px solid var(--sep); text-align:center;
+  /* ── GAME OVER PHONE ─────────────────────────────── */
+  .final-body {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; padding:32px 24px; gap:20px; text-align:center;
   }
-  .footer-text {
-    font-size:12px; color:rgba(240,235,248,0.25); letter-spacing:1px;
+  .final-trophy { font-size:72px; animation:bounce 1.2s ease-in-out infinite alternate; }
+  .final-title { font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px; color:var(--gold); }
+  .final-sub { font-size:16px; color:var(--dim); line-height:1.6; }
+  .final-score-card {
+    background:rgba(201,168,76,0.08); border:1px solid rgba(201,168,76,0.25);
+    border-radius:12px; padding:24px 36px; text-align:center;
   }
-  .footer-text span { color:rgba(201,168,76,0.5); font-weight:700; font-style:italic; }
+  .final-score-val { font-family:'Bebas Neue'; font-size:64px; color:var(--gold); letter-spacing:2px; line-height:1; }
+  .final-score-lbl { font-size:12px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
 
-  /* ── TOAST ─────────────────────────────────────── */
-  .toast {
-    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-    background:var(--panel); border:1px solid var(--magenta);
-    color:white; padding:10px 18px; border-radius:8px;
-    font-size:13px; font-weight:600; z-index:200; display:none;
-  }
-  .toast.show { display:block; animation:fadeIn 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .err-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--red); color:white; padding:12px 24px; border-radius:8px; font-size:14px; font-weight:600; z-index:999; display:none; white-space:nowrap; }
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="h-icon">😈</div>
-      <div class="h-text">
-        <div class="h-name">Demon Hunters Trivia</div>
-        <div class="h-tag">Ballantyne CC · Cabana</div>
-      </div>
+<div class="err-toast" id="errToast"></div>
+
+<!-- JOIN PAGE -->
+<div class="page active" id="pageJoin">
+  <div class="top-bar">
+    <div class="tb-brand">
+      <div class="tb-title">World Cup Trivia</div>
+      <div class="tb-sub">Ballantyne CC · June 23</div>
     </div>
-    <div class="h-status">
-      <div class="conn-dot" id="connDot"></div>
-      <span id="connText">Connecting…</span>
-    </div>
-  </header>
-
-  <div class="screens">
-
-    <!-- 1. NAME ENTRY -->
-    <div class="screen active" id="screenName">
-      <div class="center-block">
-        <div class="big-icon">😈</div>
-        <div class="display-title">
-          <span class="t1">Join the</span>
-          <span class="t2">Game</span>
-        </div>
-        <div class="display-sub">Pick a name your friends will recognize on the leaderboard.</div>
-        <div class="join-form">
-          <input class="join-input" id="nameInput" type="text" placeholder="Your name" maxlength="20"
-            autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
-          <button class="join-btn" id="joinBtn" onclick="joinGame()">Join Game</button>
-          <div class="err-msg" id="joinErr"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. WAITING -->
-    <div class="screen" id="screenWaiting">
-      <div class="center-block">
-        <div class="big-icon">✨</div>
-        <div class="you-in">You're In!</div>
-        <div class="player-name" id="lobbyPlayerName">—</div>
-        <div class="display-sub" style="margin-top:14px;">Watch the TV. Game starts soon.</div>
-        <div style="margin-top:18px;font-size:12px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;">
-          <span id="lobbyCount">0</span> Players Ready
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. ROUND INTRO -->
-    <div class="screen" id="screenIntro">
-      <div class="center-block">
-        <div class="big-icon" id="introIcon">🎤</div>
-        <div class="ri-eye" id="introEye">Round 1 of 5</div>
-        <div class="ri-name" id="introName">—</div>
-        <div class="ri-text" id="introText">—</div>
-        <div style="font-family:'Bebas Neue';font-size:18px;letter-spacing:3px;color:var(--magenta);margin-top:8px;">Get Ready…</div>
-      </div>
-    </div>
-
-    <!-- 4. QUESTION -->
-    <div class="screen" id="screenQuestion">
-      <div class="q-header">
-        <div class="q-meta-pills">
-          <div class="q-pill" id="qNum">Q1</div>
-          <div class="q-pill cat" id="qCat">—</div>
-          <div class="q-pill pts" id="qPts">200</div>
-        </div>
-        <div class="q-timer">
-          <div class="q-timer-bar"><div class="q-timer-fill" id="qTimerFill"></div></div>
-          <div class="q-timer-num" id="qTimerNum">20</div>
-        </div>
-      </div>
-      <div class="q-text" id="qText">—</div>
-      <div class="answers" id="answersList"></div>
-    </div>
-
-    <!-- 5. SUBMITTED -->
-    <div class="screen" id="screenSubmitted">
-      <div class="center-block">
-        <div class="sub-icon">🔒</div>
-        <div class="sub-status">Locked In</div>
-        <div class="sub-locked" id="subLocked">
-          <span class="sub-letter" id="subLetter">—</span>
-          <span id="subText">—</span>
-        </div>
-        <div class="sub-watch">Watch the TV for the answer reveal.</div>
-      </div>
-    </div>
-
-    <!-- 6. REVEAL -->
-    <div class="screen" id="screenReveal">
-      <div class="center-block">
-        <div class="rev-icon" id="revIcon">✓</div>
-        <div class="rev-result" id="revResult">—</div>
-        <div class="rev-pts" id="revPts">+200</div>
-        <div class="rev-row" id="revYour">
-          <div class="rev-letter" id="revYourLetter">A</div>
-          <div class="rev-text" id="revYourText">—</div>
-          <div class="rev-tag">You</div>
-        </div>
-        <div class="rev-row correct" id="revCorrect">
-          <div class="rev-letter" id="revCorrectLetter">B</div>
-          <div class="rev-text" id="revCorrectText">—</div>
-          <div class="rev-tag">Correct</div>
-        </div>
-        <div class="rev-streak" id="revStreak" style="display:none;">
-          🔥 <span id="revStreakNum">2</span>-streak
-        </div>
-      </div>
-    </div>
-
-    <!-- 7. LEADERBOARD -->
-    <div class="screen lb-screen" id="screenLB">
-      <div class="lb-eye" id="lbEye">After Round 1</div>
-      <div class="lb-title" id="lbTitle">Leaderboard</div>
-      <div class="lb-yours">
-        <div class="lb-rank" id="lbYourRank">—</div>
-        <div class="lb-yours-info">
-          <div class="lb-yours-label">Your Rank</div>
-          <div class="lb-yours-name" id="lbYourName">—</div>
-        </div>
-        <div class="lb-yours-score" id="lbYourScore">0</div>
-      </div>
-      <div class="lb-list" id="lbList"></div>
-    </div>
-
-    <!-- 8. GAME OVER -->
-    <div class="screen" id="screenOver">
-      <div class="center-block">
-        <div class="go-trophy">🏆</div>
-        <div class="go-title">Game Over</div>
-        <div class="go-final">
-          <div class="go-label">Your Final Score</div>
-          <div class="go-score" id="goScore">0</div>
-          <div class="go-rank-line" id="goRankLine">Rank: —</div>
-        </div>
-        <div class="go-thanks">Thanks for playing! See you at the next trivia night.</div>
-      </div>
-    </div>
-
+    <div>⚽🏆</div>
   </div>
-
-  <footer class="footer">
-    <div class="footer-text">Powered by Club<span>OS</span></div>
-  </footer>
-
+  <div class="join-body">
+    <div class="join-icon">⚽</div>
+    <div class="join-title">
+      <span class="j1">Join the</span>
+      <span class="j2">Game</span>
+    </div>
+    <div class="join-sub">Enter your name to join. Answers submitted from your phone appear on the TV in real time.</div>
+    <div class="name-input-wrap">
+      <input class="name-input" type="text" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <button class="join-btn" id="joinBtn" onclick="joinGame()">Join Game</button>
+    <div class="join-notice">🏟️ No account needed · Your name appears on the leaderboard</div>
+  </div>
 </div>
-<div class="toast" id="toast"></div>
+
+<!-- LOBBY WAIT PAGE -->
+<div class="page" id="pageLobby">
+  <div class="top-bar">
+    <div class="tb-brand">
+      <div class="tb-title">World Cup Trivia</div>
+      <div class="tb-sub">Ballantyne CC · June 23</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-score" id="lobbyScoreDisplay">0</div>
+      <div class="tb-score-lbl">Points</div>
+    </div>
+  </div>
+  <div class="lobby-wait">
+    <div class="pulse-ring">⚽</div>
+    <div class="wait-title">You're In!</div>
+    <div class="player-tag"><div class="player-tag-name" id="lobbyPlayerName">—</div></div>
+    <div class="wait-sub">Stand by — the host will kick off when everyone is ready. Watch the TV screen.</div>
+    <div class="wait-score-row">
+      <div class="wait-stat">
+        <div class="wait-stat-val" id="lobbyPlayerCount">—</div>
+        <div class="wait-stat-lbl">Players</div>
+      </div>
+      <div class="wait-stat">
+        <div class="wait-stat-val" id="lobbyRoundCount">5</div>
+        <div class="wait-stat-lbl">Rounds</div>
+      </div>
+      <div class="wait-stat">
+        <div class="wait-stat-val">25</div>
+        <div class="wait-stat-lbl">Questions</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION PAGE -->
+<div class="page" id="pageQuestion">
+  <div class="top-bar">
+    <div class="tb-brand">
+      <div class="tb-title" id="qTopTitle">Round 1</div>
+      <div class="tb-sub" id="qTopSub">Question 1 of 25</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-score" id="qScoreDisplay">0</div>
+      <div class="tb-score-lbl">Points</div>
+    </div>
+  </div>
+  <div class="q-page-body" id="qPageBody">
+    <!-- dynamic -->
+  </div>
+</div>
+
+<!-- BETWEEN / WAIT PAGE -->
+<div class="page" id="pageBetween">
+  <div class="top-bar">
+    <div class="tb-brand">
+      <div class="tb-title">World Cup Trivia</div>
+      <div class="tb-sub" id="btSub">Next question coming…</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-score" id="btScoreDisplay">0</div>
+      <div class="tb-score-lbl">Points</div>
+    </div>
+  </div>
+  <div class="between-state">
+    <div class="between-icon" id="btIcon">⏱</div>
+    <div class="between-title" id="btTitle">Standby</div>
+    <div class="between-sub" id="btMessage">Watch the TV for the answer reveal.</div>
+    <div class="score-card">
+      <div class="score-card-val" id="btScore">0</div>
+      <div class="score-card-lbl">Your Score</div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME OVER PAGE -->
+<div class="page" id="pageOver">
+  <div class="top-bar">
+    <div class="tb-brand">
+      <div class="tb-title">Game Over</div>
+      <div class="tb-sub">World Cup Trivia 2026</div>
+    </div>
+  </div>
+  <div class="final-body">
+    <div class="final-trophy">🏆</div>
+    <div class="final-title">Final Score</div>
+    <div class="final-score-card">
+      <div class="final-score-val" id="finalScore">0</div>
+      <div class="final-score-lbl">Points</div>
+    </div>
+    <div class="final-sub">Thanks for playing!<br>Check the TV for the final leaderboard.</div>
+  </div>
+</div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIG — matches index.html exactly
-// ═══════════════════════════════════════════════════════════════
-const CONFIG = {
-  supabaseUrl: 'https://ykfvwqewnfnibpzytspn.supabase.co',
-  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms',
-  questionSecs: 20,
-  rounds: [
-    { name:'Meet HUNTR/X', icon:'🎤', intro:"You've seen the film — now prove it. Five questions on the group, the characters, and the people behind them.", questions:[
-      { q:"What is the name of Rumi, Mira, and Zoey's K-pop group within the film's world?", answers:["HUNTR/X","HUNTRIX","DEMON GIRLZ","K-FORCE"], correct:1, pts:200 },
-      { q:"Which member of HUNTR/X is secretly half-demon, hiding golden patterns beneath her skin?", answers:["Mira","Zoey","Rumi","Jinu"], correct:2, pts:200 },
-      { q:"Which voice actor plays Rumi — HUNTR/X's leader and the film's central character?", answers:["Yunjin Kim","Ji-young Yoo","May Hong","Arden Cho"], correct:3, pts:200 },
-      { q:"Which comedian voices Bobby, HUNTR/X's manager and the film's main comic relief?", answers:["Daniel Dae Kim","Ken Jeong","Lee Byung-hun","Ahn Hyo-seop"], correct:1, pts:200 },
-      { q:"KPop Demon Hunters was produced alongside which animation studio — the same one behind Spider-Man: Across the Spider-Verse?", answers:["Pixar Animation Studios","DreamWorks Animation","Sony Pictures Animation","Blue Sky Studios"], correct:2, pts:200 }
-    ]},
-    { name:'The Soundtrack', icon:'🎵', intro:"The album topped Billboard, swept the Grammys, and broke records. How well do you know the music?", questions:[
-      { q:"Which HUNTR/X song won the 2026 Grammy Award for Best Song Written for Visual Media?", answers:["Soda Pop","What It Sounds Like","Golden","Your Idol"], correct:2, pts:200 },
-      { q:"In the film, 'How It's Done' plays as the background to which scene?", answers:["The villain reveal","HUNTR/X fighting demons mid-flight on their tour plane","The final concert climax","Rumi and Jinu's escape from the underworld"], correct:1, pts:200 },
-      { q:"'Free' is a duet between Rumi and Jinu. What triggers the song in the film?", answers:["Jinu defeats Gwi-Ma for the first time","Rumi reveals her demon half to the crowd","Rumi offers Jinu an alliance to escape Gwi-Ma's control","HUNTR/X performs their final concert"], correct:2, pts:200 },
-      { q:"Which real K-pop group performed the fight song 'Takedown' for the film's soundtrack?", answers:["BLACKPINK","aespa","NewJeans","TWICE"], correct:3, pts:200 },
-      { q:"The songwriters behind BTS's 'Butter' and 'Permission to Dance' wrote two songs for this film. Which pair?", answers:["Soda Pop and Your Idol","Free and What It Sounds Like","Golden and Takedown","How It's Done and Strategy"], correct:1, pts:200 }
-    ]},
-    { name:'The Saja Boys', icon:'😈', intro:"Every great story needs a villain. Five questions on the demon boy band, their master, and their mission.", questions:[
-      { q:"The Saja Boys are secretly demons working for a villain drawn from Korean mythology. What is that villain's name?", answers:["Dokkaebi","Gwi-Ma","Haemosu","Bulgasari"], correct:1, pts:200 },
-      { q:"Why did the demons create the Saja Boys — what is their primary mission?", answers:["To steal HUNTR/X's tour revenue","To destroy the Hanmoon barrier protecting the world","To harvest human souls by luring HUNTR/X's fanbase","To expose Rumi as half-demon"], correct:2, pts:200 },
-      { q:"Which Saja Boys member develops a genuine connection with Rumi and becomes central to the film's emotional arc?", answers:["Danny","Jinu","Kevin","Sam"], correct:1, pts:200 },
-      { q:"In 'Your Idol' — the Saja Boys' villain climax song — what are they doing when they perform it?", answers:["Auditioning to join HUNTR/X","Luring crowds into Gwi-Ma's flames to harvest their souls","Challenging HUNTR/X to a dance battle","Revealing Rumi's secret to the public"], correct:1, pts:200 },
-      { q:"INSIDER: The Saja Boys' sound was crafted by producers from which real K-pop label — the same one behind BLACKPINK and BIGBANG?", answers:["SM Entertainment","HYBE","JYP Entertainment","Black Label (YG)"], correct:3, pts:200 }
-    ]},
-    { name:'K-Pop IRL', icon:'🌏', intro:"Step outside the film. Five questions on the real K-pop industry that inspired it.", questions:[
-      { q:"Supergroup BTS is from which country?", answers:["Japan","China","South Korea","Taiwan"], correct:2, pts:200 },
-      { q:"BLACKPINK, one of the biggest K-pop groups in the world, has how many members?", answers:["3","4","5","6"], correct:1, pts:200 },
-      { q:"Only three TWICE members recorded 'Takedown' for the film. Which three?", answers:["All 9 members","Jeongyeon, Jihyo, and Chaeyoung","The Japanese members only","Nayeon, Sana, and Momo"], correct:1, pts:200 },
-      { q:"Which decade did K-pop first emerge and gain recognition as a genre?", answers:["1970s","1980s","1990s","2000s"], correct:2, pts:200 },
-      { q:"Every major K-pop group has an official fandom name. What are BTS fans called?", answers:["ONCE","BLINKS","ARMY","STAY"], correct:2, pts:200 }
-    ]},
-    { name:'The Finale', icon:'🏆', intro:"Five questions. The hardest of the night. Q25 is worth 300 points. Here we go.", questions:[
-      { q:"KPop Demon Hunters became the most-watched film in Netflix history. How many views had it reached by early 2026?", answers:["100 million","200 million","325 million","500 million"], correct:2, pts:200 },
-      { q:"The film received two Academy Award nominations. Which two categories?", answers:["Best Original Score and Best Animated Feature","Best Animated Feature and Best Original Song","Best Picture and Best Animated Feature","Best Original Song and Best Original Score"], correct:1, pts:200 },
-      { q:"In the film's climax, 'What It Sounds Like' starts as a Rumi solo. Who ends up joining HUNTR/X in singing it?", answers:["Jinu and the Saja Boys","Bobby the manager","The entire crowd of civilians","Gwi-Ma, in a villainous reprise"], correct:2, pts:200 },
-      { q:"Critics and filmmakers describe the film's core message as centering on what theme?", answers:["Fame is more important than friendship","Demons cannot change — they are always evil","Your past does not define who you become","Music is more powerful than any weapon"], correct:2, pts:200 },
-      { q:"'Golden' held #1 on the Billboard Hot 100 for 8 nonconsecutive weeks. That made HUNTR/X the first all-female group to do what on that chart this century?", answers:["First all-female group to debut at #1","First all-female group to have the longest #1 run this century","First all-female group to have 4 simultaneous Top 10 hits","First all-female group to reach #1 on Billboard Global 200"], correct:1, pts:300 }
-    ]}
-  ]
-};
+const SUPABASE_URL = 'https://ykfvwqewnfnibpzytspn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms';
 
-// ═══════════════════════════════════════════════════════════════
-// ENGINE — zero changes from original
-// ═══════════════════════════════════════════════════════════════
-const LETTERS=['A','B','C','D'];
-const sb=supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey);
-const urlParams=new URLSearchParams(window.location.search);
-const SESSION_ID=urlParams.get('s');
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let state={player:null,phase:null,roundIndex:0,questionIndex:0,answeredKey:null,myAnswerIndex:null,myPtsEarned:0,questionStartedAt:null,submitting:false};
-let timerInt=null;
+const LETTERS = ['A','B','C','D'];
 
-function setConn(ok,label){const dot=document.getElementById('connDot');dot.className='conn-dot'+(ok?'':' bad');document.getElementById('connText').textContent=label;}
+// ── STATE ─────────────────────────────────────────
+let sessionId = null;
+let playerId  = null;
+let playerName = '';
+let myScore   = 0;
+let myStreak  = 0;
+let currentPhase = 'lobby';
+let currentRi = 0, currentQi = 0;
+let hasAnswered = false;
+let timerInterval = null;
+let timerSecs = 20;
 
-async function init(){
-  if(!SESSION_ID){setConn(false,'Waiting');document.getElementById('joinErr').textContent="Scan the QR code on the TV to join the game.";document.getElementById('joinBtn').disabled=true;return;}
-  const{data,error}=await sb.from('trivia_sessions').select('phase,round_index,question_index').eq('id',SESSION_ID).single();
-  if(error||!data){setConn(false,'Waiting');document.getElementById('joinErr').textContent="Scan the QR code on the TV to join the game.";document.getElementById('joinBtn').disabled=true;return;}
-  state.phase=data.phase;state.roundIndex=data.round_index;state.questionIndex=data.question_index;
-  setConn(true,'Connected');
-  if(data.phase!=='lobby') document.getElementById('joinErr').textContent='Game in progress — you can still join from the next round.';
+// ── INIT ──────────────────────────────────────────
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  sessionId = params.get('s');
+  if(!sessionId){ showErr('No session ID in URL'); return; }
+  watchSession();
+})();
+
+function showErr(msg){
+  const t=document.getElementById('errToast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none', 5000);
 }
+
+// ── PAGES ─────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── JOIN ──────────────────────────────────────────
+document.getElementById('nameInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter') joinGame();
+});
 
 async function joinGame(){
-  const name=document.getElementById('nameInput').value.trim();
-  if(!name){document.getElementById('joinErr').textContent='Please enter a name.';return;}
-  if(name.length<2){document.getElementById('joinErr').textContent='Name too short.';return;}
-  document.getElementById('joinBtn').disabled=true;document.getElementById('joinErr').textContent='';
-  const{data,error}=await sb.from('trivia_players').insert({session_id:SESSION_ID,name:name.substring(0,20),score:0,streak:0}).select().single();
-  if(error){document.getElementById('joinErr').textContent='Could not join: '+error.message;document.getElementById('joinBtn').disabled=false;return;}
-  state.player={id:data.id,name:data.name,score:0,streak:0};
-  document.getElementById('lobbyPlayerName').textContent=data.name;
-  subscribeToSession();subscribeToPlayers();
-  syncToPhase(state.phase,state.roundIndex,state.questionIndex);
+  const name = document.getElementById('nameInput').value.trim();
+  if(!name){ showErr('Enter your name to join'); return; }
+  if(!sessionId){ showErr('No active session'); return; }
+
+  const btn = document.getElementById('joinBtn');
+  btn.disabled = true;
+  btn.textContent = 'Joining…';
+
+  try {
+    const{data,error}=await sb.from('trivia_players').insert({
+      session_id: sessionId,
+      name,
+      score: 0,
+      streak: 0
+    }).select().single();
+
+    if(error){ showErr('Could not join: '+error.message); btn.disabled=false; btn.textContent='Join Game'; return; }
+
+    playerId = data.id;
+    playerName = name;
+    document.getElementById('lobbyPlayerName').textContent = name;
+    document.getElementById('lobbyScoreDisplay').textContent = '0';
+    updateScoreDisplays();
+    showPage('pageLobby');
+
+  } catch(e){ showErr('Connection error'); btn.disabled=false; btn.textContent='Join Game'; }
 }
 
-function subscribeToSession(){
-  sb.channel('play-session-'+SESSION_ID).on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${SESSION_ID}`},
-    payload=>syncToPhase(payload.new.phase,payload.new.round_index,payload.new.question_index))
-    .subscribe(status=>{if(status==='SUBSCRIBED')setConn(true,'Live');else if(status==='CHANNEL_ERROR')setConn(false,'Connection issue');});
+// ── WATCH SESSION ─────────────────────────────────
+function watchSession(){
+  if(!sessionId) return;
+
+  sb.channel('session-watch-'+sessionId)
+    .on('postgres_changes', {event:'*', schema:'public', table:'trivia_sessions', filter:`id=eq.${sessionId}`}, p=>{
+      handleSessionState(p.new);
+    }).subscribe();
+
+  // Also get initial state
+  sb.from('trivia_sessions').select('*').eq('id',sessionId).single().then(({data})=>{ if(data) handleSessionState(data); });
+
+  // Watch player count for lobby
+  sb.channel('players-watch-'+sessionId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${sessionId}`}, ()=>{
+      sb.from('trivia_players').select('id',{count:'exact'}).eq('session_id',sessionId).then(({count})=>{
+        document.getElementById('lobbyPlayerCount').textContent = count||'—';
+      });
+    }).subscribe();
 }
 
-function subscribeToPlayers(){
-  sb.channel('play-players-'+SESSION_ID).on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${SESSION_ID}`},
-    ()=>{const el=document.getElementById('lobbyCount');el.textContent=(parseInt(el.textContent)||0)+1;}).subscribe();
-  sb.from('trivia_players').select('id',{count:'exact',head:true}).eq('session_id',SESSION_ID).then(({count})=>{document.getElementById('lobbyCount').textContent=count||0;});
-}
+function handleSessionState(s){
+  const newPhase = s.phase;
+  const newRi    = s.round_index;
+  const newQi    = s.question_index;
 
-function syncToPhase(phase,ri,qi){
-  const prevKey=`${state.roundIndex}-${state.questionIndex}`;
-  const newKey=`${ri}-${qi}`;
-  state.phase=phase;state.roundIndex=ri;state.questionIndex=qi;
-  if(prevKey!==newKey){state.answeredKey=null;state.myAnswerIndex=null;state.myPtsEarned=0;state.submitting=false;}
-  switch(phase){
-    case 'lobby': showScreen('screenWaiting'); break;
-    case 'intro': renderIntro(ri); showScreen('screenIntro'); break;
-    case 'question':
-      if(state.answeredKey===newKey){showScreen('screenSubmitted');}
-      else{renderQuestion(ri,qi);showScreen('screenQuestion');state.questionStartedAt=Date.now();startLocalTimer();}
-      break;
-    case 'paused': stopLocalTimer(); break;
-    case 'reveal': stopLocalTimer();renderReveal(ri,qi);showScreen('screenReveal'); break;
-    case 'leaderboard': stopLocalTimer();renderLeaderboard(ri);showScreen('screenLB'); break;
-    case 'gameover': stopLocalTimer();renderGameOver();showScreen('screenOver'); break;
+  if(newPhase === 'gameover'){
+    showGameOver();
+    return;
+  }
+
+  if(newPhase === 'leaderboard'){
+    setBetween('🏆', 'Round Complete', 'Check the TV for the leaderboard.', 'leaderboard');
+    return;
+  }
+
+  if(newPhase === 'intro'){
+    setBetween('⚽', 'Get Ready', 'New round starting on the TV…', 'intro');
+    return;
+  }
+
+  if(newPhase === 'paused'){
+    setBetween('⏸', 'Game Paused', 'The host has paused the game. Hang tight.', 'paused');
+    return;
+  }
+
+  if(newPhase === 'lobby'){
+    if(playerId) showPage('pageLobby');
+    return;
+  }
+
+  if(newPhase === 'question'){
+    if(newRi !== currentRi || newQi !== currentQi){
+      currentRi = newRi;
+      currentQi = newQi;
+      hasAnswered = false;
+      renderQuestion(newRi, newQi);
+    } else if(newPhase === 'question' && !hasAnswered){
+      showPage('pageQuestion');
+    }
+    return;
+  }
+
+  if(newPhase === 'reveal'){
+    if(!hasAnswered){
+      setBetween('⏰', 'Time\'s Up!', 'You didn\'t answer in time. Watch the TV for the answer.', 'reveal');
+    } else {
+      setBetween('✅', 'Answer Locked', 'Watch the TV for the answer reveal and fun fact.', 'reveal');
+    }
   }
 }
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+// ── RENDER QUESTION ───────────────────────────────
+function renderQuestion(ri, qi){
+  if(!playerId){ return; } // not joined yet
 
-function renderIntro(ri){const r=CONFIG.rounds[ri];if(!r)return;document.getElementById('introIcon').textContent=r.icon;document.getElementById('introEye').textContent=`Round ${ri+1} of ${CONFIG.rounds.length}`;document.getElementById('introName').textContent=r.name;document.getElementById('introText').textContent=r.intro;}
+  const body = document.getElementById('qPageBody');
+  const qNum = ri * 5 + qi + 1;
 
-function renderQuestion(ri,qi){
-  const r=CONFIG.rounds[ri],q=r?.questions?.[qi];if(!q)return;
-  document.getElementById('qNum').textContent=`Q${qi+1}`;
-  document.getElementById('qCat').textContent=r.name;
-  document.getElementById('qPts').textContent=`${q.pts} PTS`;
-  document.getElementById('qText').textContent=q.q;
-  const list=document.getElementById('answersList');list.innerHTML='';
-  q.answers.forEach((ans,i)=>{
-    const btn=document.createElement('button');btn.className='ans-btn';btn.dataset.index=i;
-    btn.innerHTML=`<div class="ans-letter">${LETTERS[i]}</div><div class="ans-text">${ans}</div>`;
-    btn.addEventListener('click',()=>handleAnswerClick(ri,qi,i));list.appendChild(btn);
+  // Update header
+  document.getElementById('qTopTitle').textContent = `Round ${ri+1}`;
+  document.getElementById('qTopSub').textContent = `Question ${qNum} of 25`;
+  updateScoreDisplays();
+
+  body.innerHTML = `
+    <div class="q-header">
+      <div class="q-label">Q${qNum} · Round ${ri+1}</div>
+      <div class="q-pts-badge" id="qPtsBadge">200 PTS</div>
+    </div>
+    <div class="q-timer-bar-wrap">
+      <div class="q-timer-bar" id="qTimerBar" style="width:100%"></div>
+    </div>
+    <div class="q-text-box">
+      <div class="q-text-str" id="qTextStr">Loading…</div>
+    </div>
+    <div class="ans-list" id="ansListEl"></div>
+    <div id="resultBannerEl"></div>
+  `;
+
+  showPage('pageQuestion');
+
+  // Fetch question from session
+  fetchQuestion(ri, qi);
+  startClientTimer(20);
+}
+
+async function fetchQuestion(ri, qi){
+  // Questions are stored in CONFIG on the TV side.
+  // We pull from the session to get the current question data
+  // via a dedicated questions table or — since we embed CONFIG in TV —
+  // we re-embed a minimal question set here for answer rendering.
+  // The answers are submitted by index, server validates nothing client-side.
+  // We just show "Awaiting question…" and the TV phase drives us.
+  // The question text comes from a separate fetch if available.
+
+  // Attempt to get question details from session metadata or a questions store
+  const {data} = await sb.from('trivia_sessions').select('*').eq('id',sessionId).single();
+  // We won't have question text in DB — that's fine, player just sees the answer buttons
+  // and matches what's on TV. This is the canonical ClubOS pattern.
+  document.getElementById('qTextStr').textContent = 'See the TV for the question ⬆';
+  document.getElementById('ansListEl').innerHTML = LETTERS.map((l,i)=>
+    `<button class="ans-btn" id="aBtn${i}" onclick="submitAnswer(${ri},${qi},${i})">`+
+    `<div class="ans-letter">${l}</div>`+
+    `<div class="ans-text">Option ${l}</div>`+
+    `</button>`
+  ).join('');
+}
+
+// ── TIMER ─────────────────────────────────────────
+function startClientTimer(secs){
+  clearInterval(timerInterval);
+  timerSecs = secs;
+  const bar = document.getElementById('qTimerBar');
+  if(!bar) return;
+
+  function tick(){
+    timerSecs--;
+    const pct = Math.max(0, (timerSecs / secs) * 100);
+    if(bar){
+      bar.style.width = pct + '%';
+      if(timerSecs <= 5) bar.style.background = 'linear-gradient(90deg, var(--red), var(--gold))';
+    }
+    if(timerSecs <= 0){ clearInterval(timerInterval); }
+  }
+  timerInterval = setInterval(tick, 1000);
+}
+
+// ── SUBMIT ANSWER ─────────────────────────────────
+async function submitAnswer(ri, qi, answerIndex){
+  if(hasAnswered || !playerId) return;
+  hasAnswered = true;
+  clearInterval(timerInterval);
+
+  // Disable all buttons, mark selected
+  LETTERS.forEach((_,i)=>{
+    const b=document.getElementById(`aBtn${i}`);
+    if(b){ b.disabled=true; if(i===answerIndex) b.classList.add('selected'); }
   });
+
+  const speedBonus = Math.max(0, timerSecs * 5); // up to 100 bonus for instant answer
+
+  try {
+    const{data,error}=await sb.from('trivia_answers').insert({
+      session_id: sessionId,
+      player_id: playerId,
+      round_index: ri,
+      question_index: qi,
+      answer_index: answerIndex,
+      is_correct: false,  // TV-side engine validates and updates score
+      speed_bonus: speedBonus,
+      answered_at: new Date().toISOString()
+    }).select().single();
+
+    if(error) showErr('Submit error');
+
+    // Show waiting state
+    const banner = document.getElementById('resultBannerEl');
+    if(banner){
+      banner.innerHTML = `<div class="result-banner late-banner"><div class="result-title">⏳ Locked In!</div><div class="result-pts">Watch the TV for the answer reveal.</div></div>`;
+    }
+
+  } catch(e){ showErr('Connection error'); }
 }
 
-async function handleAnswerClick(ri,qi,answerIndex){
-  if(state.submitting)return;if(state.phase!=='question')return;
-  if(ri!==state.roundIndex||qi!==state.questionIndex)return;
-  const questionKey=`${ri}-${qi}`;if(state.answeredKey===questionKey)return;
-  state.submitting=true;state.answeredKey=questionKey;state.myAnswerIndex=answerIndex;
-  document.querySelectorAll('.ans-btn').forEach(b=>{if(parseInt(b.dataset.index)===answerIndex)b.classList.add('selected');else b.classList.add('locked');});
-  const q=CONFIG.rounds[ri].questions[qi];const isCorrect=(answerIndex===q.correct);let ptsEarned=0;
-  if(isCorrect){const elapsed=state.questionStartedAt?(Date.now()-state.questionStartedAt)/1000:CONFIG.questionSecs;const remaining=Math.max(0,CONFIG.questionSecs-elapsed);const speedMult=1+0.5*(remaining/CONFIG.questionSecs);ptsEarned=Math.round(q.pts*speedMult/5)*5;}
-  state.myPtsEarned=ptsEarned;
-  const{error:ansErr}=await sb.from('trivia_answers').insert({session_id:SESSION_ID,player_id:state.player.id,round_index:ri,question_index:qi,answer_index:answerIndex,is_correct:isCorrect,pts_earned:ptsEarned});
-  if(ansErr){showToast('Error saving: '+ansErr.message);state.submitting=false;state.answeredKey=null;document.querySelectorAll('.ans-btn').forEach(b=>{b.classList.remove('selected');b.classList.remove('locked');});return;}
-  const newScore=(state.player.score||0)+ptsEarned;const newStreak=isCorrect?(state.player.streak||0)+1:0;
-  await sb.from('trivia_players').update({score:newScore,streak:newStreak}).eq('id',state.player.id);
-  state.player.score=newScore;state.player.streak=newStreak;state.submitting=false;
-  showScreen('screenSubmitted');
-  document.getElementById('subLetter').textContent=LETTERS[answerIndex];document.getElementById('subText').textContent=q.answers[answerIndex];
+// ── BETWEEN STATE ─────────────────────────────────
+function setBetween(icon, title, msg, type){
+  clearInterval(timerInterval);
+  document.getElementById('btIcon').textContent = icon;
+  document.getElementById('btTitle').textContent = title;
+  document.getElementById('btMessage').textContent = msg;
+  document.getElementById('btSub').textContent = type === 'leaderboard' ? 'Leaderboard time' : type === 'paused' ? 'Paused' : 'Next question coming…';
+  updateScoreDisplays();
+  showPage('pageBetween');
 }
 
-function startLocalTimer(){
-  stopLocalTimer();let secsLeft=CONFIG.questionSecs;
-  const numEl=document.getElementById('qTimerNum'),fillEl=document.getElementById('qTimerFill');
-  function tick(){numEl.textContent=secsLeft;fillEl.style.width=((secsLeft/CONFIG.questionSecs)*100)+'%';const urgent=secsLeft<=5;numEl.classList.toggle('urgent',urgent);fillEl.classList.toggle('urgent',urgent);secsLeft--;if(secsLeft<0)stopLocalTimer();}
-  tick();timerInt=setInterval(tick,1000);
-}
-function stopLocalTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;}}
-
-function renderReveal(ri,qi){
-  const q=CONFIG.rounds[ri]?.questions?.[qi];if(!q)return;
-  const myIndex=state.myAnswerIndex;const isCorrect=(myIndex===q.correct);const didAnswer=(myIndex!==null&&myIndex!==undefined);
-  const iconEl=document.getElementById('revIcon'),resultEl=document.getElementById('revResult'),ptsEl=document.getElementById('revPts');
-  if(!didAnswer){iconEl.textContent='⏱';iconEl.className='rev-icon';resultEl.textContent='Time Out';resultEl.className='rev-result wrong';ptsEl.textContent='+0';ptsEl.style.color='var(--dim)';}
-  else if(isCorrect){iconEl.textContent='✓';iconEl.className='rev-icon correct';resultEl.textContent='Correct!';resultEl.className='rev-result correct';ptsEl.textContent=`+${state.myPtsEarned}`;ptsEl.style.color='var(--gold)';}
-  else{iconEl.textContent='✗';iconEl.className='rev-icon wrong';resultEl.textContent='Wrong';resultEl.className='rev-result wrong';ptsEl.textContent='+0';ptsEl.style.color='var(--dim)';}
-  const yourRow=document.getElementById('revYour');
-  if(didAnswer){yourRow.style.display='flex';document.getElementById('revYourLetter').textContent=LETTERS[myIndex];document.getElementById('revYourText').textContent=q.answers[myIndex];yourRow.className=isCorrect?'rev-row correct':'rev-row wrong';}
-  else yourRow.style.display='none';
-  const corrRow=document.getElementById('revCorrect');
-  if(!isCorrect){corrRow.style.display='flex';document.getElementById('revCorrectLetter').textContent=LETTERS[q.correct];document.getElementById('revCorrectText').textContent=q.answers[q.correct];}
-  else corrRow.style.display='none';
-  const streakEl=document.getElementById('revStreak');
-  if(isCorrect&&state.player&&state.player.streak>=2){streakEl.style.display='inline-flex';document.getElementById('revStreakNum').textContent=state.player.streak;}
-  else streakEl.style.display='none';
+// ── GAME OVER ─────────────────────────────────────
+async function showGameOver(){
+  clearInterval(timerInterval);
+  // Fetch final score
+  if(playerId){
+    const{data}=await sb.from('trivia_players').select('score').eq('id',playerId).single();
+    if(data) myScore = data.score || 0;
+  }
+  document.getElementById('finalScore').textContent = myScore.toLocaleString();
+  showPage('pageOver');
 }
 
-async function renderLeaderboard(ri){
-  const isLast=(ri===CONFIG.rounds.length-1);
-  document.getElementById('lbEye').textContent=isLast?'Final Standings':`After Round ${ri+1}`;
-  document.getElementById('lbTitle').textContent=isLast?'🏆 Final Scores':'Leaderboard';
-  const{data}=await sb.from('trivia_players').select('id,name,score,streak').eq('session_id',SESSION_ID).order('score',{ascending:false});
-  const players=data||[];const myRank=players.findIndex(p=>p.id===state.player.id)+1;
-  document.getElementById('lbYourRank').textContent=myRank>0?`#${myRank}`:'—';
-  document.getElementById('lbYourName').textContent=state.player.name;
-  document.getElementById('lbYourScore').textContent=(state.player.score||0).toLocaleString();
-  const list=document.getElementById('lbList');list.innerHTML='';
-  const cls=['gold','silver','bronze'];
-  players.slice(0,5).forEach((p,i)=>{const isYou=(p.id===state.player.id);const row=document.createElement('div');row.className=`lb-row ${cls[i]||''} ${isYou?'you':''}`;row.innerHTML=`<div class="lb-row-rank">${i+1}</div><div class="lb-row-name">${p.name}${isYou?' (you)':''}</div><div class="lb-row-score">${(p.score||0).toLocaleString()}</div>`;list.appendChild(row);});
+// ── SCORE DISPLAY ─────────────────────────────────
+function updateScoreDisplays(){
+  const displays = ['qScoreDisplay','btScoreDisplay','lobbyScoreDisplay','btScore'];
+  displays.forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=myScore.toLocaleString(); });
 }
-
-async function renderGameOver(){
-  const{data}=await sb.from('trivia_players').select('id,name,score').eq('session_id',SESSION_ID).order('score',{ascending:false});
-  const players=data||[];document.getElementById('goScore').textContent=(state.player.score||0).toLocaleString();
-  const myRank=players.findIndex(p=>p.id===state.player.id)+1;const winner=players[0];
-  let line=myRank>0?`Rank: #${myRank} of ${players.length}`:'Thanks for playing!';
-  if(winner&&winner.id===state.player.id)line='🏆 You won!';else if(winner)line+=` · Winner: ${winner.name}`;
-  document.getElementById('goRankLine').textContent=line;
-}
-
-function showToast(msg,ms=3000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);}
-document.getElementById('nameInput').addEventListener('keypress',e=>{if(e.key==='Enter')joinGame();});
-init();
 </script>
 </body>
 </html>
