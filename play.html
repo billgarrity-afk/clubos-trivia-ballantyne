@@ -259,6 +259,18 @@ let timerSecs  = 20;
   const params = new URLSearchParams(window.location.search);
   sessionId = params.get('s');
   if(!sessionId){ showErr('No session ID — scan the QR code on the TV'); return; }
+  // Recover player state if this is a reload mid-game
+  try {
+    const savedPid = localStorage.getItem('wc26_player_' + sessionId);
+    const savedScore = localStorage.getItem('wc26_score_' + sessionId);
+    if(savedPid){
+      playerId = savedPid;
+      if(savedScore){ const s=JSON.parse(savedScore); myScore=s.score||0; myStreak=s.streak||0; }
+      updateScoreDisplays();
+      watchSession(); // skip join page, go straight to game
+      return;
+    }
+  } catch(e){}
   document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') joinGame(); });
 })();
 
@@ -300,6 +312,12 @@ async function joinGame(){
 
     playerId   = data.id;
     playerName = name;
+    // Persist playerId so rejoining works if Safari kills the tab
+    try { localStorage.setItem('wc26_player_' + sessionId, data.id); } catch(e){}
+    // Restore score from localStorage in case of page reload
+    const savedKey = 'wc26_score_' + sessionId;
+    const saved = localStorage.getItem(savedKey);
+    if(saved){ try{ const s=JSON.parse(saved); myScore=s.score||0; myStreak=s.streak||0; }catch(e){} }
     document.getElementById('lobbyPlayerName').textContent = name;
     updateScoreDisplays();
 
@@ -502,6 +520,9 @@ async function submitAnswer(ri, qi, answerIndex, correctIndex, pts){
       pts_earned:     isCorrect ? pts : 0
     });
   } catch(e){ /* non-fatal — score already shown locally */ }
+
+  // Persist score locally so page reload survives
+  try { localStorage.setItem('wc26_score_' + sessionId, JSON.stringify({score:myScore, streak:myStreak})); } catch(e){}
 
   // Update player score + streak in trivia_players
   try {
