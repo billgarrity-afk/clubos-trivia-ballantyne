@@ -3,547 +3,416 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ClubOS Trivia — Logos &amp; Slogans</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>ClubOS Trivia — Disney & Pixar · Join</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --bg:     #0C0C0F;
-    --bg2:    #101015;
-    --yellow: #F5E642;
-    --accent: #A3F5A0;
-    --red:    #E04040;
-    --white:  #F0EEE8;
-    --dim:    rgba(240,238,232,0.5);
-    --faint:  rgba(240,238,232,0.05);
-    --sep:    rgba(240,238,232,0.09);
+  :root{
+    --bg:#0A0E2A; --bg2:#0F1438; --card:#151B40;
+    --gold:#F5C542; --gold-faint:rgba(245,197,66,0.08);
+    --magic:#6FE3F5; --pink:#E8639B; --purple:#B892F5;
+    --white:#F1EFFB; --dim:rgba(241,239,251,0.55);
+    --faint:rgba(241,239,251,0.06); --sep:rgba(241,239,251,0.1);
+    --red:#E0506A; --green:#5AD98A;
   }
-
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { width:100%; min-height:100vh; font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--white); overflow-x:hidden; }
-
-  /* subtle grid background */
-  body::before {
-    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Space Grotesk',sans-serif;
+    background:
+      radial-gradient(800px 500px at 50% -10%, rgba(111,227,245,0.12), transparent 60%),
+      radial-gradient(700px 500px at 80% 110%, rgba(184,146,245,0.12), transparent 60%),
+      linear-gradient(180deg,#0A0E2A 0%,#0C1030 60%,#090C24 100%);
+    color:var(--white);
+    min-height:100%;
+    display:flex; flex-direction:column;
+    overflow-x:hidden;
+  }
+  /* Starfield */
+  body::before{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
     background-image:
-      linear-gradient(rgba(245,230,66,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(245,230,66,0.02) 1px, transparent 1px);
-    background-size:60px 60px;
+      radial-gradient(1.4px 1.4px at 15% 20%, rgba(255,255,255,0.85), transparent),
+      radial-gradient(1.5px 1.5px at 45% 12%, rgba(245,197,66,0.9), transparent),
+      radial-gradient(1.3px 1.3px at 75% 25%, rgba(111,227,245,0.9), transparent),
+      radial-gradient(1.2px 1.2px at 85% 60%, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1.3px 1.3px at 30% 80%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1.4px 1.4px at 65% 88%, rgba(245,197,66,0.7), transparent);
+    animation:tw 4.5s ease-in-out infinite alternate;
   }
+  @keyframes tw{from{opacity:.55}to{opacity:1}}
+  .wrap{position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:0 20px; max-width:520px; margin:0 auto; width:100%;}
 
-  .page { position:relative; z-index:1; display:none; flex-direction:column; min-height:100vh; }
-  .page.active { display:flex; }
-
-  /* ── TOP BAR ────────────────────────────────────── */
-  .top-bar {
-    background:rgba(9,9,13,0.97);
-    border-bottom:1px solid var(--sep);
-    padding:14px 20px;
-    display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:100; backdrop-filter:blur(16px);
+  /* Top bar (player status) */
+  .topbar{
+    display:none; align-items:center; justify-content:space-between;
+    padding:16px 4px 14px; border-bottom:1px solid var(--sep); margin-bottom:8px;
   }
-  .top-bar::after {
-    content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
-    background:linear-gradient(90deg, transparent, var(--yellow), transparent);
-    opacity:0.7;
+  .topbar.on{display:flex;}
+  .tb-brand{display:flex; align-items:center; gap:9px;}
+  .tb-badge{font-size:22px;}
+  .tb-name{font-family:'Oswald'; font-weight:600; letter-spacing:.5px; font-size:15px;}
+  .tb-venue{font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--gold);}
+  .tb-score{text-align:right;}
+  .tb-score-val{font-family:'Bebas Neue'; font-size:30px; color:var(--gold); line-height:.9;}
+  .tb-score-lbl{font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--dim);}
+
+  .screen{display:none; flex:1; flex-direction:column;}
+  .screen.active{display:flex;}
+  .center{justify-content:center; align-items:center; text-align:center;}
+
+  /* JOIN */
+  .join-icon{font-size:76px; margin-bottom:10px; animation:bob 1.8s ease-in-out infinite alternate;}
+  @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+  .join-title{font-family:'Bebas Neue'; font-size:60px; line-height:.9; letter-spacing:2px;}
+  .join-title .g{color:var(--gold);}
+  .join-eye{font-size:11px; letter-spacing:5px; text-transform:uppercase; color:var(--magic); margin:14px 0 4px;}
+  .join-sub{color:var(--dim); font-size:14px; margin-bottom:30px; font-weight:300;}
+  .name-input{
+    width:100%; background:var(--card); border:1.5px solid var(--sep); border-radius:12px;
+    padding:18px 20px; font-family:'Space Grotesk'; font-size:19px; color:var(--white);
+    text-align:center; outline:none; transition:border-color .2s;
   }
-  .tb-brand { display:flex; flex-direction:column; gap:2px; }
-  .tb-title { font-family:'Oswald'; font-size:16px; font-weight:600; color:var(--white); letter-spacing:1px; line-height:1; }
-  .tb-sub   { font-size:10px; color:var(--yellow); letter-spacing:2px; text-transform:uppercase; }
-  .tb-right { text-align:right; }
-  .tb-score { font-family:'Bebas Neue'; font-size:26px; color:var(--yellow); letter-spacing:1px; line-height:1; }
-  .tb-score-lbl { font-size:9px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; }
-
-  /* ── JOIN ───────────────────────────────────────── */
-  .join-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; gap:24px; text-align:center; }
-  .join-icon { font-size:64px; animation:bounce 1.6s ease-in-out infinite alternate; }
-  @keyframes bounce { from{transform:translateY(0)} to{transform:translateY(-10px)} }
-
-  .join-title { font-family:'Bebas Neue'; font-size:52px; letter-spacing:2px; line-height:0.95; }
-  .join-title .j1 { color:var(--white); display:block; }
-  .join-title .j2 { color:var(--yellow); display:block; }
-
-  .join-sub { font-size:15px; color:var(--dim); line-height:1.6; max-width:280px; font-weight:300; }
-
-  .name-input {
-    width:100%; max-width:320px;
-    padding:16px 20px;
-    background:rgba(255,255,255,0.05);
-    border:1.5px solid var(--sep);
-    border-radius:6px;
-    font-family:'Space Grotesk'; font-size:18px; font-weight:600;
-    color:var(--white); text-align:center;
-    outline:none; transition:border-color 0.2s;
-    -webkit-appearance:none;
+  .name-input:focus{border-color:var(--gold);}
+  .name-input::placeholder{color:rgba(241,239,251,0.35);}
+  .btn{
+    width:100%; margin-top:16px; background:var(--gold); color:#0A0E2A; border:none; border-radius:12px;
+    padding:18px; font-family:'Oswald'; font-weight:600; font-size:20px; letter-spacing:2px;
+    text-transform:uppercase; cursor:pointer; transition:transform .12s, opacity .2s;
   }
-  .name-input::placeholder { color:rgba(240,238,232,0.22); font-weight:400; }
-  .name-input:focus { border-color:var(--yellow); background:rgba(245,230,66,0.04); }
+  .btn:active{transform:scale(.98);}
+  .btn:disabled{opacity:.45;}
 
-  .join-btn {
-    width:100%; max-width:320px;
-    padding:18px;
-    background:var(--yellow);
-    border:none; border-radius:4px;
-    font-family:'Oswald'; font-size:20px; font-weight:600; letter-spacing:2px;
-    color:var(--bg); text-transform:uppercase;
-    cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
+  /* WAITING / STATUS */
+  .big-emoji{font-size:70px; margin-bottom:16px; animation:bob 1.8s ease-in-out infinite alternate;}
+  .status-title{font-family:'Bebas Neue'; font-size:44px; letter-spacing:2px; line-height:1; margin-bottom:10px;}
+  .status-sub{color:var(--dim); font-size:15px; font-weight:300; max-width:320px;}
+  .status-title.gold{color:var(--gold);}
+  .status-title.magic{color:var(--magic);}
+  .pulse{display:inline-block; margin-top:22px; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--magic); animation:pl 1.4s ease-in-out infinite;}
+  @keyframes pl{0%,100%{opacity:.4}50%{opacity:1}}
+
+  /* QUESTION */
+  .q-head{padding:8px 4px 16px;}
+  .q-tag{display:inline-flex; align-items:center; gap:8px; background:var(--gold-faint); border:1px solid rgba(245,197,66,0.3); border-radius:20px; padding:5px 14px; font-family:'Oswald'; font-size:12px; letter-spacing:2px; color:var(--gold); text-transform:uppercase;}
+  .q-round{font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--dim); margin-top:10px;}
+  .q-body{font-size:22px; font-weight:500; line-height:1.35; margin:8px 4px 20px;}
+  .opts{display:flex; flex-direction:column; gap:12px;}
+  .opt{
+    display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1.5px solid var(--sep); border-radius:14px;
+    padding:18px 18px; cursor:pointer; transition:transform .12s, border-color .2s, background .2s;
+    text-align:left;
   }
-  .join-btn:active { transform:scale(0.97); }
-  .join-btn:disabled { opacity:0.45; cursor:not-allowed; }
-
-  .join-notice { font-size:12px; color:var(--dim); text-align:center; line-height:1.6; font-weight:300; }
-
-  /* ── LOBBY WAIT ──────────────────────────────────── */
-  .lobby-wait { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; text-align:center; gap:20px; }
-  .wait-title { font-family:'Bebas Neue'; font-size:40px; letter-spacing:2px; color:var(--white); }
-  .wait-sub { font-size:15px; color:var(--dim); line-height:1.6; font-weight:300; }
-
-  .player-tag {
-    display:inline-flex; align-items:center; gap:8px;
-    background:rgba(245,230,66,0.08);
-    border:1px solid rgba(245,230,66,0.25);
-    border-radius:4px; padding:10px 18px;
-  }
-  .player-tag-name { font-family:'Oswald'; font-size:20px; font-weight:600; color:var(--yellow); letter-spacing:1px; }
-
-  .wait-score-row { display:flex; gap:16px; }
-  .wait-stat { background:var(--faint); border:1px solid var(--sep); border-radius:6px; padding:12px 20px; text-align:center; }
-  .wait-stat-val { font-family:'Bebas Neue'; font-size:28px; color:var(--yellow); }
-  .wait-stat-lbl { font-size:10px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
-
-  .pulse-ring {
-    width:72px; height:72px; border-radius:50%;
-    border:2px solid var(--yellow);
-    display:flex; align-items:center; justify-content:center; font-size:28px;
-    animation:ringPulse 2s ease-in-out infinite;
-  }
-  @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,230,66,0.35)} 50%{box-shadow:0 0 0 16px rgba(245,230,66,0)} }
-
-  /* ── QUESTION PAGE ───────────────────────────────── */
-  .q-page-body { flex:1; display:flex; flex-direction:column; padding:16px 16px 32px; gap:14px; }
-
-  .q-meta-bar {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 16px;
-    background:var(--faint); border:1px solid var(--sep); border-radius:6px;
-  }
-  .q-label { font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--yellow); letter-spacing:2px; text-transform:uppercase; }
-  .q-pts-badge {
-    font-family:'Oswald'; font-size:13px; font-weight:600; color:var(--yellow);
-    background:rgba(245,230,66,0.08); border:1px solid rgba(245,230,66,0.2);
-    border-radius:3px; padding:3px 10px; letter-spacing:1px;
-  }
-
-  .q-timer-bar-wrap { height:4px; background:var(--faint); border-radius:2px; overflow:hidden; }
-  .q-timer-bar { height:100%; border-radius:2px; background:var(--yellow); transition:width 1s linear, background 0.5s; width:100%; }
-
-  .q-text-box { background:var(--faint); border:1px solid var(--sep); border-radius:8px; padding:20px; }
-  .q-text-str { font-family:'Oswald'; font-size:20px; font-weight:600; color:var(--white); line-height:1.45; letter-spacing:0.3px; }
-
-  .ans-list { display:flex; flex-direction:column; gap:10px; }
-  .ans-btn {
-    width:100%; display:flex; align-items:center; gap:14px;
-    background:var(--faint); border:1.5px solid var(--sep);
-    border-radius:8px; padding:16px 18px;
-    cursor:pointer; transition:all 0.15s; text-align:left;
-  }
-  .ans-btn:active:not(:disabled) { transform:scale(0.98); }
-  .ans-btn.selected { background:rgba(245,230,66,0.07); border-color:rgba(245,230,66,0.4); }
-  .ans-btn.correct  { background:rgba(163,245,160,0.1); border-color:var(--accent); }
-  .ans-btn.wrong    { background:rgba(224,64,64,0.05); border-color:rgba(224,64,64,0.18); opacity:0.5; }
-  .ans-btn:disabled { cursor:not-allowed; }
-
-  .ans-letter {
-    width:36px; height:36px; border-radius:4px; flex-shrink:0;
-    background:rgba(255,255,255,0.05); border:1px solid var(--sep);
+  .opt:active{transform:scale(.985);}
+  .opt .k{
+    width:38px; height:38px; border-radius:9px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-family:'Oswald'; font-size:16px; font-weight:700; color:var(--yellow);
-    transition:all 0.15s;
+    font-family:'Oswald'; font-weight:600; font-size:18px;
   }
-  .ans-btn.selected .ans-letter { background:rgba(245,230,66,0.2); border-color:var(--yellow); color:var(--white); }
-  .ans-btn.correct  .ans-letter { background:var(--accent); border-color:var(--accent); color:var(--bg); }
-  .ans-btn.wrong    .ans-letter { background:rgba(224,64,64,0.1); color:var(--red); border-color:transparent; }
-  .ans-text { font-size:16px; font-weight:500; color:var(--white); line-height:1.35; }
+  .opt:nth-child(1) .k{background:rgba(245,197,66,0.16); color:var(--gold);}
+  .opt:nth-child(2) .k{background:rgba(111,227,245,0.16); color:var(--magic);}
+  .opt:nth-child(3) .k{background:rgba(232,99,155,0.16); color:var(--pink);}
+  .opt:nth-child(4) .k{background:rgba(184,146,245,0.16); color:var(--purple);}
+  .opt .t{font-size:16px; font-weight:500; line-height:1.25;}
+  .opt.picked{border-color:var(--gold); background:rgba(245,197,66,0.1);}
+  .opt.dim{opacity:.4;}
+  .opts.locked .opt{pointer-events:none;}
+  .locked-note{text-align:center; margin-top:20px; font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--magic);}
 
-  /* ── RESULT BANNER ───────────────────────────────── */
-  .result-banner { padding:14px 18px; border-radius:8px; text-align:center; margin-top:4px; }
-  .result-banner.correct-b { background:rgba(163,245,160,0.1); border:1px solid rgba(163,245,160,0.3); }
-  .result-banner.wrong-b   { background:rgba(224,64,64,0.08); border:1px solid rgba(224,64,64,0.2); }
-  .result-banner.locked-b  { background:rgba(245,230,66,0.06); border:1px solid rgba(245,230,66,0.2); }
-  .result-title { font-family:'Oswald'; font-size:20px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
-  .result-banner.correct-b .result-title { color:var(--accent); }
-  .result-banner.wrong-b   .result-title { color:var(--red); }
-  .result-banner.locked-b  .result-title { color:var(--yellow); }
-  .result-pts { font-size:13px; color:var(--dim); margin-top:4px; font-weight:300; }
+  /* RESULT */
+  .res-emoji{font-size:80px; margin-bottom:12px; animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+  .res-title{font-family:'Bebas Neue'; font-size:56px; letter-spacing:2px; line-height:1;}
+  .res-title.right{color:var(--green);}
+  .res-title.wrong{color:var(--red);}
+  .res-pts{font-family:'Bebas Neue'; font-size:44px; color:var(--gold); margin-top:6px;}
+  .res-correct{color:var(--dim); font-size:14px; margin-top:14px; font-weight:300; max-width:320px;}
+  .res-correct b{color:var(--white); font-weight:600;}
+  .res-streak{margin-top:16px; display:inline-block; background:rgba(90,217,138,0.12); color:var(--green); border-radius:20px; padding:6px 16px; font-size:13px; font-weight:600;}
 
-  /* ── BETWEEN ─────────────────────────────────────── */
-  .between-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; padding:24px; }
-  .between-icon  { font-size:56px; }
-  .between-title { font-family:'Oswald'; font-size:28px; font-weight:600; color:var(--white); letter-spacing:1px; }
-  .between-sub   { font-size:14px; color:var(--dim); line-height:1.6; font-weight:300; }
-
-  .score-card { background:var(--faint); border:1px solid var(--sep); border-radius:8px; padding:20px 32px; text-align:center; }
-  .score-card-val { font-family:'Bebas Neue'; font-size:52px; color:var(--yellow); letter-spacing:2px; line-height:1; }
-  .score-card-lbl { font-size:11px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
-
-  /* ── GAME OVER ───────────────────────────────────── */
-  .final-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; gap:20px; text-align:center; }
-  .final-trophy { font-size:72px; animation:bounce 1.2s ease-in-out infinite alternate; }
-  .final-title { font-family:'Bebas Neue'; font-size:52px; letter-spacing:3px; color:var(--yellow); }
-  .final-score-card {
-    background:rgba(245,230,66,0.07);
-    border:1px solid rgba(245,230,66,0.25);
-    border-radius:8px; padding:24px 40px; text-align:center;
-  }
-  .final-score-val { font-family:'Bebas Neue'; font-size:64px; color:var(--yellow); letter-spacing:2px; line-height:1; }
-  .final-score-lbl { font-size:12px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-top:4px; }
-  .final-sub { font-size:16px; color:var(--dim); line-height:1.7; font-weight:300; }
-
-  .err-toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--red); color:white; padding:12px 24px; border-radius:4px; font-size:14px; font-weight:600; z-index:999; display:none; white-space:nowrap; max-width:90vw; text-align:center; }
+  .foot{position:relative; z-index:1; text-align:center; padding:16px; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(241,239,251,0.3);}
+  .foot span{color:rgba(245,197,66,0.55); font-style:italic; font-weight:700;}
+  .err{position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:var(--red); color:#fff; padding:11px 20px; border-radius:10px; font-size:13px; font-weight:600; z-index:50; display:none; max-width:90%; text-align:center;}
 </style>
 </head>
 <body>
-<div class="err-toast" id="errToast"></div>
-
-<!-- ── JOIN ───────────────────────────────────────── -->
-<div class="page active" id="pageJoin">
-  <div class="top-bar">
+<div class="wrap">
+  <!-- Top status bar -->
+  <div class="topbar" id="topbar">
     <div class="tb-brand">
-      <div class="tb-title">Logos &amp; Slogans Trivia</div>
-      <div class="tb-sub">Ballantyne CC · July 7</div>
+      <div class="tb-badge">🏰</div>
+      <div>
+        <div class="tb-name" id="tbName">—</div>
+        <div class="tb-venue">Ballantyne CC · Disney &amp; Pixar</div>
+      </div>
     </div>
-    <div style="font-size:22px">🎨</div>
+    <div class="tb-score">
+      <div class="tb-score-val" id="tbScore">0</div>
+      <div class="tb-score-lbl">Points</div>
+    </div>
   </div>
-  <div class="join-body">
-    <div class="join-icon">🎨</div>
-    <div class="join-title"><span class="j1">Join the</span><span class="j2">Game</span></div>
-    <div class="join-sub">Enter your name to join. Answers submitted from your phone appear on the TV in real time.</div>
-    <input class="name-input" type="text" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off" autocorrect="off" spellcheck="false">
-    <button class="join-btn" id="joinBtn" onclick="joinGame()">Join Game</button>
-    <div class="join-notice">💡 No account needed · Your name goes on the leaderboard</div>
+
+  <!-- JOIN -->
+  <div class="screen active center" id="scrJoin">
+    <div class="join-icon">🏰</div>
+    <div class="join-title">DISNEY <span class="g">&amp;</span> PIXAR</div>
+    <div class="join-eye">Trivia Night</div>
+    <div class="join-sub">Ballantyne Country Club · Cabana</div>
+    <input class="name-input" id="nameInput" placeholder="Enter your name" maxlength="18" autocomplete="off">
+    <button class="btn" id="joinBtn" onclick="joinGame()">Join the Game</button>
+  </div>
+
+  <!-- WAITING (lobby / intro / between) -->
+  <div class="screen center" id="scrWait">
+    <div class="big-emoji" id="waitEmoji">✨</div>
+    <div class="status-title magic" id="waitTitle">You're in!</div>
+    <div class="status-sub" id="waitSub">Keep this page open — your questions will appear here.</div>
+    <div class="pulse" id="waitPulse">Waiting for the host…</div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="screen" id="scrQuestion">
+    <div class="q-head">
+      <span class="q-tag" id="qTag">Q1 · 100 PTS</span>
+      <div class="q-round" id="qRound">Round 1 — Disney Classics</div>
+    </div>
+    <div class="q-body" id="qBody">—</div>
+    <div class="opts" id="opts"></div>
+    <div class="locked-note" id="lockedNote" style="display:none;">✨ Answer locked in — look up at the big screen!</div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen center" id="scrResult">
+    <div class="res-emoji" id="resEmoji">✨</div>
+    <div class="res-title" id="resTitle">—</div>
+    <div class="res-pts" id="resPts"></div>
+    <div class="res-correct" id="resCorrect"></div>
+    <div class="res-streak" id="resStreak" style="display:none;"></div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="screen center" id="scrOver">
+    <div class="big-emoji">🏆</div>
+    <div class="status-title gold">That's a wrap!</div>
+    <div class="status-sub">Thanks for playing Disney &amp; Pixar trivia. Check the big screen for the final standings.</div>
+    <div class="res-pts" id="overScore" style="margin-top:20px;">0 pts</div>
   </div>
 </div>
 
-<!-- ── LOBBY WAIT ──────────────────────────────────── -->
-<div class="page" id="pageLobby">
-  <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">Logos &amp; Slogans Trivia</div>
-      <div class="tb-sub">Ballantyne CC · July 7</div>
-    </div>
-    <div class="tb-right"><div class="tb-score" id="lobbyScoreDisplay">0</div><div class="tb-score-lbl">Points</div></div>
-  </div>
-  <div class="lobby-wait">
-    <div class="pulse-ring">🎨</div>
-    <div class="wait-title">You're In!</div>
-    <div class="player-tag"><div class="player-tag-name" id="lobbyPlayerName">—</div></div>
-    <div class="wait-sub">Stand by — the host will start when everyone is ready. Watch the TV.</div>
-    <div class="wait-score-row">
-      <div class="wait-stat"><div class="wait-stat-val" id="lobbyPlayerCount">—</div><div class="wait-stat-lbl">Players</div></div>
-      <div class="wait-stat"><div class="wait-stat-val">5</div><div class="wait-stat-lbl">Rounds</div></div>
-      <div class="wait-stat"><div class="wait-stat-val">25</div><div class="wait-stat-lbl">Questions</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── QUESTION ────────────────────────────────────── -->
-<div class="page" id="pageQuestion">
-  <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title" id="qTopTitle">Round 1</div>
-      <div class="tb-sub" id="qTopSub">Question 1 of 25</div>
-    </div>
-    <div class="tb-right"><div class="tb-score" id="qScoreDisplay">0</div><div class="tb-score-lbl">Points</div></div>
-  </div>
-  <div class="q-page-body" id="qPageBody"></div>
-</div>
-
-<!-- ── BETWEEN ────────────────────────────────────── -->
-<div class="page" id="pageBetween">
-  <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">Logos &amp; Slogans</div>
-      <div class="tb-sub" id="btSubLabel">Next question coming…</div>
-    </div>
-    <div class="tb-right"><div class="tb-score" id="btScoreDisplay">0</div><div class="tb-score-lbl">Points</div></div>
-  </div>
-  <div class="between-state">
-    <div class="between-icon" id="btIcon">⏱</div>
-    <div class="between-title" id="btTitle">Standby</div>
-    <div class="between-sub" id="btMessage">Watch the TV for the answer reveal.</div>
-    <div class="score-card"><div class="score-card-val" id="btScore">0</div><div class="score-card-lbl">Your Score</div></div>
-  </div>
-</div>
-
-<!-- ── GAME OVER ───────────────────────────────────── -->
-<div class="page" id="pageOver">
-  <div class="top-bar">
-    <div class="tb-brand">
-      <div class="tb-title">Game Over</div>
-      <div class="tb-sub">Logos &amp; Slogans Trivia</div>
-    </div>
-  </div>
-  <div class="final-body">
-    <div class="final-trophy">🏆</div>
-    <div class="final-title">Final Score</div>
-    <div class="final-score-card">
-      <div class="final-score-val" id="finalScore">0</div>
-      <div class="final-score-lbl">Points</div>
-    </div>
-    <div class="final-sub">Thanks for playing!<br>Check the TV for the final leaderboard.</div>
-  </div>
-</div>
+<div class="foot">Powered by Club<span>OS</span></div>
+<div class="err" id="err"></div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────
-const SUPABASE_URL = 'https://ykfvwqewnfnibpzytspn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const LETTERS = ['A','B','C','D'];
-
-// ── QUESTION DATA — must match index.html CONFIG exactly ──
+// ── Question data (mirrors the display CONFIG so the phone can score locally) ──
 const ROUNDS = [
-  { name:'Fast Food & Beverage', questions:[
-    { q:"Which fast food chain's logo features a red-headed girl with pigtails?",          answers:["Dairy Queen","Wendy's","Arby's","Hardee's"],                                          correct:1, pts:100 },
-    { q:"What does the Starbucks logo depict?",                                             answers:["A mermaid","A twin-tailed siren","A sea goddess","A sailor's wife"],                 correct:1, pts:100 },
-    { q:"McDonald's 'I'm Lovin' It' was originally written in which language?",            answers:["English","German","French","Spanish"],                                                correct:1, pts:100 },
-    { q:"What color is the top half of the Pepsi logo?",                                   answers:["Red","Blue","White","Navy"],                                                          correct:0, pts:100 },
-    { q:"Subway's 'Eat Fresh' slogan launched in which year?",                             answers:["1995","1998","2000","2004"],                                                          correct:2, pts:100 }
+  { name:'Disney Classics', questions:[
+    { q:"Which was Walt Disney's first full-length animated feature film?", answers:["Pinocchio","Snow White and the Seven Dwarfs","Cinderella","Bambi"], correct:1, pts:100 },
+    { q:"In The Lion King, what is the name of Simba's father?", answers:["Mufasa","Scar","Rafiki","Zazu"], correct:0, pts:100 },
+    { q:"What kind of animal is the title character in Dumbo?", answers:["Mouse","Elephant","Giraffe","Deer"], correct:1, pts:100 },
+    { q:"Which Disney princess loses a glass slipper as the clock strikes midnight?", answers:["Aurora","Belle","Cinderella","Snow White"], correct:2, pts:100 },
+    { q:"In Frozen, what are the names of the two royal sisters?", answers:["Elsa & Anna","Rapunzel & Aurora","Merida & Moana","Elsa & Ariel"], correct:0, pts:100 }
   ]},
-  { name:'Automotive Logos', questions:[
-    { q:"How many rings are in the Audi logo?",                                             answers:["Three","Four","Five","Two"],                                                          correct:1, pts:100 },
-    { q:"What animal appears in the Ferrari logo?",                                         answers:["Bull","Prancing horse","Lion","Eagle"],                                               correct:1, pts:100 },
-    { q:"What does 'Volkswagen' mean in German?",                                           answers:["Speed wagon","People's car","Working car","Freedom car"],                            correct:1, pts:100 },
-    { q:"What is at the center of the Toyota logo?",                                        answers:["A star","A circle","Three overlapping ovals","A T and a ring"],                      correct:2, pts:100 },
-    { q:"Genesis luxury vehicles are the upscale division of which automaker?",            answers:["Kia","Hyundai","Samsung","Daewoo"],                                                   correct:1, pts:100 }
+  { name:'The Pixar Universe', questions:[
+    { q:"What was Pixar's very first feature-length film?", answers:["A Bug's Life","Toy Story","Monsters, Inc.","Finding Nemo"], correct:1, pts:200 },
+    { q:"In Finding Nemo, what type of fish is Nemo?", answers:["Angelfish","Blue tang","Clownfish","Guppy"], correct:2, pts:200 },
+    { q:"In Up, what is the name of Carl's late wife?", answers:["Dug","Ellie","Kevin","Russell"], correct:1, pts:200 },
+    { q:"In Monsters, Inc., what do Sulley and Mike nickname the little girl who sneaks into their world?", answers:["Celia","Boo","Roz","Fungus"], correct:1, pts:200 },
+    { q:"In Ratatouille, what does the rat Remy dream of becoming?", answers:["A painter","A food critic","A chef","A waiter"], correct:2, pts:200 }
   ]},
-  { name:'Famous Slogans', questions:[
-    { q:"'Just Do It.' — Which brand?",                                                     answers:["Nike","Adidas","Under Armour","Reebok"],                                              correct:0, pts:100 },
-    { q:"'Melts in your mouth, not in your hands.' — Which candy?",                        answers:["Skittles","Reese's Pieces","M&Ms","Smarties"],                                       correct:2, pts:100 },
-    { q:"'Think Different.' — Which tech company?",                                         answers:["Apple","IBM","Microsoft","Intel"],                                                    correct:0, pts:200 },
-    { q:"'Because you're worth it.' — Which brand?",                                       answers:["Revlon","L'Oréal","Maybelline","Estée Lauder"],                                      correct:1, pts:200 },
-    { q:"'The Breakfast of Champions.' — Which cereal?",                                    answers:["Corn Flakes","Special K","Wheaties","Cheerios"],                                      correct:2, pts:200 }
+  { name:'Songs & Voices', questions:[
+    { q:"'A Whole New World' is the signature song from which film?", answers:["Aladdin","Hercules","Mulan","Tarzan"], correct:0, pts:200 },
+    { q:"Who voiced the fast-talking Genie in Disney's 1992 Aladdin?", answers:["Eddie Murphy","Robin Williams","Steve Martin","Billy Crystal"], correct:1, pts:200 },
+    { q:"'Under the Sea' is performed by Sebastian the crab in which film?", answers:["Moana","Finding Nemo","The Little Mermaid","Lilo & Stitch"], correct:2, pts:200 },
+    { q:"In Moana, which actor voices the demigod Maui?", answers:["Jason Momoa","Dwayne Johnson","John Cena","Chris Pratt"], correct:1, pts:200 },
+    { q:"'Remember Me' is the Oscar-winning song from which Pixar film?", answers:["Soul","Coco","Luca","Onward"], correct:1, pts:200 }
   ]},
-  { name:'Sports & Apparel', questions:[
-    { q:"The Nike Swoosh was designed by a student in 1971. How much was she paid?",       answers:["$35","$500","$2,000","Free — she was a friend"],                                      correct:0, pts:200 },
-    { q:"The NBA logo silhouette is based on which Hall of Famer?",                        answers:["Oscar Robertson","Jerry West","Bill Russell","Wilt Chamberlain"],                     correct:1, pts:200 },
-    { q:"Adidas's three stripes originally served what purpose?",                           answers:["Speed, power, agility","The three founding brothers","Structural support for the shoe","Purely decorative"], correct:2, pts:200 },
-    { q:"What does the PGA Tour logo depict?",                                              answers:["A golfer at sunset","A full follow-through silhouette","A golf ball in flight","Crossed golf clubs"], correct:1, pts:200 },
-    { q:"The Under Armour logo is two interlocked versions of which letter?",              answers:["A and U","Two U's","U and A","A stylized shield"],                                    correct:1, pts:200 }
+  { name:'Villains & Sidekicks', questions:[
+    { q:"In 101 Dalmatians, what is the name of the fur-obsessed villain?", answers:["Madame Medusa","Cruella de Vil","Yzma","Lady Tremaine"], correct:1, pts:300 },
+    { q:"What is the name of the sea witch in The Little Mermaid?", answers:["Maleficent","Ursula","Morgana","Vanessa"], correct:1, pts:300 },
+    { q:"In Sleeping Beauty, what is the name of the dark fairy who curses Princess Aurora?", answers:["Maleficent","The Evil Queen","Ursula","Cruella"], correct:0, pts:300 },
+    { q:"In Aladdin, what is the name of the scheming royal vizier?", answers:["Iago","Jafar","Razoul","Sultan"], correct:1, pts:300 },
+    { q:"In Toy Story 3, which strawberry-scented pink bear turns out to be the villain?", answers:["Chuckles","Lots-o'-Huggin' Bear","Big Baby","Teddy"], correct:1, pts:300 }
   ]},
-  { name:'Luxury, Tech & Wildcards', questions:[
-    { q:"The Amazon logo's arrow represents two things at once. What are they?",           answers:["Fast delivery","A to Z product range","A smile AND A to Z","A river flowing east"],  correct:2, pts:200 },
-    { q:"How many circles are in the Target bullseye logo?",                                answers:["Two","Three","Four","Five"],                                                          correct:1, pts:200 },
-    { q:"The FedEx logo contains a hidden image between the E and x. What is it?",        answers:["A clock","An arrow","A truck","A package"],                                            correct:1, pts:200 },
-    { q:"'The Ultimate Driving Machine.' Which car brand?",                                 answers:["Mercedes-Benz","BMW","Porsche","Lexus"],                                              correct:1, pts:200 },
-    { q:"Ballantyne Country Club's golf course was designed by which legendary golf course architect?", answers:["Jack Nicklaus","Pete Dye","Rees Jones","Tom Fazio"],                    correct:2, pts:300 }
+  { name:'Deep Cuts & Easter Eggs', questions:[
+    { q:"What alphanumeric code is hidden as a recurring Easter egg in nearly every Pixar film?", answers:["A113","TT2085","C3PO","RX24"], correct:0, pts:400 },
+    { q:"The robot hero of Pixar's WALL·E has a name that's an acronym. What does it stand for?", answers:["Waste Allocation Load Lifter, Earth-Class","Worldwide Automated Logistics Lander","Water And Land Life Explorer","Weather Analysis & Life Locator"], correct:0, pts:400 },
+    { q:"What is the name of the hopping desk lamp in the Pixar logo?", answers:["Pixie","Lumière","Luxo Jr.","Sparky"], correct:2, pts:400 },
+    { q:"Which vehicle is a recurring Easter egg that first appeared in Toy Story and pops up across Pixar films?", answers:["The Mystery Machine","The Pizza Planet truck","Lightning McQueen","The DeLorean"], correct:1, pts:400 },
+    { q:"One actor holds the honor of voicing a character in every Pixar feature film. Who is it?", answers:["Tom Hanks","Billy Crystal","John Ratzenberger","Tim Allen"], correct:2, pts:400 }
   ]}
 ];
 
-// ── STATE ─────────────────────────────────────────
-let sessionId   = null;
-let playerId    = null;
-let playerName  = '';
-let myScore     = 0;
-let myStreak    = 0;
-let currentRi   = -1;
-let currentQi   = -1;
-let hasAnswered  = false;
-let timerInterval = null;
-let timerSecs   = 20;
+const SUPABASE_URL = 'https://ykfvwqewnfnibpzytspn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnZ3cWV3bmZuaWJwenl0c3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjE2NzYsImV4cCI6MjA5MDM5NzY3Nn0.cnMztZVHDV3Hof-26aRi4NIM7wKwjzxAfoMBR3oItms';
+const LETTERS = ['A','B','C','D'];
 
-// ── INIT ──────────────────────────────────────────
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  sessionId = params.get('s');
-  if(!sessionId){ showErr('No session ID — scan the QR code on the TV'); return; }
-  try {
-    const savedPid   = localStorage.getItem('ls26_player_' + sessionId);
-    const savedScore = localStorage.getItem('ls26_score_'  + sessionId);
-    if(savedPid){
-      playerId = savedPid;
-      if(savedScore){ try{ const s=JSON.parse(savedScore); myScore=s.score||0; myStreak=s.streak||0; }catch(e){} }
-      updateScoreDisplays();
-      watchSession();
-      return;
-    }
-  } catch(e){}
-  document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') joinGame(); });
-})();
+const params = new URLSearchParams(location.search);
+const sessionId = params.get('s');
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function showErr(msg){ const t=document.getElementById('errToast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',5000); }
-function showPage(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function updateScoreDisplays(){
-  ['qScoreDisplay','btScoreDisplay','lobbyScoreDisplay','btScore'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.textContent=myScore.toLocaleString();
-  });
-}
+let playerId = null, playerName = '', myScore = 0, myStreak = 0;
+let answered = {};        // key `${ri}-${qi}` -> chosen index
+let lastKey = null;       // last question key we rendered
+let lastPhase = null;
 
-// ── JOIN ──────────────────────────────────────────
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',5000);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function keyOf(ri,qi){return ri+'-'+qi;}
+function refreshTop(){document.getElementById('tbName').textContent=playerName;document.getElementById('tbScore').textContent=myScore.toLocaleString();}
+
+document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+
 async function joinGame(){
-  const name = document.getElementById('nameInput').value.trim();
-  if(!name){ showErr('Enter your name to join'); return; }
-  const btn = document.getElementById('joinBtn');
-  btn.disabled=true; btn.textContent='Joining…';
-  try {
-    const { data, error } = await sb.from('trivia_players').insert({ session_id:sessionId, name, score:0, streak:0 }).select().single();
-    if(error){ showErr('Could not join — try again'); btn.disabled=false; btn.textContent='Join Game'; return; }
-    playerId=data.id; playerName=name;
-    try { localStorage.setItem('ls26_player_'+sessionId, data.id); } catch(e){}
-    const saved=localStorage.getItem('ls26_score_'+sessionId);
-    if(saved){ try{ const s=JSON.parse(saved); myScore=s.score||0; myStreak=s.streak||0; }catch(e){} }
-    document.getElementById('lobbyPlayerName').textContent=name;
-    updateScoreDisplays();
-    watchSession();
-    showPage('pageLobby');
-  } catch(e){ showErr('Connection error'); btn.disabled=false; btn.textContent='Join Game'; }
+  const name=document.getElementById('nameInput').value.trim();
+  if(!name){showErr('Please enter your name');return;}
+  if(!sessionId){showErr('Missing game link — rescan the QR code');return;}
+  const btn=document.getElementById('joinBtn');btn.disabled=true;btn.textContent='Joining…';
+  try{
+    const{data,error}=await sb.from('trivia_players')
+      .insert({session_id:sessionId,name:name,score:0,streak:0})
+      .select().single();
+    if(error){showErr('Could not join: '+error.message);btn.disabled=false;btn.textContent='Join the Game';return;}
+    playerId=data.id; playerName=name; myScore=0; myStreak=0;
+    document.getElementById('topbar').classList.add('on');
+    refreshTop();
+    await syncSession();       // pull current phase immediately
+    subscribeSession();        // then listen for changes
+  }catch(e){showErr('Connection failed');btn.disabled=false;btn.textContent='Join the Game';console.error(e);}
 }
 
-// ── WATCH SESSION ─────────────────────────────────
-function watchSession(){
-  sb.channel('session-play-'+sessionId)
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${sessionId}`}, p=>handleState(p.new))
+function subscribeSession(){
+  sb.channel('play-'+sessionId)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'trivia_sessions',filter:`id=eq.${sessionId}`},
+      p=>handleSession(p.new))
     .subscribe();
-  sb.channel('players-count-'+sessionId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'trivia_players',filter:`session_id=eq.${sessionId}`}, ()=>{
-      sb.from('trivia_players').select('*',{count:'exact',head:true}).eq('session_id',sessionId)
-        .then(({count})=>{ document.getElementById('lobbyPlayerCount').textContent=count||'—'; });
-    }).subscribe();
-  sb.from('trivia_sessions').select('*').eq('id',sessionId).single()
-    .then(({data})=>{ if(data) handleState(data); });
+}
+async function syncSession(){
+  const{data}=await sb.from('trivia_sessions').select('phase,round_index,question_index').eq('id',sessionId).single();
+  if(data)handleSession(data);
 }
 
-// ── STATE MACHINE ─────────────────────────────────
-function handleState(s){
-  const phase=s.phase, ri=s.round_index, qi=s.question_index;
-  if(phase==='lobby')       { return; }
-  if(phase==='gameover')    { showGameOver(); return; }
-  if(phase==='leaderboard') { setBetween('🏆','Round Complete','Check the TV for the leaderboard.','lb'); return; }
-  if(phase==='intro')       { setBetween('🎨','Get Ready','New round starting on the TV…','intro'); return; }
-  if(phase==='paused')      { setBetween('⏸','Game Paused','The host has paused. Hang tight.','pause'); return; }
-  if(phase==='reveal'){
-    if(!hasAnswered){ setBetween('⏰',"Time's Up!",'You didn\'t answer in time. Watch the TV for the answer.','reveal'); }
-    else             { setBetween('✅','Answer Locked','Watch the TV for the answer reveal and fun fact.','reveal'); }
-    return;
-  }
-  if(phase==='question'){
-    if(ri!==currentRi||qi!==currentQi){ currentRi=ri; currentQi=qi; hasAnswered=false; renderQuestion(ri,qi); }
-    else if(!hasAnswered){ showPage('pageQuestion'); }
-    return;
+function handleSession(s){
+  const phase=s.phase, ri=s.round_index||0, qi=s.question_index||0;
+  lastPhase=phase;
+  switch(phase){
+    case 'lobby':
+      setWait('✨','You\'re in!','Keep this page open — the game will start soon.','Waiting for the host…');
+      break;
+    case 'intro':
+      setWait('🎬', (ROUNDS[ri]?ROUNDS[ri].name:('Round '+(ri+1))), 'Get ready — Round '+(ri+1)+' is about to begin.','Starting soon…');
+      break;
+    case 'question':
+      renderQuestion(ri,qi);
+      break;
+    case 'reveal':
+      renderResult(ri,qi);
+      break;
+    case 'leaderboard':
+      setWait('🏆','Round '+(ri+1)+' done!','Your score so far: '+myScore.toLocaleString()+' points. Look up at the leaderboard!','Next round loading…');
+      break;
+    case 'paused':
+      setWait('⏸','Paused','The host paused the game. Hang tight — it\'ll resume in a moment.','Paused…');
+      break;
+    case 'gameover':
+      document.getElementById('overScore').textContent=myScore.toLocaleString()+' pts';
+      showScreen('scrOver');
+      break;
   }
 }
 
-// ── RENDER QUESTION ───────────────────────────────
-function renderQuestion(ri, qi){
-  const round=ROUNDS[ri];
-  const q=round?round.questions[qi]:null;
-  const qNum=ri*5+qi+1;
-  const pts=(q&&q.pts)?q.pts:200;
-  const correctIndex=q?q.correct:-1;
+function setWait(emoji,title,sub,pulse){
+  document.getElementById('waitEmoji').textContent=emoji;
+  document.getElementById('waitTitle').textContent=title;
+  document.getElementById('waitSub').textContent=sub;
+  document.getElementById('waitPulse').textContent=pulse||'';
+  showScreen('scrWait');
+}
 
-  document.getElementById('qTopTitle').textContent=`Round ${ri+1}`;
-  document.getElementById('qTopSub').textContent=`Question ${qNum} of 25`;
-  updateScoreDisplays();
+function renderQuestion(ri,qi){
+  const r=ROUNDS[ri]; if(!r)return; const q=r.questions[qi]; if(!q)return;
+  const key=keyOf(ri,qi);
+  document.getElementById('qTag').textContent='Q'+(ri*5+qi+1)+' · '+q.pts+' PTS';
+  document.getElementById('qRound').textContent='Round '+(ri+1)+' — '+r.name;
+  document.getElementById('qBody').textContent=q.q;
+  const wrap=document.getElementById('opts');
+  const alreadyAnswered = answered[key]!==undefined;
+  wrap.className='opts'+(alreadyAnswered?' locked':'');
+  wrap.innerHTML=q.answers.map((a,i)=>
+    `<button class="opt${alreadyAnswered&&answered[key]===i?' picked':''}${alreadyAnswered&&answered[key]!==i?' dim':''}" onclick="pick(${ri},${qi},${i})">
+       <span class="k">${LETTERS[i]}</span><span class="t">${a}</span>
+     </button>`).join('');
+  document.getElementById('lockedNote').style.display=alreadyAnswered?'block':'none';
+  lastKey=key;
+  showScreen('scrQuestion');
+}
 
-  const body=document.getElementById('qPageBody');
-  body.innerHTML=`
-    <div class="q-meta-bar">
-      <div class="q-label">Q${qNum} · Round ${ri+1}</div>
-      <div class="q-pts-badge">${pts} PTS</div>
-    </div>
-    <div class="q-timer-bar-wrap"><div class="q-timer-bar" id="qTimerBar"></div></div>
-    <div class="q-text-box"><div class="q-text-str" id="qTextStr"></div></div>
-    <div class="ans-list" id="ansListEl"></div>
-    <div id="resultBannerEl"></div>
-  `;
+async function pick(ri,qi,idx){
+  const key=keyOf(ri,qi);
+  if(answered[key]!==undefined)return;   // guard double answers
+  answered[key]=idx;
+  const q=ROUNDS[ri].questions[qi];
+  const isCorrect = idx===q.correct;
+  const pts = isCorrect ? q.pts : 0;
+  myScore += pts;
+  myStreak = isCorrect ? myStreak+1 : 0;
+  refreshTop();
 
-  document.getElementById('qTextStr').textContent=q?q.q:'Watch the TV for the question ↑';
-
-  const ansListEl=document.getElementById('ansListEl');
-  const answerTexts=q?q.answers:['Option A','Option B','Option C','Option D'];
-  answerTexts.forEach((ansText,i)=>{
-    const btn=document.createElement('button');
-    btn.className='ans-btn'; btn.id='aBtn'+i;
-    const letter=document.createElement('div'); letter.className='ans-letter'; letter.textContent=LETTERS[i]; letter.style.pointerEvents='none';
-    const text=document.createElement('div'); text.className='ans-text'; text.textContent=ansText; text.style.pointerEvents='none';
-    btn.appendChild(letter); btn.appendChild(text);
-    btn.addEventListener('click',(function(idx){ return function(){ submitAnswer(ri,qi,idx,correctIndex,pts); }; })(i));
-    ansListEl.appendChild(btn);
+  // lock the UI
+  const wrap=document.getElementById('opts');
+  wrap.className='opts locked';
+  Array.from(wrap.children).forEach((el,i)=>{
+    el.classList.toggle('picked',i===idx);
+    el.classList.toggle('dim',i!==idx);
   });
+  document.getElementById('lockedNote').style.display='block';
 
-  showPage('pageQuestion');
-  startClientTimer(20);
+  // write answer (exact schema) + update this player's running score/streak
+  try{
+    await sb.from('trivia_answers').insert({
+      session_id: sessionId,
+      player_id: playerId,
+      round_index: ri,
+      question_index: qi,
+      answer_index: idx,
+      is_correct: isCorrect,
+      pts_earned: pts,
+      submitted_at: new Date().toISOString()
+    });
+    await sb.from('trivia_players').update({score:myScore,streak:myStreak}).eq('id',playerId);
+  }catch(e){showErr('Answer may not have saved — check signal');console.error(e);}
 }
 
-// ── TIMER ─────────────────────────────────────────
-function startClientTimer(secs){
-  clearInterval(timerInterval); timerSecs=secs;
-  const bar=document.getElementById('qTimerBar');
-  if(!bar) return;
-  bar.style.width='100%'; bar.style.background='var(--yellow)';
-  timerInterval=setInterval(()=>{
-    timerSecs=Math.max(0,timerSecs-1);
-    const pct=(timerSecs/secs)*100;
-    const barEl=document.getElementById('qTimerBar');
-    if(barEl){ barEl.style.width=pct+'%'; if(timerSecs<=5) barEl.style.background='var(--red)'; }
-    if(timerSecs<=0) clearInterval(timerInterval);
-  },1000);
-}
-
-// ── SUBMIT ANSWER ─────────────────────────────────
-async function submitAnswer(ri, qi, answerIndex, correctIndex, pts){
-  if(hasAnswered||!playerId) return;
-  hasAnswered=true; clearInterval(timerInterval);
-  const isCorrect=(answerIndex===correctIndex);
-
-  for(let i=0;i<4;i++){
-    const b=document.getElementById('aBtn'+i); if(!b) continue; b.disabled=true;
-    if(correctIndex>=0){ if(i===correctIndex) b.classList.add('correct'); else if(i===answerIndex&&!isCorrect) b.classList.add('wrong'); }
-    else { if(i===answerIndex) b.classList.add('selected'); }
+function renderResult(ri,qi){
+  const q=ROUNDS[ri]?.questions[qi]; if(!q)return;
+  const key=keyOf(ri,qi);
+  const myIdx=answered[key];
+  const answeredIt = myIdx!==undefined;
+  const isCorrect = answeredIt && myIdx===q.correct;
+  document.getElementById('resEmoji').textContent = !answeredIt ? '⏱️' : (isCorrect ? '🎉' : '💫');
+  const title=document.getElementById('resTitle');
+  const pts=document.getElementById('resPts');
+  const streak=document.getElementById('resStreak');
+  if(!answeredIt){
+    title.className='res-title'; title.style.color='var(--dim)'; title.textContent='Missed that one';
+    pts.textContent='';
+  }else if(isCorrect){
+    title.className='res-title right'; title.textContent='Correct!';
+    pts.textContent='+'+q.pts+' pts';
+  }else{
+    title.className='res-title wrong'; title.textContent='Not this time';
+    pts.textContent='+0 pts';
   }
-
-  if(isCorrect){ myStreak++; myScore+=pts; } else { myStreak=0; }
-  updateScoreDisplays();
-
-  const banner=document.getElementById('resultBannerEl');
-  if(banner){
-    if(correctIndex<0){
-      banner.innerHTML=`<div class="result-banner locked-b"><div class="result-title">⏳ Locked In!</div><div class="result-pts">Watch the TV for the reveal.</div></div>`;
-    } else if(isCorrect){
-      banner.innerHTML=`<div class="result-banner correct-b"><div class="result-title">✅ Correct!</div><div class="result-pts">+${pts} points · Score: ${myScore.toLocaleString()}</div></div>`;
-    } else {
-      banner.innerHTML=`<div class="result-banner wrong-b"><div class="result-title">❌ Wrong</div><div class="result-pts">Watch the TV for the correct answer.</div></div>`;
-    }
-  }
-
-  try {
-    await sb.from('trivia_answers').insert({ session_id:sessionId, player_id:playerId, round_index:ri, question_index:qi, answer_index:answerIndex, is_correct:isCorrect, pts_earned:isCorrect?pts:0 });
-  } catch(e){}
-  try { localStorage.setItem('ls26_score_'+sessionId, JSON.stringify({score:myScore, streak:myStreak})); } catch(e){}
-  try { await sb.from('trivia_players').update({ score:myScore, streak:myStreak }).eq('id',playerId); } catch(e){}
+  document.getElementById('resCorrect').innerHTML='Correct answer: <b>'+q.answers[q.correct]+'</b>';
+  if(isCorrect && myStreak>=2){streak.style.display='inline-block';streak.textContent='🔥 '+myStreak+' in a row!';}
+  else{streak.style.display='none';}
+  showScreen('scrResult');
 }
 
-// ── BETWEEN ───────────────────────────────────────
-function setBetween(icon,title,msg,type){
-  clearInterval(timerInterval);
-  document.getElementById('btIcon').textContent=icon;
-  document.getElementById('btTitle').textContent=title;
-  document.getElementById('btMessage').textContent=msg;
-  const subMap={lb:'Leaderboard',intro:'Next round…',pause:'Paused',reveal:'Answer revealing…'};
-  document.getElementById('btSubLabel').textContent=subMap[type]||'Next question coming…';
-  updateScoreDisplays();
-  showPage('pageBetween');
-}
-
-// ── GAME OVER ─────────────────────────────────────
-async function showGameOver(){
-  clearInterval(timerInterval);
-  if(playerId){
-    const { data }=await sb.from('trivia_players').select('score').eq('id',playerId).single();
-    if(data&&data.score>myScore) myScore=data.score;
-  }
-  document.getElementById('finalScore').textContent=myScore.toLocaleString();
-  showPage('pageOver');
+// If no session id, tell the user to rescan
+if(!sessionId){
+  document.getElementById('joinBtn').disabled=true;
+  showErr('No game found — please scan the QR code on the TV');
 }
 </script>
 </body>
