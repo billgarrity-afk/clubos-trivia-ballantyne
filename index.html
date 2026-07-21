@@ -62,9 +62,8 @@
       radial-gradient(1.4px 1.4px at 68% 82%, rgba(245,197,66,0.7), transparent),
       radial-gradient(1.2px 1.2px at 8% 54%, rgba(255,255,255,0.6), transparent),
       radial-gradient(1.3px 1.3px at 55% 34%, rgba(255,255,255,0.7), transparent);
-    animation:twinkle 4.5s ease-in-out infinite alternate;
+    opacity:0.9; /* static — cast-safe (no per-frame repaint) */
   }
-  @keyframes twinkle { from{opacity:0.55} to{opacity:1} }
   /* Secondary fainter star layer, offset */
   .bg-grid-major {
     position:absolute; inset:0;
@@ -74,7 +73,7 @@
       radial-gradient(1px 1px at 72% 12%, rgba(255,255,255,0.45), transparent),
       radial-gradient(1px 1px at 92% 40%, rgba(255,255,255,0.4), transparent),
       radial-gradient(1px 1px at 25% 78%, rgba(255,255,255,0.4), transparent);
-    animation:twinkle 6s ease-in-out infinite alternate-reverse;
+    /* static — cast-safe */
   }
   /* Soft magic orbs */
   .bg-shapes { position:absolute; inset:0; overflow:hidden; }
@@ -98,11 +97,10 @@
   }
   .glow-blob {
     position:absolute; border-radius:50%;
-    filter:blur(160px); pointer-events:none;
+    filter:blur(100px); pointer-events:none;
   }
   .glow-blob.a { width:760px;height:520px; background:rgba(245,197,66,0.12); top:-220px;right:180px; opacity:0.55; }
-  .glow-blob.b { width:560px;height:420px; background:rgba(111,227,245,0.10); bottom:-120px;left:380px; animation:blobDrift 18s ease-in-out infinite alternate; }
-  @keyframes blobDrift { from{transform:translate(0,0)} to{transform:translate(40px,20px)} }
+  .glow-blob.b { width:560px;height:420px; background:rgba(111,227,245,0.10); bottom:-120px;left:380px; }
   .scanlines {
     position:absolute; inset:0;
     background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
@@ -206,9 +204,8 @@
     content:'';
     position:absolute; left:0; top:12%; bottom:12%; width:2px;
     background:linear-gradient(180deg, transparent, var(--yellow), transparent);
-    animation:borderPulse 5s ease-in-out infinite;
+    opacity:0.5; /* static — cast-safe */
   }
-  @keyframes borderPulse { 0%,100%{opacity:0.2} 50%{opacity:0.8} }
   /* ── PAUSE OVERLAY ───────────────────────────────── */
   .pause-overlay {
     position:absolute; inset:0;
@@ -800,7 +797,7 @@ async function runReveal(ri,qi){
   document.getElementById('revFact').textContent=q.fact;
   document.getElementById('revAnswers').innerHTML=q.answers.map((a,i)=>{const ok=i===q.correct;return`<div class="abtn ${ok?'correct':'wrong'}">${ok?'<div class="correct-sweep"></div>':''}<div class="aletter">${LETTERS[i]}</div><div class="atext">${a}</div></div>`;}).join('');
   showScreen('screenReveal');updatePhase('reveal',ri,qi);
-  if(Math.random()>0.55)confetti(35);
+  if(Math.random()>0.55)confetti(18);
   setTimeout(()=>runQuestion(ri,qi+1),CONFIG.revealSecs*1000);
 }
 async function showMidLB(ri){
@@ -809,12 +806,12 @@ async function showMidLB(ri){
   document.getElementById('lbTitle').textContent=isLast?'🏆 Final Scores':'🏆 Leaderboard';
   document.getElementById('lbSub').textContent=isLast?'Thanks for playing! See you in two weeks.':`After Round ${ri+1} · ${CONFIG.rounds.length-ri-1} round${CONFIG.rounds.length-ri-1!==1?'s':''} remaining`;
   document.getElementById('pauseBtn').style.display='none';
-  showScreen('screenLB');updatePhase('leaderboard',ri,0);confetti(60);
+  showScreen('screenLB');updatePhase('leaderboard',ri,0);confetti(30);
   setTimeout(()=>{if(isLast)showGameOver(players);else runIntro(ri+1);},7000);
 }
 function showGameOver(players){
   document.getElementById('winnerName').textContent=players[0]?.name||'—';
-  renderLB('goList',5);showScreen('screenOver');updatePhase('gameover',0,0);confetti(80);
+  renderLB('goList',5);showScreen('screenOver');updatePhase('gameover',0,0);confetti(40);
   let sec=20;const el=document.getElementById('goRestart');
   const ct=setInterval(()=>{sec--;el.textContent=`New game starting in ${sec}…`;if(sec<=0){clearInterval(ct);location.reload();}},1000);
 }
