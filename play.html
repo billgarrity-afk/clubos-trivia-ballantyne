@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ClubOS Trivia — Disney & Pixar · Join</title>
+<title>ClubOS Trivia — Movies by the Decade · Join</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#0A0E2A; --bg2:#0F1438; --card:#151B40;
-    --gold:#F5C542; --gold-faint:rgba(245,197,66,0.08);
-    --magic:#6FE3F5; --pink:#E8639B; --purple:#B892F5;
-    --white:#F1EFFB; --dim:rgba(241,239,251,0.55);
-    --faint:rgba(241,239,251,0.06); --sep:rgba(241,239,251,0.1);
-    --red:#E0506A; --green:#5AD98A;
+    --bg:#0C0618; --bg2:#140A2A; --card:#191033;
+    --gold:#FF3DA6; --gold-faint:rgba(255,61,166,0.10);
+    --magic:#35E4FF; --pink:#FF3DA6; --purple:#B26BFF;
+    --white:#F3ECFF; --dim:rgba(243,236,255,0.55);
+    --faint:rgba(243,236,255,0.06); --sep:rgba(243,236,255,0.1);
+    --red:#FF4D6D; --green:#3DE6B0;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
   body{
     font-family:'Space Grotesk',sans-serif;
     background:
-      radial-gradient(800px 500px at 50% -10%, rgba(111,227,245,0.12), transparent 60%),
-      radial-gradient(700px 500px at 80% 110%, rgba(184,146,245,0.12), transparent 60%),
-      linear-gradient(180deg,#0A0E2A 0%,#0C1030 60%,#090C24 100%);
+      radial-gradient(700px 460px at 50% 108%, rgba(255,61,166,0.20), transparent 62%),
+      radial-gradient(600px 420px at 50% 116%, rgba(53,228,255,0.12), transparent 60%),
+      linear-gradient(180deg,#0C0618 0%,#16092E 60%,#0C0618 100%);
     color:var(--white);
     min-height:100%;
     display:flex; flex-direction:column;
@@ -30,15 +30,13 @@
   }
   /* Starfield */
   body::before{
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    content:''; position:fixed; left:0; right:0; bottom:0; height:42%; pointer-events:none; z-index:0;
     background-image:
-      radial-gradient(1.4px 1.4px at 15% 20%, rgba(255,255,255,0.85), transparent),
-      radial-gradient(1.5px 1.5px at 45% 12%, rgba(245,197,66,0.9), transparent),
-      radial-gradient(1.3px 1.3px at 75% 25%, rgba(111,227,245,0.9), transparent),
-      radial-gradient(1.2px 1.2px at 85% 60%, rgba(255,255,255,0.7), transparent),
-      radial-gradient(1.3px 1.3px at 30% 80%, rgba(255,255,255,0.6), transparent),
-      radial-gradient(1.4px 1.4px at 65% 88%, rgba(245,197,66,0.7), transparent);
-    animation:tw 4.5s ease-in-out infinite alternate;
+      repeating-linear-gradient(90deg, rgba(53,228,255,0.22) 0 1.5px, transparent 1.5px 46px),
+      repeating-linear-gradient(0deg, rgba(255,61,166,0.20) 0 1.5px, transparent 1.5px 34px);
+    transform:perspective(300px) rotateX(64deg); transform-origin:bottom center;
+    -webkit-mask:linear-gradient(180deg, transparent 0%, #000 60%); mask:linear-gradient(180deg, transparent 0%, #000 60%);
+    opacity:0.5;
   }
   @keyframes tw{from{opacity:.55}to{opacity:1}}
   .wrap{position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:0 20px; max-width:520px; margin:0 auto; width:100%;}
@@ -141,10 +139,10 @@
   <!-- Top status bar -->
   <div class="topbar" id="topbar">
     <div class="tb-brand">
-      <div class="tb-badge">🏰</div>
+      <div class="tb-badge">🎬</div>
       <div>
         <div class="tb-name" id="tbName">—</div>
-        <div class="tb-venue">Ballantyne CC · Disney &amp; Pixar</div>
+        <div class="tb-venue">Ballantyne CC · Movies by the Decade</div>
       </div>
     </div>
     <div class="tb-score">
@@ -155,8 +153,8 @@
 
   <!-- JOIN -->
   <div class="screen active center" id="scrJoin">
-    <div class="join-icon">🏰</div>
-    <div class="join-title">DISNEY <span class="g">&amp;</span> PIXAR</div>
+    <div class="join-icon">🎬</div>
+    <div class="join-title">MOVIES <span class="g">BY THE</span> DECADE</div>
     <div class="join-eye">Trivia Night</div>
     <div class="join-sub">Ballantyne Country Club · Cabana</div>
     <input class="name-input" id="nameInput" placeholder="Enter your name" maxlength="18" autocomplete="off">
@@ -175,7 +173,7 @@
   <div class="screen" id="scrQuestion">
     <div class="q-head">
       <span class="q-tag" id="qTag">Q1 · 100 PTS</span>
-      <div class="q-round" id="qRound">Round 1 — Disney Classics</div>
+      <div class="q-round" id="qRound">Round 1 — The 1980s</div>
     </div>
     <div class="q-body" id="qBody">—</div>
     <div class="opts" id="opts"></div>
@@ -195,7 +193,7 @@
   <div class="screen center" id="scrOver">
     <div class="big-emoji">🏆</div>
     <div class="status-title gold">That's a wrap!</div>
-    <div class="status-sub">Thanks for playing Disney &amp; Pixar trivia. Check the big screen for the final standings.</div>
+    <div class="status-sub">Thanks for playing Movies by the Decade trivia. Check the big screen for the final standings.</div>
     <div class="res-pts" id="overScore" style="margin-top:20px;">0 pts</div>
   </div>
 </div>
@@ -206,40 +204,40 @@
 <script>
 // ── Question data (mirrors the display CONFIG so the phone can score locally) ──
 const ROUNDS = [
-  { name:'Disney Classics', questions:[
-    { q:"Which was Walt Disney's first full-length animated feature film?", answers:["Pinocchio","Snow White and the Seven Dwarfs","Cinderella","Bambi"], correct:1, pts:100 },
-    { q:"In The Lion King, what is the name of Simba's father?", answers:["Mufasa","Scar","Rafiki","Zazu"], correct:0, pts:100 },
-    { q:"What kind of animal is the title character in Dumbo?", answers:["Mouse","Elephant","Giraffe","Deer"], correct:1, pts:100 },
-    { q:"Which Disney princess loses a glass slipper as the clock strikes midnight?", answers:["Aurora","Belle","Cinderella","Snow White"], correct:2, pts:100 },
-    { q:"In Frozen, what are the names of the two royal sisters?", answers:["Elsa & Anna","Rapunzel & Aurora","Merida & Moana","Elsa & Ariel"], correct:0, pts:100 }
+  { name:"The 1980s", questions:[
+    { q:"In Back to the Future (1985), what make of car is the time machine?", answers:["Chevrolet Corvette", "DeLorean DMC-12", "Ferrari 308", "Ford Mustang"], correct:1, pts:100 },
+    { q:"Which 1982 Spielberg film features an alien who longs to 'phone home'?", answers:["E.T. the Extra-Terrestrial", "Close Encounters", "Cocoon", "Flight of the Navigator"], correct:0, pts:100 },
+    { q:"In The Karate Kid (1984), which phrase does Mr. Miyagi use to teach Daniel?", answers:["Sweep the leg", "Wax on, wax off", "Strike first", "Focus, Daniel-san"], correct:1, pts:100 },
+    { q:"In The Empire Strikes Back (1980), who says 'No, I am your father'?", answers:["Darth Vader", "Obi-Wan Kenobi", "Yoda", "The Emperor"], correct:0, pts:100 },
+    { q:"Which actor starred as 'Maverick' in the 1986 film Top Gun?", answers:["Tom Cruise", "Val Kilmer", "Kevin Costner", "Patrick Swayze"], correct:0, pts:100 }
   ]},
-  { name:'The Pixar Universe', questions:[
-    { q:"What was Pixar's very first feature-length film?", answers:["A Bug's Life","Toy Story","Monsters, Inc.","Finding Nemo"], correct:1, pts:200 },
-    { q:"In Finding Nemo, what type of fish is Nemo?", answers:["Angelfish","Blue tang","Clownfish","Guppy"], correct:2, pts:200 },
-    { q:"In Up, what is the name of Carl's late wife?", answers:["Dug","Ellie","Kevin","Russell"], correct:1, pts:200 },
-    { q:"In Monsters, Inc., what do Sulley and Mike nickname the little girl who sneaks into their world?", answers:["Celia","Boo","Roz","Fungus"], correct:1, pts:200 },
-    { q:"In Ratatouille, what does the rat Remy dream of becoming?", answers:["A painter","A food critic","A chef","A waiter"], correct:2, pts:200 }
+  { name:"The 1990s", questions:[
+    { q:"In Titanic (1997), what was the ship's destination?", answers:["New York City", "Boston", "London", "Halifax"], correct:0, pts:200 },
+    { q:"In Forrest Gump (1994), Forrest says 'life is like a box of ___.'", answers:["Crayons", "Chocolates", "Surprises", "Cards"], correct:1, pts:200 },
+    { q:"In Jurassic Park (1993), what creatures are brought back to life on the island?", answers:["Dragons", "Woolly mammoths", "Dinosaurs", "Sea monsters"], correct:2, pts:200 },
+    { q:"In The Matrix (1999), Neo chooses between two pills of which colors?", answers:["Red and blue", "Black and white", "Green and red", "Gold and silver"], correct:0, pts:200 },
+    { q:"'You can't handle the truth!' is shouted in which 1992 courtroom drama?", answers:["A Few Good Men", "The Firm", "JFK", "Primal Fear"], correct:0, pts:200 }
   ]},
-  { name:'Songs & Voices', questions:[
-    { q:"'A Whole New World' is the signature song from which film?", answers:["Aladdin","Hercules","Mulan","Tarzan"], correct:0, pts:200 },
-    { q:"Who voiced the fast-talking Genie in Disney's 1992 Aladdin?", answers:["Eddie Murphy","Robin Williams","Steve Martin","Billy Crystal"], correct:1, pts:200 },
-    { q:"'Under the Sea' is performed by Sebastian the crab in which film?", answers:["Moana","Finding Nemo","The Little Mermaid","Lilo & Stitch"], correct:2, pts:200 },
-    { q:"In Moana, which actor voices the demigod Maui?", answers:["Jason Momoa","Dwayne Johnson","John Cena","Chris Pratt"], correct:1, pts:200 },
-    { q:"'Remember Me' is the Oscar-winning song from which Pixar film?", answers:["Soul","Coco","Luca","Onward"], correct:1, pts:200 }
+  { name:"The 2000s", questions:[
+    { q:"In The Lord of the Rings, what object must be destroyed in Mount Doom?", answers:["The One Ring", "The Elder Wand", "The Sword of Kings", "The Arkenstone"], correct:0, pts:200 },
+    { q:"In Shrek (2001), what type of creature is the title character?", answers:["Troll", "Ogre", "Giant", "Goblin"], correct:1, pts:200 },
+    { q:"What is the name of Johnny Depp's pirate captain in Pirates of the Caribbean?", answers:["Davy Jones", "Jack Sparrow", "Hector Barbossa", "Will Turner"], correct:1, pts:200 },
+    { q:"Which 2008 film starring Robert Downey Jr. launched the Marvel Cinematic Universe?", answers:["Iron Man", "The Avengers", "Thor", "Captain America"], correct:0, pts:200 },
+    { q:"Which 2009 James Cameron film became the highest-grossing movie of all time?", answers:["Avatar", "Titanic", "Transformers", "2012"], correct:0, pts:200 }
   ]},
-  { name:'Villains & Sidekicks', questions:[
-    { q:"In 101 Dalmatians, what is the name of the fur-obsessed villain?", answers:["Madame Medusa","Cruella de Vil","Yzma","Lady Tremaine"], correct:1, pts:300 },
-    { q:"What is the name of the sea witch in The Little Mermaid?", answers:["Maleficent","Ursula","Morgana","Vanessa"], correct:1, pts:300 },
-    { q:"In Sleeping Beauty, what is the name of the dark fairy who curses Princess Aurora?", answers:["Maleficent","The Evil Queen","Ursula","Cruella"], correct:0, pts:300 },
-    { q:"In Aladdin, what is the name of the scheming royal vizier?", answers:["Iago","Jafar","Razoul","Sultan"], correct:1, pts:300 },
-    { q:"In Toy Story 3, which strawberry-scented pink bear turns out to be the villain?", answers:["Chuckles","Lots-o'-Huggin' Bear","Big Baby","Teddy"], correct:1, pts:300 }
+  { name:"The 2010s", questions:[
+    { q:"In Inception (2010), the spinning top is an example of what?", answers:["A totem to test reality", "A hidden weapon", "A house key", "A stopwatch"], correct:0, pts:300 },
+    { q:"Which 2019 Marvel epic concluded the 'Infinity Saga'?", answers:["Avengers: Endgame", "Avengers: Infinity War", "Captain Marvel", "Spider-Man: Far From Home"], correct:0, pts:300 },
+    { q:"Which two actors play the leads in the musical La La Land (2016)?", answers:["Ryan Gosling & Emma Stone", "Bradley Cooper & Lady Gaga", "Ryan Reynolds & Blake Lively", "Timothee Chalamet & Zendaya"], correct:0, pts:300 },
+    { q:"Which 2018 film was the first superhero movie nominated for Best Picture?", answers:["Black Panther", "Wonder Woman", "Logan", "Deadpool"], correct:0, pts:300 },
+    { q:"In The Greatest Showman (2017), Hugh Jackman plays which real-life showman?", answers:["P.T. Barnum", "Harry Houdini", "Buffalo Bill", "Walt Disney"], correct:0, pts:300 }
   ]},
-  { name:'Deep Cuts & Easter Eggs', questions:[
-    { q:"What alphanumeric code is hidden as a recurring Easter egg in nearly every Pixar film?", answers:["A113","TT2085","C3PO","RX24"], correct:0, pts:400 },
-    { q:"The robot hero of Pixar's WALL·E has a name that's an acronym. What does it stand for?", answers:["Waste Allocation Load Lifter, Earth-Class","Worldwide Automated Logistics Lander","Water And Land Life Explorer","Weather Analysis & Life Locator"], correct:0, pts:400 },
-    { q:"What is the name of the hopping desk lamp in the Pixar logo?", answers:["Pixie","Lumière","Luxo Jr.","Sparky"], correct:2, pts:400 },
-    { q:"Which vehicle is a recurring Easter egg that first appeared in Toy Story and pops up across Pixar films?", answers:["The Mystery Machine","The Pizza Planet truck","Lightning McQueen","The DeLorean"], correct:1, pts:400 },
-    { q:"One actor holds the honor of voicing a character in every Pixar feature film. Who is it?", answers:["Tom Hanks","Billy Crystal","John Ratzenberger","Tim Allen"], correct:2, pts:400 }
+  { name:"Silver Screen Finale", questions:[
+    { q:"'Here's looking at you, kid' is a line from which 1942 classic?", answers:["Casablanca", "Gone with the Wind", "Citizen Kane", "The Maltese Falcon"], correct:0, pts:400 },
+    { q:"'May the Force be with you' is the signature line of which franchise?", answers:["Star Wars", "Star Trek", "Dune", "Guardians of the Galaxy"], correct:0, pts:400 },
+    { q:"'I'm going to make him an offer he can't refuse' is spoken in which 1972 film?", answers:["The Godfather", "Goodfellas", "Scarface", "The Untouchables"], correct:0, pts:400 },
+    { q:"'You're gonna need a bigger boat' comes from which 1975 thriller?", answers:["Jaws", "Deep Blue Sea", "The Perfect Storm", "Poseidon"], correct:0, pts:400 },
+    { q:"Which of these films won a record-tying 11 Academy Awards?", answers:["Titanic", "Gladiator", "The Dark Knight", "Avatar"], correct:0, pts:400 }
   ]}
 ];
 
