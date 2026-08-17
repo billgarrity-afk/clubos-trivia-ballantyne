@@ -3,26 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ClubOS Trivia — Movies by the Decade · Join</title>
+<title>ClubOS Trivia — Generations · Join</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#0C0618; --bg2:#140A2A; --card:#191033;
-    --gold:#FF3DA6; --gold-faint:rgba(255,61,166,0.10);
-    --magic:#35E4FF; --pink:#FF3DA6; --purple:#B26BFF;
-    --white:#F3ECFF; --dim:rgba(243,236,255,0.55);
-    --faint:rgba(243,236,255,0.06); --sep:rgba(243,236,255,0.1);
-    --red:#FF4D6D; --green:#3DE6B0;
+    --bg:#141021; --bg2:#1C1630; --card:#221A38;
+    --gold:#F2A93B; --gold-faint:rgba(242,169,59,0.10);
+    --magic:#38D6C6; --pink:#F0567A; --purple:#B58BFF;
+    --white:#F3EEFF; --dim:rgba(243,238,255,0.55);
+    --faint:rgba(243,238,255,0.06); --sep:rgba(243,238,255,0.1);
+    --red:#F0567A; --green:#4FE0A6;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
   body{
     font-family:'Space Grotesk',sans-serif;
     background:
-      radial-gradient(700px 460px at 50% 108%, rgba(255,61,166,0.20), transparent 62%),
-      radial-gradient(600px 420px at 50% 116%, rgba(53,228,255,0.12), transparent 60%),
-      linear-gradient(180deg,#0C0618 0%,#16092E 60%,#0C0618 100%);
+
+      radial-gradient(700px 460px at 50% 108%, rgba(242,169,59,0.18), transparent 62%),
+      radial-gradient(600px 420px at 50% 116%, rgba(56,214,198,0.12), transparent 60%),
+      linear-gradient(180deg,#141021 0%,#1B1430 60%,#120F1E 100%);
     color:var(--white);
     min-height:100%;
     display:flex; flex-direction:column;
@@ -30,13 +31,13 @@
   }
   /* Starfield */
   body::before{
-    content:''; position:fixed; left:0; right:0; bottom:0; height:42%; pointer-events:none; z-index:0;
+    content:''; position:fixed; left:0; right:0; bottom:0; height:40%; pointer-events:none; z-index:0;
     background-image:
-      repeating-linear-gradient(90deg, rgba(53,228,255,0.22) 0 1.5px, transparent 1.5px 46px),
-      repeating-linear-gradient(0deg, rgba(255,61,166,0.20) 0 1.5px, transparent 1.5px 34px);
+      repeating-linear-gradient(90deg, rgba(56,214,198,0.16) 0 1.5px, transparent 1.5px 48px),
+      repeating-linear-gradient(0deg, rgba(242,169,59,0.14) 0 1.5px, transparent 1.5px 36px);
     transform:perspective(300px) rotateX(64deg); transform-origin:bottom center;
     -webkit-mask:linear-gradient(180deg, transparent 0%, #000 60%); mask:linear-gradient(180deg, transparent 0%, #000 60%);
-    opacity:0.5;
+    opacity:0.45;
   }
   @keyframes tw{from{opacity:.55}to{opacity:1}}
   .wrap{position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:0 20px; max-width:520px; margin:0 auto; width:100%;}
@@ -139,10 +140,10 @@
   <!-- Top status bar -->
   <div class="topbar" id="topbar">
     <div class="tb-brand">
-      <div class="tb-badge">🎬</div>
+      <div class="tb-badge">⏳</div>
       <div>
         <div class="tb-name" id="tbName">—</div>
-        <div class="tb-venue">Ballantyne CC · Movies by the Decade</div>
+        <div class="tb-venue">Ballantyne CC · Generations</div>
       </div>
     </div>
     <div class="tb-score">
@@ -153,8 +154,8 @@
 
   <!-- JOIN -->
   <div class="screen active center" id="scrJoin">
-    <div class="join-icon">🎬</div>
-    <div class="join-title">MOVIES <span class="g">BY THE</span> DECADE</div>
+    <div class="join-icon">⏳</div>
+    <div class="join-title">THE <span class="g">GENERATIONS</span></div>
     <div class="join-eye">Trivia Night</div>
     <div class="join-sub">Ballantyne Country Club · Cabana</div>
     <input class="name-input" id="nameInput" placeholder="Enter your name" maxlength="18" autocomplete="off">
@@ -173,7 +174,7 @@
   <div class="screen" id="scrQuestion">
     <div class="q-head">
       <span class="q-tag" id="qTag">Q1 · 100 PTS</span>
-      <div class="q-round" id="qRound">Round 1 — The 1980s</div>
+      <div class="q-round" id="qRound">Round 1 — The Baby Boomers</div>
     </div>
     <div class="q-body" id="qBody">—</div>
     <div class="opts" id="opts"></div>
@@ -193,7 +194,7 @@
   <div class="screen center" id="scrOver">
     <div class="big-emoji">🏆</div>
     <div class="status-title gold">That's a wrap!</div>
-    <div class="status-sub">Thanks for playing Movies by the Decade trivia. Check the big screen for the final standings.</div>
+    <div class="status-sub">Thanks for playing Generations trivia. Check the big screen for the final standings.</div>
     <div class="res-pts" id="overScore" style="margin-top:20px;">0 pts</div>
   </div>
 </div>
@@ -204,40 +205,40 @@
 <script>
 // ── Question data (mirrors the display CONFIG so the phone can score locally) ──
 const ROUNDS = [
-  { name:"The 1980s", questions:[
-    { q:"In Back to the Future (1985), how much power does the DeLorean need to time travel?", answers:["88 megawatts", "1.21 gigawatts", "500 kilowatts", "2.21 gigawatts"], correct:1, pts:100 },
-    { q:"In The Shining (1980), what sentence does Jack type over and over?", answers:["'Here's Johnny'", "'Redrum'", "'All work and no play makes Jack a dull boy'", "'Come play with us'"], correct:2, pts:100 },
-    { q:"Who directed the 1982 sci-fi classic Blade Runner?", answers:["George Lucas", "Ridley Scott", "John Carpenter", "Steven Spielberg"], correct:1, pts:100 },
-    { q:"In The Breakfast Club (1985), on what day do the students serve detention?", answers:["Sunday", "Friday", "Monday", "Saturday"], correct:3, pts:100 },
-    { q:"Which 1987 film gave us the line 'Nobody puts Baby in a corner'?", answers:["Dirty Dancing", "Flashdance", "Footloose", "Fame"], correct:0, pts:100 }
+  { name:"The Baby Boomers", questions:[
+    { q:"Which 1969 festival drew roughly 400,000 people to a dairy farm in Bethel, New York?", answers:["Live Aid", "Monterey Pop", "Woodstock", "Altamont"], correct:2, pts:100 },
+    { q:"Which 1960s TV series followed a starship on a 'five-year mission'?", answers:["Star Trek", "Lost in Space", "The Twilight Zone", "Doctor Who"], correct:0, pts:100 },
+    { q:"Whose 1964 appearance on The Ed Sullivan Show drew an estimated 73 million viewers?", answers:["The Rolling Stones", "The Beatles", "The Beach Boys", "Elvis Presley"], correct:1, pts:100 },
+    { q:"In what year did humans first land on the Moon?", answers:["1965", "1971", "1972", "1969"], correct:3, pts:100 },
+    { q:"The 1967 'Summer of Love' is most associated with which neighborhood?", answers:["Haight-Ashbury, San Francisco", "Greenwich Village, New York", "Venice Beach, Los Angeles", "The Sunset Strip"], correct:0, pts:100 }
   ]},
-  { name:"The 1990s", questions:[
-    { q:"In Pulp Fiction (1994), what does Vincent say a Quarter Pounder is called in France?", answers:["Le Big Mac", "A Cheese Royale", "A Royale with Cheese", "A McRoyale"], correct:2, pts:200 },
-    { q:"Which 1991 film swept the 'Big Five' Oscars (Picture, Director, Actor, Actress, Screenplay)?", answers:["Dances with Wolves", "The Silence of the Lambs", "Schindler's List", "JFK"], correct:1, pts:200 },
-    { q:"Who directed the 1990 mob classic Goodfellas?", answers:["Francis Ford Coppola", "Brian De Palma", "Quentin Tarantino", "Martin Scorsese"], correct:3, pts:200 },
-    { q:"What is the famous twist in The Sixth Sense (1999)?", answers:["Bruce Willis's character was dead the whole time", "The boy was imaginary", "It was all a dream", "The mother was the ghost"], correct:0, pts:200 },
-    { q:"Which acclaimed 1994 film follows inmate Andy Dufresne?", answers:["The Green Mile", "The Shawshank Redemption", "Cool Hand Luke", "Escape from Alcatraz"], correct:1, pts:200 }
+  { name:"Generation X", questions:[
+    { q:"Which cable channel launched in 1981 with 'Video Killed the Radio Star'?", answers:["VH1", "MTV", "BET", "MuchMusic"], correct:1, pts:200 },
+    { q:"Which handheld console did Nintendo release in 1989?", answers:["Game Gear", "Sega Genesis", "Atari Lynx", "Game Boy"], correct:3, pts:200 },
+    { q:"Whose 1994 death became a defining moment for Gen X?", answers:["Kurt Cobain", "Eddie Vedder", "Chris Cornell", "Layne Staley"], correct:0, pts:200 },
+    { q:"Which 1989 Tim Burton film reinvented the superhero blockbuster?", answers:["Superman", "Dick Tracy", "Batman", "The Crow"], correct:2, pts:200 },
+    { q:"'Where's the beef?' was a famous 1984 ad slogan for which chain?", answers:["McDonald's", "Wendy's", "Burger King", "Arby's"], correct:1, pts:200 }
   ]},
-  { name:"The 2000s", questions:[
-    { q:"In Gladiator (2000), what is the name of Russell Crowe's character?", answers:["Maximus", "Commodus", "Marcus", "Spartacus"], correct:0, pts:200 },
-    { q:"Which 2006 film finally won Martin Scorsese his first Best Director Oscar?", answers:["The Aviator", "Gangs of New York", "The Departed", "Shutter Island"], correct:2, pts:200 },
-    { q:"In No Country for Old Men (2007), what unusual weapon does Anton Chigurh carry?", answers:["A sawed-off shotgun", "A captive bolt pistol", "A crossbow", "An ice pick"], correct:1, pts:200 },
-    { q:"Sofia Coppola's 2003 film Lost in Translation is set in which city?", answers:["Hong Kong", "Seoul", "Kyoto", "Tokyo"], correct:3, pts:200 },
-    { q:"Which 2008 film earned Heath Ledger a posthumous Academy Award?", answers:["The Dark Knight", "Batman Begins", "Brokeback Mountain", "Joker"], correct:0, pts:200 }
+  { name:"Millennials", questions:[
+    { q:"Which series, begun in 1997, defined a Millennial childhood with a boy wizard?", answers:["Harry Potter", "Percy Jackson", "His Dark Materials", "Eragon"], correct:0, pts:200 },
+    { q:"Which dial-up service greeted users with 'You've got mail'?", answers:["CompuServe", "Prodigy", "AOL", "Earthlink"], correct:2, pts:200 },
+    { q:"Which social network, launched in 2004, was initially limited to college students?", answers:["MySpace", "Friendster", "Orkut", "Facebook"], correct:3, pts:200 },
+    { q:"In what year was the first iPhone released?", answers:["2005", "2007", "2009", "2010"], correct:1, pts:200 },
+    { q:"Which late-'90s craze had kids collecting beanbag plush animals?", answers:["Beanie Babies", "Tamagotchi", "Furby", "Pogs"], correct:0, pts:200 }
   ]},
-  { name:"The 2010s", questions:[
-    { q:"Which 2019 film became the first non-English-language movie to win Best Picture?", answers:["Roma", "Amour", "Parasite", "Crouching Tiger, Hidden Dragon"], correct:2, pts:300 },
-    { q:"In Whiplash (2014), which instrument does the ambitious student play?", answers:["Drums", "Trumpet", "Piano", "Saxophone"], correct:0, pts:300 },
-    { q:"How many Academy Awards did Mad Max: Fury Road (2015) win?", answers:["Two", "Six", "Ten", "Zero"], correct:1, pts:300 },
-    { q:"At the 2017 Oscars, which film was mistakenly announced as Best Picture before Moonlight actually won?", answers:["Manchester by the Sea", "Hidden Figures", "Lion", "La La Land"], correct:3, pts:300 },
-    { q:"Which 2014 Christopher Nolan film features a planet where one hour equals seven Earth years?", answers:["Interstellar", "Gravity", "Arrival", "Ad Astra"], correct:0, pts:300 }
+  { name:"Generation Z", questions:[
+    { q:"Which short-video app went global in 2018 and became Gen Z's defining platform?", answers:["Vine", "Triller", "TikTok", "Dubsmash"], correct:2, pts:300 },
+    { q:"'Yeet,' 'sus,' and 'rizz' are examples of what?", answers:["Gen Z slang terms", "Dance moves", "Video game titles", "Emoji names"], correct:0, pts:300 },
+    { q:"Which sandbox game, released in 2011, became a Gen Z staple?", answers:["Roblox", "Minecraft", "Terraria", "Stardew Valley"], correct:1, pts:300 },
+    { q:"Which platform popularized 'binge-watching' by dropping whole seasons at once?", answers:["Hulu", "YouTube", "Twitch", "Netflix"], correct:3, pts:300 },
+    { q:"Which battle-royale phenomenon is known for the phrase 'Victory Royale'?", answers:["Apex Legends", "PUBG", "Fortnite", "Call of Duty: Warzone"], correct:2, pts:300 }
   ]},
-  { name:"Silver Screen Finale", questions:[
-    { q:"'Frankly, my dear, I don't give a damn' is the closing line of which 1939 film?", answers:["Casablanca", "Gone with the Wind", "Rebecca", "Wuthering Heights"], correct:1, pts:400 },
-    { q:"'I'll be back' is the signature line of which franchise?", answers:["RoboCop", "Predator", "The Terminator", "Total Recall"], correct:2, pts:400 },
-    { q:"'Say hello to my little friend!' is shouted in which 1983 film?", answers:["Scarface", "The Godfather", "Goodfellas", "Casino"], correct:0, pts:400 },
-    { q:"'You talkin' to me?' was famously improvised by Robert De Niro in which 1976 film?", answers:["Raging Bull", "Mean Streets", "The Deer Hunter", "Taxi Driver"], correct:3, pts:400 },
-    { q:"Which director holds the record for most Best Director Oscars, with four wins?", answers:["Steven Spielberg", "John Ford", "Martin Scorsese", "William Wyler"], correct:1, pts:400 }
+  { name:"Cross-Generation Finale", questions:[
+    { q:"Which generation falls between the Baby Boomers and the Millennials?", answers:["Generation X", "The Silent Generation", "Generation Z", "Generation Alpha"], correct:0, pts:400 },
+    { q:"The generation born roughly 1928–1945 is known as which?", answers:["The Greatest Generation", "The Silent Generation", "The Lost Generation", "The Baby Boomers"], correct:1, pts:400 },
+    { q:"Around which year did 'OK Boomer' go viral as a catchphrase?", answers:["2012", "2015", "2021", "2019"], correct:3, pts:400 },
+    { q:"Which generation comes after Generation Z?", answers:["Generation Alpha", "Generation AA", "Generation Y", "The Post-Millennials"], correct:0, pts:400 },
+    { q:"Millennials are also commonly known by which alternate name?", answers:["Generation Next", "The Net Generation", "Generation Y", "Generation Me"], correct:2, pts:400 }
   ]}
 ];
 
