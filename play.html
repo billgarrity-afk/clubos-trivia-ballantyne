@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ClubOS Trivia — Flags of the World · Join</title>
+<title>ClubOS Trivia — North Carolina Sports · Join</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#0A1430; --bg2:#0F1C42; --card:#152250;
-    --gold:#F2C14E; --gold-faint:rgba(242,193,78,0.10);
-    --magic:#43D07E; --pink:#E8455E; --purple:#37B7E0;
-    --white:#EEF3FF; --dim:rgba(238,243,255,0.55);
-    --faint:rgba(238,243,255,0.06); --sep:rgba(238,243,255,0.1);
-    --red:#E8455E; --green:#43D07E;
+    --bg:#0B1A2E; --bg2:#10233C; --card:#152B47;
+    --gold:#E8B04B; --gold-faint:rgba(232,176,75,0.10);
+    --magic:#7BAFD4; --pink:#E5566B; --purple:#A7C7E7;
+    --white:#F2F6FB; --dim:rgba(242,246,251,0.55);
+    --faint:rgba(242,246,251,0.06); --sep:rgba(242,246,251,0.1);
+    --red:#E5566B; --green:#4FD89A;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
@@ -21,9 +21,9 @@
     font-family:'Space Grotesk',sans-serif;
     background:
 
-      radial-gradient(700px 460px at 50% 108%, rgba(242,193,78,0.16), transparent 62%),
-      radial-gradient(600px 420px at 50% 116%, rgba(67,208,126,0.12), transparent 60%),
-      linear-gradient(180deg,#0A1430 0%,#0E1A3E 60%,#081026 100%);
+      radial-gradient(700px 460px at 50% 108%, rgba(232,176,75,0.16), transparent 62%),
+      radial-gradient(600px 420px at 50% 116%, rgba(123,175,212,0.16), transparent 60%),
+      linear-gradient(180deg,#0B1A2E 0%,#0F2138 60%,#081423 100%);
     color:var(--white);
     min-height:100%;
     display:flex; flex-direction:column;
@@ -31,13 +31,12 @@
   }
   /* Starfield */
   body::before{
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    content:''; position:fixed; left:0; right:0; bottom:0; height:34%; pointer-events:none; z-index:0;
     background-image:
-      linear-gradient(rgba(238,243,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(238,243,255,0.05) 1px, transparent 1px);
-    background-size:60px 60px;
-    -webkit-mask:radial-gradient(circle at 50% 28%, #000, transparent 78%); mask:radial-gradient(circle at 50% 28%, #000, transparent 78%);
-    opacity:0.5;
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.20) 0 1.5px, transparent 1.5px 40px),
+      repeating-linear-gradient(90deg, rgba(196,140,80,0.12) 0 20px, rgba(214,160,96,0.08) 20px 40px);
+    -webkit-mask:linear-gradient(180deg, transparent 0%, #000 60%); mask:linear-gradient(180deg, transparent 0%, #000 60%);
+    opacity:0.6;
   }
   @keyframes tw{from{opacity:.55}to{opacity:1}}
   .wrap{position:relative; z-index:1; flex:1; display:flex; flex-direction:column; padding:0 20px; max-width:520px; margin:0 auto; width:100%;}
@@ -140,10 +139,10 @@
   <!-- Top status bar -->
   <div class="topbar" id="topbar">
     <div class="tb-brand">
-      <div class="tb-badge">🌍</div>
+      <div class="tb-badge">🏀</div>
       <div>
         <div class="tb-name" id="tbName">—</div>
-        <div class="tb-venue">Ballantyne CC · Flags of the World</div>
+        <div class="tb-venue">Ballantyne CC · North Carolina Sports</div>
       </div>
     </div>
     <div class="tb-score">
@@ -154,8 +153,8 @@
 
   <!-- JOIN -->
   <div class="screen active center" id="scrJoin">
-    <div class="join-icon">🌍</div>
-    <div class="join-title">FLAGS OF THE <span class="g">WORLD</span></div>
+    <div class="join-icon">🏀</div>
+    <div class="join-title">NORTH CAROLINA <span class="g">SPORTS</span></div>
     <div class="join-eye">Trivia Night</div>
     <div class="join-sub">Ballantyne Country Club · Cabana</div>
     <input class="name-input" id="nameInput" placeholder="Enter your name" maxlength="18" autocomplete="off">
@@ -174,7 +173,7 @@
   <div class="screen" id="scrQuestion">
     <div class="q-head">
       <span class="q-tag" id="qTag">Q1 · 100 PTS</span>
-      <div class="q-round" id="qRound">Round 1 — Europe</div>
+      <div class="q-round" id="qRound">Round 1 — Carolina Legends</div>
     </div>
     <div class="q-body" id="qBody">—</div>
     <div class="opts" id="opts"></div>
@@ -194,7 +193,7 @@
   <div class="screen center" id="scrOver">
     <div class="big-emoji">🏆</div>
     <div class="status-title gold">That's a wrap!</div>
-    <div class="status-sub">Thanks for playing Flags of the World trivia. Check the big screen for the final standings.</div>
+    <div class="status-sub">Thanks for playing North Carolina Sports trivia. Check the big screen for the final standings.</div>
     <div class="res-pts" id="overScore" style="margin-top:20px;">0 pts</div>
   </div>
 </div>
@@ -205,40 +204,40 @@
 <script>
 // ── Question data (mirrors the display CONFIG so the phone can score locally) ──
 const ROUNDS = [
-  { name:"Europe", questions:[
-    { q:"Which country's flag is a blue Nordic cross on a white field?", answers:["Sweden", "Norway", "Finland", "Iceland"], correct:2, pts:100 },
-    { q:"Which is the only national flag that is not a rectangle (or square)?", answers:["Nepal", "Bhutan", "Switzerland", "Vatican City"], correct:0, pts:100 },
-    { q:"Which country has a square flag: a white cross on a red field?", answers:["Denmark", "England", "Austria", "Switzerland"], correct:3, pts:100 },
-    { q:"The Union Jack combines the crosses of which three patron saints?", answers:["St. George, St. David & St. Andrew", "St. George, St. Andrew & St. Patrick", "St. Patrick, St. David & St. George", "St. Andrew, St. David & St. Patrick"], correct:1, pts:100 },
-    { q:"Ireland's flag is a vertical tricolor of green, white, and which third color?", answers:["Orange", "Red", "Gold", "Blue"], correct:0, pts:100 }
+  { name:"Carolina Legends", questions:[
+    { q:"Michael Jordan was born in Brooklyn, but which North Carolina city did he grow up in and play high school ball?", answers:["Charlotte", "Wilmington", "Greensboro", "Fayetteville"], correct:1, pts:100 },
+    { q:"Richard Petty, \"The King\" from Level Cross, NC, won how many NASCAR Cup Series races?", answers:["105", "184", "200", "212"], correct:2, pts:100 },
+    { q:"Which Hall of Fame pitcher from Hertford, NC, threw a perfect game in 1968?", answers:["Gaylord Perry", "Jim Palmer", "Don Drysdale", "Catfish Hunter"], correct:3, pts:100 },
+    { q:"Which boxing great was born in Wilmington, NC?", answers:["Sugar Ray Leonard", "Evander Holyfield", "Marvin Hagler", "Joe Frazier"], correct:0, pts:100 },
+    { q:"Which Winston-Salem native starred at Wake Forest before a long NBA career at point guard?", answers:["John Wall", "Tim Duncan", "Stephen Curry", "Chris Paul"], correct:3, pts:100 }
   ]},
-  { name:"The Americas", questions:[
-    { q:"How many stripes are on the flag of the United States?", answers:["15", "13", "50", "12"], correct:1, pts:200 },
-    { q:"El Salvador's flag is a blue-white-blue triband. What sits at its center?", answers:["A golden sun", "A red star", "The national coat of arms", "A green quetzal"], correct:2, pts:200 },
-    { q:"A single star gives which U.S. state the nickname 'The Lone Star State'?", answers:["Texas", "California", "Arizona", "Nevada"], correct:0, pts:200 },
-    { q:"Which country's flag shows a golden eagle on a cactus, devouring a snake?", answers:["Guatemala", "Ecuador", "Peru", "Mexico"], correct:3, pts:200 },
-    { q:"Which plant sits at the center of Canada's flag?", answers:["Oak leaf", "Maple leaf", "Maple flower", "Pine branch"], correct:1, pts:200 }
+  { name:"Tobacco Road Hoops", questions:[
+    { q:"How many NCAA championships did Dean Smith win as head coach at UNC?", answers:["1", "2", "3", "4"], correct:1, pts:200 },
+    { q:"Who dunked the game-winner for NC State in the 1983 national title game?", answers:["Dereck Whittenburg", "Thurl Bailey", "Sidney Lowe", "Lorenzo Charles"], correct:3, pts:200 },
+    { q:"How many NCAA championships did Mike Krzyzewski win at Duke?", answers:["3", "4", "5", "6"], correct:2, pts:200 },
+    { q:"Christian Laettner's famous buzzer-beater in the 1992 East Regional final beat which team?", answers:["Kentucky", "UNLV", "Michigan", "Indiana"], correct:0, pts:200 },
+    { q:"David Thompson led which school to the 1974 national title, ending UCLA's run of seven straight championships?", answers:["UNC", "Duke", "NC State", "Wake Forest"], correct:2, pts:200 }
   ]},
-  { name:"Asia & the Middle East", questions:[
-    { q:"The red circle on Japan's flag represents what?", answers:["The sun", "The moon", "A pearl", "A lantern"], correct:0, pts:200 },
-    { q:"Which country's flag bears the Islamic declaration of faith and a sword?", answers:["Iran", "Iraq", "Saudi Arabia", "Kuwait"], correct:2, pts:200 },
-    { q:"The red-and-blue circle on South Korea's flag is called the?", answers:["Tomoe", "Bagua", "Mandala", "Taegeuk"], correct:3, pts:200 },
-    { q:"From 1977 to 2011, which country flew a national flag that was a plain green field with no design?", answers:["Libya", "Saudi Arabia", "Pakistan", "Bangladesh"], correct:0, pts:200 },
-    { q:"The navy-blue wheel at the center of India's flag is called the?", answers:["Dharma Wheel", "Ashoka Chakra", "Konark Wheel", "Sun Disk"], correct:1, pts:200 }
+  { name:"Panthers & Canes", questions:[
+    { q:"In what year did the Carolina Panthers play their first NFL season?", answers:["1993", "1995", "1997", "1999"], correct:1, pts:200 },
+    { q:"The Panthers' first Super Bowl, Super Bowl XXXVIII, was a 32–29 loss to which team?", answers:["Pittsburgh Steelers", "Denver Broncos", "Indianapolis Colts", "New England Patriots"], correct:3, pts:200 },
+    { q:"The Hurricanes won the 2006 Stanley Cup by beating which team in Game 7?", answers:["Edmonton Oilers", "Detroit Red Wings", "Buffalo Sabres", "Calgary Flames"], correct:0, pts:200 },
+    { q:"Before moving to North Carolina in 1997, the Hurricanes franchise played in which city?", answers:["Quebec City", "Winnipeg", "Hartford", "Minneapolis"], correct:2, pts:200 },
+    { q:"What was the Panthers' regular-season record in Cam Newton's 2015 MVP season?", answers:["13–3", "14–2", "16–0", "15–1"], correct:3, pts:200 }
   ]},
-  { name:"Africa & Oceania", questions:[
-    { q:"Which country's flag is the only one to feature an AK-47 rifle?", answers:["Angola", "Zimbabwe", "Mozambique", "DR Congo"], correct:2, pts:300 },
-    { q:"How many colors are on South Africa's flag, making it one of the most colorful?", answers:["Six", "Four", "Five", "Three"], correct:0, pts:300 },
-    { q:"Which two countries' flags feature both the Union Jack and the Southern Cross?", answers:["Australia & Fiji", "New Zealand & Samoa", "Fiji & Papua New Guinea", "Australia & New Zealand"], correct:3, pts:300 },
-    { q:"Nigeria's flag consists of three vertical bands in which colors?", answers:["Green, yellow, green", "Green, white, green", "Green, white, orange", "Red, white, green"], correct:1, pts:300 },
-    { q:"Kenya's flag features a traditional Maasai shield and two crossed what?", answers:["Spears", "Swords", "Arrows", "Clubs"], correct:0, pts:300 }
+  { name:"Speedways & Fairways", questions:[
+    { q:"What is NASCAR's longest race, run every Memorial Day weekend at Charlotte Motor Speedway?", answers:["Southern 500", "Coca-Cola 600", "Daytona 500", "Brickyard 400"], correct:1, pts:300 },
+    { q:"Who designed Pinehurst No. 2?", answers:["Donald Ross", "A.W. Tillinghast", "Alister MacKenzie", "Rees Jones"], correct:0, pts:300 },
+    { q:"Who won the 2017 PGA Championship at Charlotte's Quail Hollow Club?", answers:["Brooks Koepka", "Jordan Spieth", "Hideki Matsuyama", "Justin Thomas"], correct:3, pts:300 },
+    { q:"Dale Earnhardt Sr. grew up in which North Carolina town?", answers:["Mooresville", "Kannapolis", "Concord", "Statesville"], correct:1, pts:300 },
+    { q:"In 2014, Pinehurst No. 2 hosted the men's and women's U.S. Opens in back-to-back weeks. Who won the women's title?", answers:["Stacy Lewis", "Lexi Thompson", "Michelle Wie", "Inbee Park"], correct:2, pts:300 }
   ]},
-  { name:"Flag Facts & Symbols", questions:[
-    { q:"What is the study of flags called?", answers:["Heraldry", "Cartography", "Vexillology", "Semaphore"], correct:2, pts:400 },
-    { q:"Which country has the oldest continuously used national flag still flown today?", answers:["Denmark", "England", "Austria", "Scotland"], correct:0, pts:400 },
-    { q:"A national flag flown upside-down traditionally signals what?", answers:["Celebration", "Distress", "Surrender", "Mourning"], correct:1, pts:400 },
-    { q:"Chad's flag is nearly identical to which other country's (blue, yellow, red bands)?", answers:["Moldova", "Belgium", "Colombia", "Romania"], correct:3, pts:400 },
-    { q:"Which country's flag is different on its front and back, with a separate emblem on each side?", answers:["Paraguay", "Uruguay", "Bolivia", "Ecuador"], correct:0, pts:400 }
+  { name:"The Finale", questions:[
+    { q:"Who is the UNC men's basketball career scoring leader?", answers:["Phil Ford", "Tyler Hansbrough", "Sam Perkins", "Antawn Jamison"], correct:1, pts:400 },
+    { q:"Jim Valvano gave his \"Don't give up… don't ever give up\" speech in 1993 at which event?", answers:["The Final Four", "The first ESPY Awards", "NC State's Senior Night", "The Naismith Hall of Fame induction"], correct:1, pts:400 },
+    { q:"Who holds the Carolina Panthers' franchise record for career rushing yards?", answers:["DeAngelo Williams", "Christian McCaffrey", "Jonathan Stewart", "Stephen Davis"], correct:2, pts:400 },
+    { q:"Richard Petty won his 200th race on July 4, 1984, at Daytona. Which U.S. president was there to see it?", answers:["Jimmy Carter", "Gerald Ford", "George H.W. Bush", "Ronald Reagan"], correct:3, pts:400 },
+    { q:"Which golf legend went to Wake Forest on a golf scholarship?", answers:["Arnold Palmer", "Jack Nicklaus", "Tom Watson", "Ben Crenshaw"], correct:0, pts:400 }
   ]}
 ];
 
